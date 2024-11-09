@@ -3,7 +3,7 @@ name = "ClubManager"
 version = "0.1.0"
 description = "An open source club management software"
 authors = ["Bernard Siebens <bernard@siebens.org>"]
-readme = "README.md"
+readme = "README"
 license = "MIT"
 
 [tool.poetry.dependencies]
