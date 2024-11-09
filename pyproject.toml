@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "ClubManager"
+version = "0.1.0"
+description = "An open source club management software"
+authors = ["Bernard Siebens <bernard@siebens.org>"]
+readme = "README.md"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+django = "^5.1.3"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.7.3"
+flake8-django = "^1.4"
+flake8-bugbear = "^24.10.31"
+flake8-print = "^5.0.0"
+flake8-todos = "^0.3.1"
+flake8-fixme = "^1.1.1"
+pytest-django = "^4.9.0"
+coverage = "^7.6.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+omit = [
+    "*/migrations/*",
+]
+
+[tool.ruff]
+line-length = 200
+exclude = ["migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "UP", "B", "SIM", "DJ", "T20", "TD", "FIX"]
+ignore = ["E111", "E114", "E117", "E501"]
+
+[tool.black]
+line-length = 150
