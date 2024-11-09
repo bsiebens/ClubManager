@@ -12,20 +12,25 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+import environ
+from django.utils.translation import gettext_lazy as _
+
+env = environ.Env(DJANGO_DEBUG=(bool, False))
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+environ.Env.read_env(Path(BASE_DIR / '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@$w_cyr^iq1&ybasdbfzu7a6_8ch7x1sb1))m5w84%b!ks8*3g'
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DJANGO_DEBUG", default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost"])
 
 
 # Application definition
@@ -37,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "constance",
+    "members"
 ]
 
 MIDDLEWARE = [
@@ -59,6 +66,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                "constance.context_processors.config"
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -104,9 +112,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = env("DJANGO_LANGUAGE_CODE", default="en-us")
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = env("DJANGO_TIME_ZONE", default="Europe/Brussels")
 
 USE_I18N = True
 
@@ -122,3 +130,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
+CONSTANCE_CONFIG = {
+    "CLUBMANAGER_CLUB_NAME": ("ClubManager", _("Club name"), str),
+    "CLUBMANAGER_CLUB_LOGO": ("", _("Location of the club logo"), str),
+    "CLUBMANAGER_CLUB_LOCATION": ("Home", _("Location of the home games"), str),
+    "CLUBMANAGER_ENABLE_EXPERIMENTAL_FEATURES": (False, _("Enables experimental features of ClubManager which might not be ready for use"), bool)
+}
+
+PHONENUMBER_DEFAULT_FORMAT = "INTERNATIONAL"
