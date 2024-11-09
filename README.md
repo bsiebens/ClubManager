@@ -1,5 +1,8 @@
 # ClubManager
 
+__This is a rewrite of the original ClubManager that is now preserved under https://github.com/bsiebens/clubmanager2. This version should be fully
+compatible with the old version (or at least we hope so).__
+
 ## Description
 ClubManager is an open source sport club management software. It was created out of frustration at 
 the lack of good quality tools that exists for managing sports clubs. There are a few tools but either
