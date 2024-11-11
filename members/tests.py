@@ -20,7 +20,17 @@ class MembersTestCase(TestCase):
         self.assertEqual(new_member.user, self.user_b)
 
     def testCreateMemberExistingUserWithPassword(self):
-        raise NotImplementedError
+        try:
+            self.user_b.member.delete()
+        except get_user_model().member.RelatedObjectDoesNotExist:
+            pass
+
+        new_member = Member.create_member(first_name='user_b', last_name='user', email='user_b@user.com', password="<PASSWORD>")
+        self.user_b.refresh_from_db()
+
+        self.assertEqual(new_member.user, self.user_b)
+        self.assertTrue(self.user_b.is_active)
+        self.assertTrue(self.user_b.check_password("<PASSWORD>"))
 
     def testCreateMemberExistingInactiveUser(self):
         new_member = Member.create_member(first_name='user_c', last_name='user', email='user_c@user.com')
@@ -37,13 +47,28 @@ class MembersTestCase(TestCase):
         self.assertTrue(new_member.notes.startswith("Initial password:"))
 
     def testCreateMemberNewUserWithPassword(self):
-        raise NotImplementedError
+        new_member = Member.create_member(first_name='user_d', last_name='user', email='user_d@user.com', password="<PASSWORD>")
+
+        self.assertIsNotNone(get_user_model().objects.get(username='user_d@user.com'))
+        self.assertEqual(new_member.user, get_user_model().objects.get(username='user_d@user.com'))
+        self.assertTrue(new_member.user.check_password("<PASSWORD>"))
 
     def testCreateMemberWithMember(self):
-        raise NotImplementedError
+        new_member = Member.create_member(first_name='user_z', last_name='user', email='user_z@user.com', member=self.member_a)
+
+        self.assertEqual(new_member.user, self.user_a)
+        self.assertEqual(new_member.user.first_name, "user_z")
+        self.assertEqual(new_member.user.email, "user_z@user.com")
+        self.assertEqual(new_member.user.username, "user_z@user.com")
 
     def testCreateMemberWithMemberWithPassword(self):
-        raise NotImplementedError
+        new_member = Member.create_member(first_name='user_z', last_name='user', email='user_z@user.com', member=self.member_a, password="<PASSWORD>")
+
+        self.assertEqual(new_member.user, self.user_a)
+        self.assertEqual(new_member.user.first_name, "user_z")
+        self.assertEqual(new_member.user.email, "user_z@user.com")
+        self.assertEqual(new_member.user.username, "user_z@user.com")
+        self.assertTrue(new_member.user.check_password("<PASSWORD>"))
 
     def testDeleteMember(self):
         self.member_a.delete()

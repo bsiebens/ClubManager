@@ -59,12 +59,12 @@ class Member(models.Model):
             except get_user_model().DoesNotExist:
                 user = get_user_model().objects.create(first_name=first_name, last_name=last_name, email=email, username=email)
 
-                initial_password = "".join(secrets.choice(string.ascii_letters + string.digits) for _ in range(20))
-                if password is None or password == "":
-                    password = initial_password
-                    member.notes = f"Initial password: {password}"
+            initial_password = "".join(secrets.choice(string.ascii_letters + string.digits) for _ in range(20))
+            if password is None or password == "":
+                password = initial_password
+                member.notes = f"Initial password: {password}"
 
-                user.set_password(password)
+            user.set_password(password)
 
             member.user = user
 
