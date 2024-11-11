@@ -141,3 +141,5 @@ CONSTANCE_CONFIG = {
 }
 
 PHONENUMBER_DEFAULT_FORMAT = "INTERNATIONAL"
+
+TEST_RUNNER = "teamcity.django.TeamcityDjangoRunner"

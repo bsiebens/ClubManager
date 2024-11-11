@@ -31,6 +31,7 @@ class MembersTestCase(TestCase):
         self.assertEqual(new_member.user, self.user_b)
         self.assertTrue(self.user_b.is_active)
         self.assertTrue(self.user_b.check_password("<PASSWORD>"))
+        self.assertFalse(new_member.password_change_required)
 
     def testCreateMemberExistingInactiveUser(self):
         new_member = Member.create_member(first_name='user_c', last_name='user', email='user_c@user.com')
@@ -45,6 +46,7 @@ class MembersTestCase(TestCase):
         self.assertIsNotNone(get_user_model().objects.get(username='user_d@user.com'))
         self.assertEqual(new_member.user, get_user_model().objects.get(username='user_d@user.com'))
         self.assertTrue(new_member.notes.startswith("Initial password:"))
+        self.assertTrue(new_member.password_change_required)
 
     def testCreateMemberNewUserWithPassword(self):
         new_member = Member.create_member(first_name='user_d', last_name='user', email='user_d@user.com', password="<PASSWORD>")
@@ -52,6 +54,7 @@ class MembersTestCase(TestCase):
         self.assertIsNotNone(get_user_model().objects.get(username='user_d@user.com'))
         self.assertEqual(new_member.user, get_user_model().objects.get(username='user_d@user.com'))
         self.assertTrue(new_member.user.check_password("<PASSWORD>"))
+        self.assertFalse(new_member.password_change_required)
 
     def testCreateMemberWithMember(self):
         new_member = Member.create_member(first_name='user_z', last_name='user', email='user_z@user.com', member=self.member_a)
@@ -69,6 +72,7 @@ class MembersTestCase(TestCase):
         self.assertEqual(new_member.user.email, "user_z@user.com")
         self.assertEqual(new_member.user.username, "user_z@user.com")
         self.assertTrue(new_member.user.check_password("<PASSWORD>"))
+        self.assertFalse(new_member.password_change_required)
 
     def testDeleteMember(self):
         self.member_a.delete()

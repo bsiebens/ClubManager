@@ -7,6 +7,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
+class MemberManager(models.Manager):
+    def get_queryset(self) -> models.QuerySet:
+        """All queryset will return the users cached as we almost always need the user object anyway"""
+        return super().get_queryset().select_related("user")
 
 class Member(models.Model):
     """Each user has a member profile, containing links to other family members."""
@@ -17,12 +21,16 @@ class Member(models.Model):
 
     birthday = models.DateField(_("birthday"), blank=True, null=True)
     license = models.CharField(_("license"), max_length=50, blank=True, default="")
+    password_change_required = models.BooleanField(_("password change required"), default=False, help_text=_("If checked require the user to "
+                                                                                                             "change their password at next logon"))
 
     phone = PhoneNumberField(_("phone number"), blank=True, default="")
     emergency_phone = PhoneNumberField(_("emergency phone number"), blank=True, default="")
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    objects = MemberManager()
 
     class Meta:
         verbose_name = _("member")
@@ -63,6 +71,7 @@ class Member(models.Model):
             if password is None or password == "":
                 password = initial_password
                 member.notes = f"Initial password: {password}"
+                member.password_change_required = True
 
             user.set_password(password)
 
