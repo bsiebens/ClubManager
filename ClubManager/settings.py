@@ -36,7 +36,7 @@ ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost"])
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -44,7 +44,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "constance",
     "phonenumber_field",
+    "rules.apps.AutodiscoverRulesConfig",
     "members"
+]
+
+AUTHENTICATION_BACKENDS = [
+    "rules.permissions.ObjectPermissionBackend",
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 MIDDLEWARE = [

@@ -6,6 +6,9 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
+from rules import is_superuser
+from rules.contrib.models import RulesModel
+
 
 class MemberManager(models.Manager):
     def get_queryset(self) -> models.QuerySet:
