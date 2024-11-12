@@ -16,9 +16,11 @@ Including another URLconf
 """
 # from django.contrib import admin
 from django.urls import path, include
+from . import configuration
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path("clubmanager/backend/", include("ClubManager.clubmanager_urls.backend")),
+    path("clubmanager/configuration/", configuration.index, name="clubmanager_configuration:index"),
     path("clubmanager/", include("ClubManager.clubmanager_urls.frontend"))
 ]

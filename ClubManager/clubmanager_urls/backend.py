@@ -1,8 +1,7 @@
 from django.urls import include, path
-
-from members import views
+from .. import configuration
 
 app_name = "clubmanager_backend"
 urlpatterns = [
-    path("", views.index, name="index"),
+
 ]
