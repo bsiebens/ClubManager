@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "compressor",
     "constance",
     "phonenumber_field",
     "rules.apps.AutodiscoverRulesConfig",
@@ -73,7 +74,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                "constance.context_processors.config"
+                'constance.context_processors.config',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -149,3 +150,7 @@ CONSTANCE_CONFIG = {
 PHONENUMBER_DEFAULT_FORMAT = "INTERNATIONAL"
 
 TEST_RUNNER = "teamcity.django.TeamcityDjangoRunner"
+
+COMPRESS_ROOT = BASE_DIR / "static"
+COMPRESS_ENABLED = True
+STATICFILES_FINDERS = ['compressor.finders.CompressorFinder']
