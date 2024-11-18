@@ -1,0 +1,19 @@
+<div class="avatar placeholder font-semibold {% if button %}btn btn-circle btn-ghost{% endif %}">
+    {% if width == "xl" %}
+        <div class="w-24 rounded-full" style="background-color: {{ background }}; color: {{ foreground }};">
+            <span class="text-3xl">{{ name }}</span>
+        </div>
+    {% elif width == "lg" %}
+        <div class="w-16 rounded-full" style="background-color: {{ background }}; color: {{ foreground }};">
+            <span class="text-xl">{{ name }}</span>
+        </div>
+    {% elif width == "sm" %}
+        <div class="w-8 rounded-full" style="background-color: {{ background }}; color: {{ foreground }};">
+            <span class="text-xs">{{ name }}</span>
+        </div>
+    {% else %}
+        <div class="rounded-full {% if button %}w-10{% else %}w-12{% endif %}" style="background-color: {{ background }}; color: {{ foreground }};">
+            <span>{{ name }}</span>
+        </div>
+    {% endif %}
+</div>

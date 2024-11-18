@@ -2,6 +2,8 @@
 
 {% load compress %}
 {% load static %}
+{% load avatar %}
+{% load i18n %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,10 +23,10 @@
 
     <body class="bg-base-100">
         <div class="grid grid-rows-[auto_1fr_auto]">
-            <header class="navbar bg-base-300 p-2.5">
-                <a href="#" class="flex items-center space-x-3 flex-1">
+            <header class="navbar bg-base-300 p-2.5 justify-between">
+                <a href="#" class="flex items-center space-x-3 mx-4">
                     {% if config.CLUBMANAGER_CLUB_LOGO %}
-                        <img src="{% static config.CLUBMANAGER_CLUB_LOGO %}" class="w-8 h-8 laptop:w-14 laptop:h-14 rounded-full bg-base-content my-2" />
+                        <img src="{% static config.CLUBMANAGER_CLUB_LOGO %}" class="w-8 h-8 laptop:w-14 laptop:h-14 rounded-full bg-base-content my-2" alt="Logo {{ config.CLUBMANAGER_CLUB_NAME }}" />
                     {% endif %}
 
                     <div class="text-lg laptop:text-2xl font-semibold whitespace-nowrap text-base-content">
@@ -36,10 +38,86 @@
                     </div>
                 </a>
 
-                <div>ADMIN/MEMBER AREA</div>
-                <div>AVATAR</div>
-                <div>LOGIN/LOGOUT</div>
+                <div class="mx-4 gap-x-2">
+                    <div class="hidden laptop:flex">
+                        {% if request.user.is_authenticated %}
+                            <a class="btn btn-outline btn-neutral btn-sm">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>{% translate "Logout" %}
+                            </a>
+                        {% else %}
+                            <a class="btn btn-outline btn-neutral btn-sm">
+                                <i class="fa-solid fa-arrow-right-to-bracket"></i>{% translate "Login" %}
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- TODO Needs to be hooked into the unread notifications count once notifications have been enabled/build -->
+                    {% if unread_notifications %}
+                        <div class="indicator">
+                            <span class="indicator-item badge badge-error badge-xs left-4 top-2.5"></span>
+                            <a class="btn btn-ghost btn-sm">
+                                <i class="fa-solid fa-bell text-lg"></i>
+                            </a>
+                        </div>
+                    {% else %}
+                        <a class="btn btn-ghost btn-sm">
+                            <i class="fa-regular fa-bell text-lg"></i>
+                        </a>
+                    {% endif %}
+
+                    {% if request.user.is_authenticated %}
+                        <a href="#">
+                            {% avatar request.user.first_name request.user.last_name button=True %}
+                        </a>
+                    {% endif %}
+                </div>
             </header>
+
+            {% if request.user.is_authenticated and request.user.is_staff %}
+                {% if "admin" in request.path or "configuration" in request.path %}
+                    <div class="bg-orange-200 text-orange-800 px-4 py-2.5 text-sm dark:bg-orange-950 dark:text-orange-200">
+                        <div class="flex flex-row gap-4 items-center">
+                            <div class="hidden laptop:flex">
+                                <i class="fa-solid fa-user-shield text-xl"></i>
+                            </div>
+
+                            <div class="flex flex-col flex-1 gap-2 laptop:gap-0 items-center laptop:items-start">
+                                <span class="font-semibold"><i class="fa-solid fa-user-shield laptop:hidden mr-2"></i>{% translate "Admin area" %}</span>
+                                <a href="#" class="btn btn-sm w-full laptop:hidden">
+                                    {% translate "Switch to the members area" %}
+                                </a>
+                            </div>
+
+                            <div class="hidden laptop:flex">
+                                <a href="#" class="btn btn-sm">
+                                    {% translate "Switch to the members area" %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="bg-blue-200 text-blue-800 px-4 py-2.5 text-sm dark:bg-blue-950 dark:text-blue-200">
+                        <div class="flex flex-row gap-4 items-center">
+                            <div class="hidden laptop:flex">
+                                <i class="fa-solid fa-user text-xl"></i>
+                            </div>
+
+                            <div class="flex flex-col flex-1 gap-2 laptop:gap-0 items-center laptop:items-start">
+                                <span class="font-semibold"><i class="fa-solid fa-user laptop:hidden mr-2"></i>{% translate "Member area" %}</span>
+                                <a href="#" class="btn btn-sm w-full laptop:hidden">
+                                    {% translate "Switch to the admin area" %}
+                                </a>
+                            </div>
+
+                            <div class="hidden laptop:flex">
+                                <a href="#" class="btn btn-sm">
+                                    {% translate "Switch to the admin area" %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
 
             <div class="grid grid-cols-1 laptop:grid-cols-[auto_1fr]">
                 <aside class="">ASIDE</aside>
@@ -189,9 +267,5 @@
 {#                </div>#}
 {#            </div>#}
 {#        </nav>#}
-
-
-
-        <script src="{% static "src/flowbite.min.js" %}"></script>
     </body>
 </html>
