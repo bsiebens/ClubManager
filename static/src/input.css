@@ -4,3 +4,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+    .menu_title {
+        @apply hover:bg-inherit;
+        @apply cursor-default hover:cursor-default;
+        @apply pb-0 pl-1 mt-4 mb-2;
+        @apply border-b border-neutral rounded-none;
+        @apply font-bold text-neutral;
+    }
+
+    .page_title {
+        @apply text-3xl;
+        @apply font-bold;
+        @apply mb-12;
+    }
+
+    .page_title > svg {
+        @apply mr-2;
+    }
+
+    .page_subtitle {
+        @apply text-xl;
+        @apply font-bold;
+        @apply mt-8;
+        @apply border-b border-base-content;
+    }
+}

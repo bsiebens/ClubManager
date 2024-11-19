@@ -21,6 +21,6 @@ from . import configuration
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("clubmanager/backend/", include("ClubManager.clubmanager_urls.backend")),
-    path("clubmanager/configuration/", configuration.index, name="clubmanager_configuration:index"),
+    path("clubmanager/configuration/", configuration.index, name="clubmanager_configuration"),
     path("clubmanager/", include("ClubManager.clubmanager_urls.frontend"))
 ]

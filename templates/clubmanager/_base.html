@@ -22,250 +22,195 @@
     </head>
 
     <body class="bg-base-100">
-        <div class="grid grid-rows-[auto_1fr_auto]">
-            <header class="navbar bg-base-300 p-2.5 justify-between">
-                <a href="#" class="flex items-center space-x-3 mx-4">
-                    {% if config.CLUBMANAGER_CLUB_LOGO %}
-                        <img src="{% static config.CLUBMANAGER_CLUB_LOGO %}" class="w-8 h-8 laptop:w-14 laptop:h-14 rounded-full bg-base-content my-2" alt="Logo {{ config.CLUBMANAGER_CLUB_NAME }}" />
-                    {% endif %}
-
-                    <div class="text-lg laptop:text-2xl font-semibold whitespace-nowrap text-base-content">
-                        {% if config.CLUBMANAGER_CLUB_NAME != "ClubManager" %}
-                            {{ config.CLUBMANAGER_CLUB_NAME }}<span class="hidden laptop:inline"> - ClubManager</span>
-                        {% else %}
-                            ClubManager
-                        {% endif %}
+        <div class="drawer">
+            <input id="menu-drawer" type="checkbox" class="drawer-toggle" />
+            <div class="drawer-content flex flex-col">
+                <header class="navbar bg-base-200 p-2.5 justify-between border-b border-neutral">
+                    <div class="flex-none laptop:hidden">
+                        <label for="menu-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost">
+                            <i class="fa-solid fa-bars text-xl"></i>
+                        </label>
                     </div>
-                </a>
 
-                <div class="mx-4 gap-x-2">
-                    <div class="hidden laptop:flex">
+                    <a href="#" class="flex items-center space-x-3 mx-4">
+                        {% if config.CLUBMANAGER_CLUB_LOGO %}
+                            <img src="{% static config.CLUBMANAGER_CLUB_LOGO %}" class="w-8 h-8 laptop:w-14 laptop:h-14 rounded-full bg-base-content my-2" alt="Logo {{ config.CLUBMANAGER_CLUB_NAME }}" />
+                        {% endif %}
+
+                        <div class="text-lg laptop:text-2xl font-semibold whitespace-nowrap text-base-content">
+                            {% if config.CLUBMANAGER_CLUB_NAME != "ClubManager" %}
+                                {{ config.CLUBMANAGER_CLUB_NAME }}<span class="hidden laptop:inline"> - ClubManager</span>
+                            {% else %}
+                                ClubManager
+                            {% endif %}
+                        </div>
+                    </a>
+
+                    <div class="mx-4 gap-x-2">
+                        <div class="hidden laptop:flex">
+                            {% if request.user.is_authenticated %}
+                                <a class="btn btn-outline btn-neutral btn-sm">
+                                    <i class="fa-solid fa-arrow-right-from-bracket"></i>{% translate "Logout" %}
+                                </a>
+                            {% else %}
+                                <a class="btn btn-outline btn-neutral btn-sm">
+                                    <i class="fa-solid fa-arrow-right-to-bracket"></i>{% translate "Login" %}
+                                </a>
+                            {% endif %}
+                        </div>
+
                         {% if request.user.is_authenticated %}
-                            <a class="btn btn-outline btn-neutral btn-sm">
-                                <i class="fa-solid fa-arrow-right-from-bracket"></i>{% translate "Logout" %}
-                            </a>
-                        {% else %}
-                            <a class="btn btn-outline btn-neutral btn-sm">
-                                <i class="fa-solid fa-arrow-right-to-bracket"></i>{% translate "Login" %}
-                            </a>
+                            <!-- TODO Needs to be hooked into the unread notifications count once notifications have been enabled/build -->
+                            {% if unread_notifications %}
+                                <div class="indicator">
+                                    <span class="indicator-item badge badge-error badge-xs left-4 top-2.5"></span>
+                                    <a class="btn btn-ghost btn-sm">
+                                        <i class="fa-solid fa-bell text-lg"></i>
+                                    </a>
+                                </div>
+                            {% else %}
+                                <a class="btn btn-ghost btn-sm">
+                                    <i class="fa-regular fa-bell text-lg"></i>
+                                </a>
+                            {% endif %}
+
+                            <div class="dropdown dropdown-end">
+                                {% avatar request.user.first_name request.user.last_name button=True %}
+
+                                <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box w-64 z-[1] mt-3 p-2 shadow">
+                                    <li>
+                                        <a>
+                                            <i class="fa-solid fa-user"></i>Profile
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a>
+                                            <i class="fa-solid fa-key"></i>Authentication settings
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         {% endif %}
                     </div>
+                </header>
 
-                    <!-- TODO Needs to be hooked into the unread notifications count once notifications have been enabled/build -->
-                    {% if unread_notifications %}
-                        <div class="indicator">
-                            <span class="indicator-item badge badge-error badge-xs left-4 top-2.5"></span>
-                            <a class="btn btn-ghost btn-sm">
-                                <i class="fa-solid fa-bell text-lg"></i>
-                            </a>
+                {% if request.user.is_authenticated and request.user.is_staff %}
+                    {% if "admin" in request.path or "configuration" in request.path %}
+                        <div class="bg-orange-200 text-orange-800 px-4 py-2.5 text-sm dark:bg-orange-950 dark:text-orange-200 border-b border-neutral">
+                            <div class="flex flex-row gap-4 items-center">
+                                <div class="hidden laptop:flex">
+                                    <i class="fa-solid fa-user-shield text-xl"></i>
+                                </div>
+
+                                <div class="flex flex-col flex-1 gap-2 laptop:gap-0 items-center laptop:items-start">
+                                    <span class="font-semibold"><i class="fa-solid fa-user-shield laptop:hidden mr-2"></i>{% translate "Admin area" %}</span>
+                                    <a href="#" class="btn btn-sm w-full laptop:hidden">
+                                        {% translate "Switch to the members area" %}
+                                    </a>
+                                </div>
+
+                                <div class="hidden laptop:flex">
+                                    <a href="#" class="btn btn-sm">
+                                        {% translate "Switch to the members area" %}
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     {% else %}
-                        <a class="btn btn-ghost btn-sm">
-                            <i class="fa-regular fa-bell text-lg"></i>
-                        </a>
-                    {% endif %}
+                        <div class="bg-blue-200 text-blue-800 px-4 py-2.5 text-sm dark:bg-blue-950 dark:text-blue-200">
+                            <div class="flex flex-row gap-4 items-center">
+                                <div class="hidden laptop:flex">
+                                    <i class="fa-solid fa-user text-xl"></i>
+                                </div>
 
-                    {% if request.user.is_authenticated %}
-                        <a href="#">
-                            {% avatar request.user.first_name request.user.last_name button=True %}
-                        </a>
-                    {% endif %}
-                </div>
-            </header>
+                                <div class="flex flex-col flex-1 gap-2 laptop:gap-0 items-center laptop:items-start">
+                                    <span class="font-semibold"><i class="fa-solid fa-user laptop:hidden mr-2"></i>{% translate "Member area" %}</span>
+                                    <a href="#" class="btn btn-sm w-full laptop:hidden">
+                                        {% translate "Switch to the admin area" %}
+                                    </a>
+                                </div>
 
-            {% if request.user.is_authenticated and request.user.is_staff %}
-                {% if "admin" in request.path or "configuration" in request.path %}
-                    <div class="bg-orange-200 text-orange-800 px-4 py-2.5 text-sm dark:bg-orange-950 dark:text-orange-200">
-                        <div class="flex flex-row gap-4 items-center">
-                            <div class="hidden laptop:flex">
-                                <i class="fa-solid fa-user-shield text-xl"></i>
-                            </div>
-
-                            <div class="flex flex-col flex-1 gap-2 laptop:gap-0 items-center laptop:items-start">
-                                <span class="font-semibold"><i class="fa-solid fa-user-shield laptop:hidden mr-2"></i>{% translate "Admin area" %}</span>
-                                <a href="#" class="btn btn-sm w-full laptop:hidden">
-                                    {% translate "Switch to the members area" %}
-                                </a>
-                            </div>
-
-                            <div class="hidden laptop:flex">
-                                <a href="#" class="btn btn-sm">
-                                    {% translate "Switch to the members area" %}
-                                </a>
+                                <div class="hidden laptop:flex">
+                                    <a href="#" class="btn btn-sm">
+                                        {% translate "Switch to the admin area" %}
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% else %}
-                    <div class="bg-blue-200 text-blue-800 px-4 py-2.5 text-sm dark:bg-blue-950 dark:text-blue-200">
-                        <div class="flex flex-row gap-4 items-center">
-                            <div class="hidden laptop:flex">
-                                <i class="fa-solid fa-user text-xl"></i>
-                            </div>
-
-                            <div class="flex flex-col flex-1 gap-2 laptop:gap-0 items-center laptop:items-start">
-                                <span class="font-semibold"><i class="fa-solid fa-user laptop:hidden mr-2"></i>{% translate "Member area" %}</span>
-                                <a href="#" class="btn btn-sm w-full laptop:hidden">
-                                    {% translate "Switch to the admin area" %}
-                                </a>
-                            </div>
-
-                            <div class="hidden laptop:flex">
-                                <a href="#" class="btn btn-sm">
-                                    {% translate "Switch to the admin area" %}
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
 
-            <div class="grid grid-cols-1 laptop:grid-cols-[auto_1fr]">
-                <aside class="">ASIDE</aside>
-                <main class="">MAIN</main>
+                <div class="flex flex-row gap-2">
+                    <ul class="menu bg-base-200 w-60 py-2 px-4 m-2 rounded-lg hidden laptop:flex">
+                        {% if "admin" in request.path or "configuration" in request.path %}
+                            {% include "clubmanager/_menu_backend.html" %}
+                        {% else %}
+                            {% include "clubmanager/_menu_frontend.html" %}
+                        {% endif %}
+                    </ul>
+
+                    <div class="bg-base-100 grow py-8 pl-4 pr-8">
+                        {% block page_title %}
+
+                        {% endblock page_title %}
+
+                        {% if messages %}
+                            <div class="flex flex-col p-2 m-4 -mt-8 gap-y-2">
+                                {% for message in messages %}
+                                    {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                                        <div role="alert" class="alert alert-success">
+                                            <i class="text-lg fa-solid fa-check"></i>
+                                            <span>{{ message|safe }}</span>
+                                        </div>
+                                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+                                        <div role="alert" class="alert alert-warning">
+                                            <i class="text-lg fa-solid fa-ban"></i>
+                                            <span>{{ message|safe }}</span>
+                                        </div>
+                                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                                        <div role="alert" class="alert alert-error">
+                                            <i class="text-lg fa-solid fa-exclamation"></i>
+                                            <span>{{ message|safe }}</span>
+                                        </div>
+                                    {% else %}
+                                        <div role="alert" class="alert alert-info">
+                                            <i class="text-lg fa-solid fa-info"></i>
+                                            <span>{{ message|safe }}</span>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% block page_content %}
+                            CONTENT GOES HERE
+                        {% endblock page_content %}
+                    </div>
+                </div>
+
+                <footer class="footer bg-neutral text-neutral-content items-center p-4">
+                    <aside class="grid-flow-col items-center">
+                        <p>ClubManager &copy; {% now "Y" %} - MIT license</p>
+                    </aside>
+
+                    <nav class="grid-flow-col gap-4 md:place-self-center md:justify-self-end">
+                        <a href="https://github.com/bsiebens/ClubManager">
+                            <i class="fa-brands fa-github text-xl"></i>
+                        </a>
+                    </nav>
+                </footer>
             </div>
 
-            <footer class="">FOOTER</footer>
+            <div class="drawer-side">
+                <label for="menu-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+                <ul class="menu bg-base-200 min-h-full w-80 p-4">
+                    {% if "admin" in request.path or "configuration" in request.path %}
+                        {% include "clubmanager/_menu_backend.html" %}
+                    {% else %}
+                        {% include "clubmanager/_menu_frontend.html" %}
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-
-
-{#        <nav class="bg-white border-gray-200 dark:bg-gray-900">#}
-{#            <div class="max-w-full flex flex-wrap items-center justify-between mx-auto p-4">#}
-{#                <a href="#" class="flex items-center space-x-3">#}
-{#                    {% if config.CLUBMANAGER_CLUB_LOGO %}#}
-{#                        <img src="{{ config.CLUBMANAGER_CLUB_LOGO }}" class="w-8 h-8 md:w-10 md:h-10 overflow-hidden rounded-full bg-red-900" alt="{{ config.CLUBMANAGER_CLUB_NAME }} logo" />#}
-{#                    {% endif %}#}
-{##}
-{#                    <span class="self-center text-lg md:text-2xl font-semibold whitespace-nowrap dark:text-white">#}
-{#                        {% if config.CLUBMANAGER_CLUB_NAME != "ClubManager" %}#}
-{#                            <span class="hidden md:inline">ClubManager - </span>{{ config.CLUBMANAGER_CLUB_NAME }}#}
-{#                        {% else %}#}
-{#                            ClubManager#}
-{#                        {% endif %}#}
-{#                    </span>#}
-{#                </a>#}
-{##}
-{#                <div class="flex items-center md:order-2 space-x-3 md:space-x-0">#}
-{#                    <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus-ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">#}
-{#                        <span class="sr-only">Open user menu</span>#}
-{#                        <img class="w-8 h-8 rounded-full" src="#" alt="user photo" />#}
-{#                    </button>#}
-{##}
-{#                    <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">#}
-{#                        <div class="px-4 py-3">#}
-{#                            <span class="block text-sm text-gray-900 dark:text-white">{{ request.user.get_full_name }}</span>#}
-{#                            <span class="block text-sm text-gray-500 truncate dark:text-gray-400">{{ request.user.email }}</span>#}
-{#                        </div>#}
-{##}
-{#                        <ul class="py-2" aria-labelledby="user-menu-button">#}
-{#                            <li>#}
-{#                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Sign out</a>#}
-{#                            </li>#}
-{#                        </ul>#}
-{#                    </div>#}
-{##}
-{#                     <button data-collapse-toggle="navbar-user" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-user" aria-expanded="false">#}
-{#                        <span class="sr-only">Open main menu</span>#}
-{#                        <i class="fa-solid fa-bars text-2xl"></i>#}
-{#                    </button>#}
-{#                </div>#}
-{##}
-{#                <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">#}
-{#    <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">#}
-{#      <li>#}
-{#        <a href="#" class="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500" aria-current="page">Home</a>#}
-{#      </li>#}
-{#      <li>#}
-{#        <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">About</a>#}
-{#      </li>#}
-{#      <li>#}
-{#        <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Services</a>#}
-{#      </li>#}
-{#      <li>#}
-{#        <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Pricing</a>#}
-{#      </li>#}
-{#      <li>#}
-{#        <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Contact</a>#}
-{#      </li>#}
-{#    </ul>#}
-{#  </div>#}
-{#            </div>#}
-{#        </nav>#}
-
-
-{#        <nav class="bg-gray-100 dark:bg-gray-800">#}
-{#            <div class="flex flex-row justify-between items-center p-4 text-gray-800 dark:text-gray-100">#}
-{#                <a href="#" class="flex flex-row items-center">#}
-{#                    {% if config.CLUBMANAGER_CLUB_LOGO is not None and config.CLUBMANAGER_CLUB_LOGO != "" %}#}
-{#                        <img class="w-20 h-20 rounded-full bg-gray-800 dark:bg-gray-100" src="{{ config.CLUBMANAGER_CLUB_LOGO }}" alt="Logo {{ config.CLUBMANAGER_CLUB_NAME }}" />#}
-{#                    {% endif %}#}
-{##}
-{#                    <div class="text-2xl font-semibold">#}
-{#                        {% if config.CLUBMANAGER_CLUB_NAME != "ClubManager" %}#}
-{#                            ClubManager - {{ config.CLUBMANAGER_CLUB_NAME }}#}
-{#                        {% else %}#}
-{#                            ClubManager#}
-{#                        {% endif %}#}
-{#                    </div>#}
-{#                </a>#}
-{##}
-{#                <div class="flex flex-row items-center gap-x-2 md:order-2">#}
-{#                    {% if request.user.is_authenticated %}#}
-{#                        <div class="avatar">#}
-{#                            <span class="font-medium text-gray-600 dark:text-gray-300">{{ request.user.first_name|capfirst|make_list|first }}{{ request.user.last_name|capfirst|make_list|first }}</span>#}
-{#                        </div>#}
-{#                    {% endif %}#}
-{#                    <button data-collapse-toggle="navbar-extra-button" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-user" aria-expanded="false">#}
-{#                        <span class="sr-only">Open main menu</span>#}
-{#                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">#}
-{#                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>#}
-{#                        </svg>#}
-{#                    </button>#}
-{#                </div>#}
-{##}
-{#                <div class="hidden md:flex flex-row items-center md:order-1" id="navbar-extra-button">#}
-{#                    <div class="flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">#}
-{#                    {% if request.user.is_authenticated %}#}
-{#                        {% if request.user.is_staff %}#}
-{#                            {% if "admin" in request.path or "configuration" in request.path %}#}
-{#                                <a href="#" class="btn btn-neutral-outline">#}
-{#                                    <i class="fa-solid fa-user mr-2 items-center"></i>Member area#}
-{#                                </a>#}
-{#                            {% else %}#}
-{#                                <a href="#" class="btn btn-neutral-outline">#}
-{#                                    <i class="fa-solid fa-screwdriver-wrench mr-2 items-center"></i>Admin area#}
-{#                                </a>#}
-{#                            {% endif %}#}
-{#                        {% endif %}#}
-{#                    {% endif %}#}
-{#                    </div>#}
-{#                </div>#}
-{##}
-{#                <div class="flex flex-row items-center gap-x-2">#}
-{#                    {% if request.user.is_authenticated %}#}
-{#                        {% if request.user.is_staff %}#}
-{#                            {% if "admin" in request.path or "configuration" in request.path %}#}
-{#                                <a href="#" class="btn btn-neutral-outline">#}
-{#                                    <i class="fa-solid fa-user mr-2 items-center"></i>Member area#}
-{#                                </a>#}
-{#                            {% else %}#}
-{#                                <a href="#" class="btn btn-neutral-outline">#}
-{#                                    <i class="fa-solid fa-screwdriver-wrench mr-2 items-center"></i>Admin area#}
-{#                                </a>#}
-{#                            {% endif %}#}
-{#                        {% endif %}#}
-{#                        <div class="avatar ml-16">#}
-{#                            <span class="font-medium text-gray-600 dark:text-gray-300">{{ request.user.first_name|capfirst|make_list|first }}{{ request.user.last_name|capfirst|make_list|first }}</span>#}
-{#                        </div>#}
-{#                        <a href="#" class="btn btn-neutral-outline btn-neutral-ghost">#}
-{#                            <i class="fa-solid fa-arrow-right-from-bracket mr-2 items-center"></i>Logout#}
-{#                        </a>#}
-{#                    {% else %}#}
-{#                        <a href="#" class="btn btn-neutral-outline btn-neutral-ghost">#}
-{#                            <i class="fa-solid fa-arrow-right-to-bracket mr-2 items-center"></i>Login#}
-{#                        </a>#}
-{#                    {% endif %}#}
-{#                </div>#}
-{#            </div>#}
-{#        </nav>#}
     </body>
 </html>

@@ -2,3 +2,43 @@
 
 {% extends "clubmanager/_base.html" %}
 
+{% load i18n %}
+{% load form_field %}
+
+{% block page_title %}
+    <h1 class="page_title">
+        <i class="fa-solid fa-screwdriver-wrench"></i>
+        Configuration
+    </h1>
+{% endblock page_title %}
+
+{% block page_content %}
+    {% blocktranslate %}
+        <article class="prose max-w-none text-justify">
+            <p>Use the below options to configure your ClubManager instance. Options marked as required will need to be set in order for ClubManager to function properly.</p>
+            <p>You can also use this form to enable or disable certain pieces of functionality for your users.</p>
+        </article>
+    {% endblocktranslate %}
+
+    {% if form.errors %}
+        <div class="mt-4 font-semibold text-error">
+            {% translate "Please correct the errors below." %}
+        </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'clubmanager_configuration' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h2 class="page_subtitle">General configuration</h2>
+        <div class="grid grid-cols-1 gap-2 gap-x-4 laptop:grid-cols-2 mt-2">
+            {% form_field form.club_name %}
+            {% form_field form.club_location %}
+            {% form_field form.club_logo %}
+        </div>
+
+        <button class="w-full mt-8 btn btn-neutral" type="submit">
+            <i class="fa-solid fa-floppy-disk"></i>{% translate "Save" %}
+        </button>
+    </form>
+
+{% endblock page_content %}

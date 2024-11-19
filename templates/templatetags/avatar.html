@@ -1,4 +1,4 @@
-<div class="avatar placeholder font-semibold {% if button %}btn btn-circle btn-ghost{% endif %}">
+<div class="avatar placeholder font-semibold {% if button %}btn btn-circle btn-ghost{% endif %}" {% if button %}tabindex="0" role="button"{% endif %}>
     {% if width == "xl" %}
         <div class="w-24 rounded-full" style="background-color: {{ background }}; color: {{ foreground }};">
             <span class="text-3xl">{{ name }}</span>

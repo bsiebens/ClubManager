@@ -1,0 +1,15 @@
+<!-- clubmanager/_menu_backend.html -->
+
+{% load i18n %}
+{% load rules %}
+
+<li class="mb-4">
+    {% if request.user.is_superuser %}
+        <span class="menu_title">ClubManager</span>
+        {% url "clubmanager_configuration" as configuration %}
+        <a href="{{ configuration }}" {% if configuration in request.path %}class="active"{% endif %}>
+            <i class="fa-solid fa-screwdriver-wrench min-w-5"></i>
+            {% translate "Configuration" %}
+        </a>
+    {% endif %}
+</li>
