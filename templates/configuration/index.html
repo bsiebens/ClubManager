@@ -30,7 +30,7 @@
         {% csrf_token %}
 
         <h2 class="page_subtitle">General configuration</h2>
-        <div class="grid grid-cols-1 gap-2 gap-x-4 laptop:grid-cols-2 mt-2">
+        <div class="grid grid-cols-1 gap-1 gap-x-4 laptop:grid-cols-2 mt-2">
             {% form_field form.club_name %}
             {% form_field form.club_location %}
             {% form_field form.club_logo %}
