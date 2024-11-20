@@ -1,13 +1,18 @@
-from django.http import HttpResponse, HttpRequest
-from django.shortcuts import render
-from constance import config
-from .forms import ConfigurationForm
-from django.contrib import messages
-from django.utils.translation import gettext_lazy as _
-from django.core.files.storage import default_storage
-from django.conf import settings
 from pathlib import Path
 
+from constance import config
+from django.conf import settings
+from django.contrib import messages
+from django.core.files.storage import default_storage
+from django.http import HttpResponse, HttpRequest
+from django.shortcuts import render
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+from .forms import ConfigurationForm
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def index(request: HttpRequest) -> HttpResponse:
     initial_data = {
         "club_name": config.CLUBMANAGER_CLUB_NAME,

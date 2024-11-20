@@ -1,0 +1,16 @@
+{% load form_field %}
+{% load i18n %}
+
+<div class="mb-3">
+    {% if wizard.form.errors %}
+        <div role="alert" class="my-4 alert alert-error">
+            {% blocktranslate %}Username and password combination incorrect. Please try again.<br />Note that the password field is case-sensitive.{% endblocktranslate %}
+        </div>
+    {% endif %}
+
+    {{ wizard.management_form }}
+
+    {% for field in wizard.form %}
+        {% form_field field show_placeholder=False %}
+    {% endfor %}
+</div>

@@ -31,3 +31,20 @@
         @apply border-b border-base-content;
     }
 }
+
+body > div.flex.grow.justify-center.items-center > div > div:nth-child(2) > div.mt-8 > h1 {
+    @apply hidden
+}
+
+body > div.flex.grow.justify-center.items-center > div > div:nth-child(2) > div.mt-8 > p {
+    @apply text-sm font-semibold;
+    @apply ml-1 mb-4
+}
+
+body > div.flex.grow.justify-center.items-center > div > div:nth-child(2) > div.mt-8 > form > button.btn.btn-primary {
+    @apply btn-neutral;
+}
+
+body > div.flex.grow.justify-center.items-center > div > div:nth-child(2) > div.mt-8 > p:nth-child(3) > a {
+    @apply btn-neutral;
+}

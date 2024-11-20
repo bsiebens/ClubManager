@@ -1,0 +1,75 @@
+{% load compress %}
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light" class="h-full">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>ClubManager</title>
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+
+        {% compress css %}
+            <link rel="stylesheet" href="{% static 'src/output.css' %}" />
+        {% endcompress %}
+
+        <script src="https://kit.fontawesome.com/8189f10079.js" crossorigin="anonymous"></script>
+
+        {% block extra_media %}{% endblock %}
+        
+    </head>
+
+    <body class="flex flex-col h-dvh">
+        <!-- Navbar -->
+        <div class="w-full bg-gray-200 navbar dark:bg-gray-700">
+            <div class="navbar-start">
+                <div class="flex-1 px-2 mx-2 text-xl font-bold">
+                    ClubManager
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-center grow">
+            <div class="flex flex-col w-full max-w-2xl m-4 border rounded-lg shadow-xl border-neutral h-fit lg:m-0">
+                <div class="w-full p-4 bg-gray-200 rounded-t-lg dark:bg-gray-700">
+                    <div class="text-2xl font-bold">
+                        ClubManager Access
+                    </div>
+                </div>
+
+                <div class="w-full p-4">
+                    <div class="flex flex-row items-center justify-center gap-4 my-4">
+                        {% if config.CLUBMANAGER_CLUB_LOGO %}
+                            <img src="{% static config.CLUBMANAGER_CLUB_LOGO %}" class="w-8 h-8 laptop:w-14 laptop:h-14 rounded-full bg-base-content my-2" alt="Logo {{ config.CLUBMANAGER_CLUB_NAME }}" />
+                        {% endif %}
+
+                        <div class="text-lg laptop:text-2xl font-semibold whitespace-nowrap text-base-content">
+                            {% if config.CLUBMANAGER_CLUB_NAME != "ClubManager" %}
+                                {{ config.CLUBMANAGER_CLUB_NAME }}<span class="hidden laptop:inline"> - ClubManager</span>
+                            {% else %}
+                                ClubManager
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        {% block content %}{% endblock content %}
+                    </div>
+
+                    {% url "two_factor:login" as login %}
+                    {% url "logout" as logout %}
+
+                    {% if login not in request.path and logout not in request.path%}
+                        <div class="mt-8">
+                            <a class="w-full btn btn-neutral" href="{% url "clubmanager_frontend:index" %}"><i class="fa-solid fa-arrow-left"></i>{% translate "Back to ClubManager" %}</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,31 @@
+{% extends "registration/_base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    {% if form.errors %}
+        <div role="alert" class="alert alert-error my-4">
+            {% blocktranslate %}Username and password combination incorrect. Please try again.<br />Note that the password field is case-sensitive.{% endblocktranslate %}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <input type="hidden" name="next" value="{{ next }}" />
+
+        <div class="flex flex-col gap-4">
+            <label class="input input-bordered flex items-center gap-2">
+                <i class="fa-solid fa-user h-4 w-4 opacity-70"></i>
+                <input type="text" name={{ form.username.html_name }} class="grow" placeholder="{% translate "Username" %}" />
+            </label>
+
+            <label class="input input-bordered flex items-center gap-2">
+                <i class="fa-solid fa-key h-4 w-4 opacity-70"></i>
+                <input type="password" name={{ form.password.html_name }} class="grow" placeholder="{% translate "Password" %}" />
+            </label>
+
+            <button class="btn btn-neutral">Login<i class="fa-solid fa-arrow-right ml-2"></i></button>
+        </div>
+    </form>
+{% endblock content %}

@@ -49,11 +49,14 @@
                     <div class="mx-4 gap-x-2">
                         <div class="hidden laptop:flex">
                             {% if request.user.is_authenticated %}
-                                <a class="btn btn-outline btn-neutral btn-sm">
-                                    <i class="fa-solid fa-arrow-right-from-bracket"></i>{% translate "Logout" %}
-                                </a>
+                                <form action="{% url 'logout' %}?next={% url "clubmanager_frontend:index" %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline btn-neutral btn-sm">
+                                        <i class="fa-solid fa-right-from-bracket"></i>Log out
+                                    </button>
+                                </form>
                             {% else %}
-                                <a class="btn btn-outline btn-neutral btn-sm">
+                                <a class="btn btn-outline btn-neutral btn-sm"  href="{% url "two_factor:login" %}">
                                     <i class="fa-solid fa-arrow-right-to-bracket"></i>{% translate "Login" %}
                                 </a>
                             {% endif %}
@@ -80,12 +83,12 @@
                                 <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box w-64 z-[1] mt-3 p-2 shadow">
                                     <li>
                                         <a>
-                                            <i class="fa-solid fa-user"></i>Profile
+                                            <i class="fa-solid fa-user"></i>{% translate "Profile" %}
                                         </a>
                                     </li>
                                     <li>
-                                        <a>
-                                            <i class="fa-solid fa-key"></i>Authentication settings
+                                        <a href="{% url "two_factor:profile" %}">
+                                            <i class="fa-solid fa-key"></i>{% translate "Authentication settings" %}
                                         </a>
                                     </li>
                                 </ul>
