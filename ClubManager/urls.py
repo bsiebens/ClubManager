@@ -14,12 +14,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.contrib import admin
-from django.urls import path, include
-
-from two_factor.urls import urlpatterns as two_factor_urls
 from django.contrib.auth import views as auth_views
+from django.urls import path, include
 from django.views.generic import RedirectView
+from two_factor.urls import urlpatterns as two_factor_urls
+
 from . import configuration
 
 urlpatterns = [
@@ -28,8 +29,12 @@ urlpatterns = [
     path("accounts/profile/", RedirectView.as_view(pattern_name="clubmanager:index"), name="profile"),
     path("accounts/password_change/", auth_views.PasswordChangeView.as_view(), name="password_change"),
     path("accounts/password_change/done/", auth_views.PasswordChangeDoneView.as_view(), name="password_change_done"),
-    path('admin/', admin.site.urls),
     path("clubmanager/backend/", include("ClubManager.clubmanager_urls.backend")),
     path("clubmanager/configuration/", configuration.index, name="clubmanager_configuration"),
     path("clubmanager/", include("ClubManager.clubmanager_urls.frontend")),
 ]
+
+if settings.DEBUG:
+    urlpatterns = urlpatterns + [
+        path('admin/', admin.site.urls),
+    ]
