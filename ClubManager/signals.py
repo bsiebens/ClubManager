@@ -8,4 +8,4 @@ def update_home_game_location(sender, key, old_value, new_value, **kwargs):
     if key == 'CLUBMANAGER_CLUB_LOCATION' and old_value != new_value:
         ...
 
-        # TODO Implement the actual logic once games have been implemented --> should be moved into the games/activities app once build!
+        # TODO(Bernard Siebens): Implement the actual logic once games have been implemented --> should be moved into the games/activities app once build!

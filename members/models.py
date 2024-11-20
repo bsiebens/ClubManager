@@ -13,6 +13,7 @@ class MemberManager(models.Manager):
         """All queryset will return the users cached as we almost always need the user object anyway"""
         return super().get_queryset().select_related("user")
 
+
 class Member(models.Model):
     """Each user has a member profile, containing links to other family members."""
 
@@ -22,8 +23,7 @@ class Member(models.Model):
 
     birthday = models.DateField(_("birthday"), blank=True, null=True)
     license = models.CharField(_("license"), max_length=50, blank=True, default="")
-    password_change_required = models.BooleanField(_("password change required"), default=False, help_text=_("If checked require the user to "
-                                                                                                             "change their password at next logon"))
+    password_change_required = models.BooleanField(_("password change required"), default=False, help_text=_("If checked require the user to " "change their password at next logon"))
 
     phone = PhoneNumberField(_("phone number"), blank=True, default="")
     emergency_phone = PhoneNumberField(_("emergency phone number"), blank=True, default="")

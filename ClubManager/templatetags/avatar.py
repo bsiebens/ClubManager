@@ -41,20 +41,16 @@ def background(name: str) -> dict:
 
 @register.inclusion_tag("templatetags/avatar.html")
 def avatar(first_name: str, last_name: str, width: str = "md", button: bool = False) -> dict:
-    full_name = "{first_name} {last_name}".format(
-        first_name=first_name, last_name=last_name
-    )
+    full_name = f"{first_name} {last_name}"
     avatar_background = background(full_name)
     avatar_foreground = foreground(avatar_background)
 
     return {
-        "name": "{first_letter}{last_letter}".format(
-            first_letter=first_name[0], last_letter=last_name[0]
-        ),
+        "name": f"{first_name[0]}{last_name[0]}",
         "width": width,
         "button": button,
-        "background": "#%02x%02x%02x"
+        "background": "#%02x%02x%02x" # noqa: UP031
         % (avatar_background["R"], avatar_background["G"], avatar_background["B"]),
-        "foreground": "#%02x%02x%02x"
+        "foreground": "#%02x%02x%02x" # noqa: UP031
         % (avatar_foreground["R"], avatar_foreground["G"], avatar_foreground["B"]),
     }

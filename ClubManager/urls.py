@@ -17,7 +17,7 @@ Including another URLconf
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.urls import path, include
+from django.urls import include, path
 from django.views.generic import RedirectView
 from two_factor.urls import urlpatterns as two_factor_urls
 

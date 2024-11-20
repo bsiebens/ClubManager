@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_totp",
     "two_factor",
     "two_factor.plugins.webauthn",
+    "django_filters",
     "members",
 ]
 
