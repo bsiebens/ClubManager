@@ -26,7 +26,7 @@
         </div>
     {% endif %}
 
-    <form method="post" action="{% url 'clubmanager_configuration' %}" enctype="multipart/form-data">
+    <form method="post" action="{% url 'backend:configuration' %}" enctype="multipart/form-data">
         {% csrf_token %}
 
         <h2 class="page_subtitle">General configuration</h2>
