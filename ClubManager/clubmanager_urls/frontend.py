@@ -1,9 +1,9 @@
-from .. import views
-from .. import configuration
+from ClubManager import views
+from ClubManager import configuration
 
 from django.urls import path, include
 
-app_name = "backend"
+app_name = "frontend"
 urlpatterns = [
     path("", views.index, name="index"),
     path("members/", include("members.backend.urls")),

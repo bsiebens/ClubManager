@@ -5,6 +5,16 @@
 
 <li class="mb-4">
     {% if request.user.is_superuser %}
+        <span class="menu_title">{% translate "Members" %}</span>
+
+        {% url "backend:members:members_list" as members_list %}
+        <a href="{{ members_list }}" {% if members_list in request.path %}class="active"{% endif %}>
+            <i class="fa-solid fa-users min-w-5"></i>
+            {% translate "Members" %}
+        </a>
+    {% endif %}
+
+    {% if request.user.is_superuser %}
         <span class="menu_title">ClubManager</span>
         {% url "backend:configuration" as configuration %}
         <a href="{{ configuration }}" {% if configuration in request.path %}class="active"{% endif %}>

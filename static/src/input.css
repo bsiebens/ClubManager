@@ -15,7 +15,7 @@
     }
 
     .page_title {
-        @apply text-3xl;
+        @apply text-2xl;
         @apply font-bold;
         @apply mb-12;
     }
@@ -29,6 +29,58 @@
         @apply font-bold;
         @apply mt-8;
         @apply border-b border-base-content;
+    }
+
+    .action_bar {
+        @apply flex flex-col laptop:flex-row;
+        @apply items-center;
+    }
+
+    .action_bar > .filter {
+        @apply grow;
+        @apply w-full;
+    }
+
+    .action_bar > .filter > form {
+        @apply flex flex-col laptop:flex-row;
+        @apply gap-2;
+        @apply items-end;
+    }
+
+    .action_bar > .filter > form > button {
+        @apply btn btn-outline btn-xs;
+        @apply w-full laptop:w-fit;
+    }
+
+    .action_bar > .add {
+        @apply my-6 lg:my-0;
+        @apply w-full laptop:w-fit shrink-0;
+    }
+
+    .action_bar > .add > a {
+        @apply w-full laptop:w-fit;
+    }
+
+    .data_card {
+        @apply hover:bg-base-300;
+        @apply border border-l-4;
+        @apply rounded;
+        @apply p-2;
+        @apply flex flex-row gap-2;
+        @apply items-center;
+    }
+
+    .data_card > .data {
+        @apply flex flex-col;
+        @apply grow;
+    }
+
+    .data_card > .data > div:first-child {
+        @apply font-semibold;
+    }
+
+    .data_card > .data > div:first-child + div {
+        @apply text-sm opacity-50;
     }
 }
 

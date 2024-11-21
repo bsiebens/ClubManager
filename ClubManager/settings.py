@@ -88,6 +88,7 @@ TEMPLATES = [
             "libraries": {
                 "avatar": "ClubManager.templatetags.avatar",
                 "form_field": "ClubManager.templatetags.form_field",
+                "pagination_tags": "ClubManager.templatetags.pagination_tags",
             },
         },
     },

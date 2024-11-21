@@ -27,7 +27,8 @@ urlpatterns = [
     path("accounts/profile/", RedirectView.as_view(pattern_name="clubmanager:index"), name="profile"),
     path("accounts/password_change/", auth_views.PasswordChangeView.as_view(), name="password_change"),
     path("accounts/password_change/done/", auth_views.PasswordChangeDoneView.as_view(), name="password_change_done"),
-    path("clubmanager/backend/", include("ClubManager.urls.backend")),
+    path("clubmanager/backend/", include("ClubManager.clubmanager_urls.backend")),
+    path("clubmanager/", include("ClubManager.clubmanager_urls.frontend")),
 ]
 
 if settings.DEBUG:

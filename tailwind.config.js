@@ -4,6 +4,19 @@ module.exports = {
       './templates/**/*.html',
       './**/templates/**/*.html',
   ],
+  safelist: [
+      "checkbox-sm",
+      "file-input-sm",
+      "select-sm",
+      "file-input-sm",
+      "checkbox-xs",
+      "file-input-xs",
+      "input-xs",
+      "select-xs",
+      "input-sm",
+      "w-10",
+      "w-12",
+  ],
   theme: {
     extend: {
       screens: {
@@ -13,7 +26,7 @@ module.exports = {
       }
     },
     fontFamily: {
-     "sans": ["Ubuntu", "Fira Sans", "Noto Sans", "Catamaran", "Cabin", "Roboto"],
+     "sans": ["Noto Sans", "Ubuntu", "Fira Sans", "Noto Sans", "Catamaran", "Cabin", "Roboto"],
      "jersey": ['Graduate', 'sans-serif'],
     },
   },
@@ -21,5 +34,8 @@ module.exports = {
       require("@tailwindcss/typography"),
       require("daisyui"),
   ],
+    daisyui: {
+      themes: ["fantasy"]
+    }
 }
 
