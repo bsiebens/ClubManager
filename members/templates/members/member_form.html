@@ -1,0 +1,72 @@
+{% extends "clubmanager/_base.html" %}
+
+{% load i18n %}
+{% load form_field %}
+{% load avatar %}
+
+{% block page_title %}
+    <h1 class="page_title">
+        <i class="fa-solid fa-users"></i>{% translate "Members" %}
+    </h1>
+{% endblock page_title %}
+
+{% block page_content %}
+    {% if member %}
+
+    {% else %}
+        <h2 class="page_subtitle !border-b-0">{% translate "Create new member" %}</h2>
+    {% endif %}
+
+
+
+    {% if form.errors %}
+        <div class="bg-error bg-opacity-50 border-error border-2 rounded-lg p-2 m-2">
+            <div class="font-semibold text-error-content mb-1">{% translate "Error" %}</div>
+            <div class="text-sm">{% translate "Please correct the errors below before saving again." %}</div>
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <h2 class="page_subtitle">{% translate "Personal information" %}</h2>
+        <div class="grid grid-cols-1 gap-1 gap-x-4 laptop:grid-cols-2 mt-2">
+            {% form_field form.first_name %}
+            {% form_field form.last_name %}
+            {% form_field form.birthday %}
+        </div>
+
+        <h2 class="page_subtitle">{% translate "Contact information" %}</h2>
+        <div class="grid grid-cols-1 gap-1 gap-x-4 laptop:grid-cols-2 mt-2">
+            {% form_field form.email %}
+            {% form_field form.phone %}
+            {% form_field form.emergency_phone %}
+        </div>
+
+        <h2 class="page_subtitle">{% translate "Family information" %}</h2>
+        <div class="grid grid-cols-1 gap-1 gap-x-4 laptop:grid-cols-2 mt-2">
+            {% form_field form.family_members %}
+        </div>
+
+        <h2 class="page_subtitle">{% translate "Club information" %}</h2>
+        <div class="grid grid-cols-1 gap-1 gap-x-4 laptop:grid-cols-2 mt-2">
+            {% form_field form.license %}
+            {% form_field form.admin %}
+        </div>
+
+        <h2 class="page_subtitle">{% translate "Password" %}</h2>
+        <div class="mt-2 text-sm text-justify opacity-50">{% blocktranslate %}Setting the password here will overwrite the current password for this member, after changing the member will be prompted to set a new password at the next login.<br />If both fields are empty the current password will not be changed.{% endblocktranslate %}</div>
+        <div class="grid grid-cols-1 gap-1 gap-x-4 laptop:grid-cols-2 mt-2">
+            {% form_field form.password %}
+            {% form_field form.password_confirm %}
+        </div>
+
+        <button class="w-full mt-8 btn btn-neutral" type="submit">
+            <i class="fa-solid fa-floppy-disk"></i>{% translate "Save" %}
+        </button>
+    </form>
+    
+    <script type="text/javascript">
+        new Choices(document.querySelector("#id_family_members"));
+    </script>
+{% endblock page_content %}

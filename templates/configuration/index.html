@@ -21,8 +21,9 @@
     {% endblocktranslate %}
 
     {% if form.errors %}
-        <div class="mt-4 font-semibold text-error">
-            {% translate "Please correct the errors below." %}
+        <div class="bg-error bg-opacity-50 border-error border-2 rounded-lg p-2 m-2">
+            <div class="font-semibold text-error-content mb-1">{% translate "Error" %}</div>
+            <div class="text-sm">{% translate "Please correct the errors below before saving again." %}</div>
         </div>
     {% endif %}
 

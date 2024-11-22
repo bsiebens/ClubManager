@@ -4,7 +4,7 @@
     <label class="w-full form-control">
         {% if show_label %}
             <div class="label">
-                <span class="label-text font-light {% if field.errors %}text-error{% else %}text-gray-500{% endif %}">{{ field.label }}</span>
+                <span class="label-text opacity-50 {% if field.errors %}text-error{% else %}text-base-content{% endif %}">{{ field.label }}</span>
 
                 {% if field.field.required %}
                     <span class="label-text-alt badge badge-sm {% if field.errors %}badge-error text-error-content{% else %}badge-neutral text-neutral-content{% endif %}">{% translate "required" %}</span>
