@@ -57,7 +57,7 @@
                     {% for member in object_list %}
                         <tr class="hover">
                             <td>
-                                <a href="#">
+                                <a href="{% url "backend:members:members_edit" member.id %}">
                                     <div class="flex flex-row gap-3 items-center">
                                         <div>
                                             {% avatar first_name=member.user.first_name last_name=member.user.last_name %}
@@ -96,7 +96,7 @@
                             </td>
                             <td>
                                 <div class="flex flex-row gap-2">
-                                    <a class="btn btn-outline btn-sm" href="#">
+                                    <a class="btn btn-outline btn-sm" href="{% url "backend:members:members_edit" member.id %}">
                                         <i class="fa-solid fa-eye"></i>{% translate "Details" %}
                                     </a>
 
