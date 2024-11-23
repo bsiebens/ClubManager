@@ -100,7 +100,7 @@
                                         <i class="fa-solid fa-eye"></i>{% translate "Details" %}
                                     </a>
 
-                                    <a class="btn btn-outline btn-error btn-sm" href="#">
+                                    <a class="btn btn-outline btn-error btn-sm" href="{% url "backend:members:members_delete" member.id %}">
                                         <i class="fa-solid fa-trash"></i>{% translate "Delete" %}
                                     </a>
                                 </div>
