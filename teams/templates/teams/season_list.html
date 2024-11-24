@@ -1,0 +1,90 @@
+{% extends "clubmanager/_base.html" %}
+
+{% load i18n %}
+{% load form_field %}
+
+{% block page_title %}
+    <h1 class="page_title">
+        <i class="fa-solid fa-calendar-days"></i>{% translate "Seasons" %}
+    </h1>
+{% endblock page_title %}
+
+{% block page_content %}
+    <div class="justify-end action_bar">
+        <form class="add_form" method="post" action="{% url "backend:teams:seasons_add" %}">
+            {% csrf_token %}
+
+            <div class="form_label">
+                {% translate "Add a new season with a duration of" %}
+            </div>
+
+            <div class="form">
+                {% form_field form.duration show_label=False %}
+                {% form_field form.unit show_label=False %}
+
+                <button type="submit">
+                    <i class="fa-solid fa-plus"></i>
+                    {% translate "Add" %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="hidden mt-4 laptop:block">
+        <table class="table table-zebra">
+            <thead>
+                <tr>
+                    <th>{% translate "Season" %}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if object_list|length == 0 %}
+                    <tr>
+                        <td colspan="2">{% translate "No seasons found" %}</td>
+                    </tr>
+                {% else %}
+                    {% for season in object_list %}
+                        <tr class="hover border-l-4 {% if season.current_season %}border-l-success{% endif %}">
+                            <td>
+                                <div class="flex flex-col grow">
+                                    <div class="font-bold">{{ season.start_date|date:"d F Y" }} {% translate "to" %} {{ season.end_date|date:"d F Y" }}</div>
+                                    {% if season.current_season %}
+                                        <div class="text-sm opacity-50">{% translate "Current season" %}</div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <a class="btn btn-outline btn-error btn-sm {% if season.passed_start_date %}btn-disabled{% endif %}" href="#">
+                                    <i class="fa-solid fa-trash"></i>
+                                    {% translate "Delete" %}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-2 laptop:hidden flex flex-col gap-2">
+        {% if object_list|length == 0 %}
+            <div class="mx-auto">{% translate "No members found" %}</div>
+        {% else %}
+            {% for member in object_list %}
+                <a href="#">
+                    <div class="data_card">
+                        <div>
+                            TITLE
+                        </div>
+
+                        <div class="data">
+                            <div>{{ member.user.get_full_name }}</div>
+                            <div>{{ member.user.email }}</div>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock page_content %}

@@ -82,6 +82,32 @@
     .data_card > .data > div:first-child + div {
         @apply text-sm opacity-50;
     }
+
+    .action_bar > form.add_form {
+        @apply flex flex-col;
+        @apply gap-2;
+        @apply items-center;
+        @apply w-full laptop:w-fit;
+    }
+
+    .action_bar > form.add_form > .form_label {
+        @apply self-start;
+        @apply ml-2;
+        @apply text-sm opacity-50;
+    }
+
+    .action_bar > form.add_form > .form {
+        @apply flex flex-col laptop:flex-row;
+        @apply gap-2;
+        @apply items-center;
+        @apply w-full laptop:w-fit;
+    }
+
+    .action_bar > form.add_form > .form > button {
+        @apply btn;
+        @apply w-full laptop:w-fit;
+        @apply my-6 laptop:my-0;
+    }
 }
 
 body > div.flex.grow.justify-center.items-center > div > div:nth-child(2) > div.mt-8 > h1 {

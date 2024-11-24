@@ -17,6 +17,7 @@ django-compressor = "^4.5.1"
 pillow = "^11.0.0"
 django-two-factor-auth = {extras = ["webauthn"], version = "^1.17.0"}
 django-filter = "^24.3"
+python-dateutil = "^2.9.0.post0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.7.3"

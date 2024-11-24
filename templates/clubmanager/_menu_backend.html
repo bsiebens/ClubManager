@@ -3,14 +3,27 @@
 {% load i18n %}
 {% load rules %}
 
+{% has_perm "members.view_member" request.user as has_member_rights %}
+{% has_perm "teams.view_season" request.user as has_season_rights %}
+
 <li class="mb-4">
-    {% if request.user.is_superuser %}
+    {% if has_member_rights %}
         <span class="menu_title">{% translate "Members" %}</span>
 
         {% url "backend:members:members_list" as members_list %}
         <a href="{{ members_list }}" {% if members_list in request.path %}class="active"{% endif %}>
             <i class="fa-solid fa-users min-w-5"></i>
             {% translate "Members" %}
+        </a>
+    {% endif %}
+
+    {% if config.CLUBMANAGER_ENABLE_TEAMS %}
+        <span class="menu_title">{% translate "Teams" %}</span>
+
+        {% url "backend:teams:seasons_list" as seasons_list %}
+        <a href="{{ seasons_list }}" {% if seasons_list in request.path %}class="active"{% endif %}>
+            <i class="fa-solid fa-calendar-days min-w-5"></i>
+            {% translate "Seasons" %}
         </a>
     {% endif %}
 

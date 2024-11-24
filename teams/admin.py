@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Season, TeamRole
+
+admin.site.register(Season)
+admin.site.register(TeamRole)
