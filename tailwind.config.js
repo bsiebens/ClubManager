@@ -9,6 +9,8 @@ module.exports = {
       "file-input-sm",
       "select-sm",
       "file-input-sm",
+      "toggle-xs",
+      "toggle-sm",
       "checkbox-xs",
       "file-input-xs",
       "input-xs",

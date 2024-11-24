@@ -19,6 +19,7 @@ def index(request: HttpRequest) -> HttpResponse:
         "club_name": config.CLUBMANAGER_CLUB_NAME,
         "club_location": config.CLUBMANAGER_CLUB_LOCATION,
         "club_logo": config.CLUBMANAGER_CLUB_LOGO,
+        "club_enable_teams": config.CLUBMANAGER_ENABLE_TEAMS,
     }
 
     form = ConfigurationForm(initial=initial_data)
@@ -28,6 +29,7 @@ def index(request: HttpRequest) -> HttpResponse:
         if form.is_valid():
             config.CLUBMANAGER_CLUB_NAME = form.cleaned_data["club_name"]
             config.CLUBMANAGER_CLUB_LOCATION = form.cleaned_data["club_location"]
+            config.CLUBMANAGER_ENABLE_TEAMS = form.cleaned_data["club_enable_teams"]
 
             if form.cleaned_data["club_logo"] is not None:
                 default_storage.save(Path(settings.STATIC_ROOT / form.cleaned_data["club_logo"].name), form.cleaned_data["club_logo"])

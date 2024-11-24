@@ -51,7 +51,7 @@ class Member(models.Model):
     def create_member(cls, first_name: str, last_name: str, email: str, password: str | None = None, member: "Member | None" = None) -> "Member":
         """Creates a new member based on the provided details. Will link this to an existing user or create a new one if necessary."""
 
-        if member is not None:
+        if member is not None and member.id is not None:
             member.user.first_name = first_name
             member.user.last_name = last_name
             member.user.email = email

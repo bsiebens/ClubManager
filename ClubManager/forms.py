@@ -9,3 +9,4 @@ class ConfigurationForm(forms.Form):
     club_location = forms.CharField(label=_("Home Game Location"), max_length=250, help_text=_("Changing this setting will set a new home game "
                                                                                                "location and will update already existing games"))
     club_logo = forms.ImageField(label=_("Club Logo"), required=False)
+    club_enable_teams = forms.BooleanField(label=_("Enable Teams"), required=False, help_text=_("Enable or disable the teams module"))

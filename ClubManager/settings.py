@@ -156,6 +156,7 @@ CONSTANCE_CONFIG = {
     "CLUBMANAGER_CLUB_LOGO": ("", _("Location of the club logo"), str),
     "CLUBMANAGER_CLUB_LOCATION": ("Home", _("Location of the home games"), str),
     "CLUBMANAGER_ENABLE_EXPERIMENTAL_FEATURES": (False, _("Enables experimental features of ClubManager which might not be ready for use"), bool),
+    "CLUBMANAGER_ENABLE_TEAMS": (True, _("Enables the teams module"), bool)
 }
 
 PHONENUMBER_DEFAULT_FORMAT = "INTERNATIONAL"

@@ -1,0 +1,49 @@
+{% extends "clubmanager/_base.html" %}
+
+{% load i18n %}
+{% load form_field %}
+{% load avatar %}
+
+{% block page_title %}
+    <h1 class="page_title">
+        <i class="fa-solid fa-users"></i>{% translate "Members" %}
+    </h1>
+{% endblock page_title %}
+
+{% block page_content %}
+    <h2 class="page_subtitle !border-b-0">{% translate "Load new member information" %}</h2>
+
+    {% blocktranslate %}
+        <article class="prose max-w-none text-justify">
+            <p>Use the below form to upload a .csv file containing the information on your members. The file should be formatted in the following format:</p>
+            <ul class="ml-2">
+                <li>First name</li>
+                <li>Last name</li>
+                <li>Email</li>
+                <li>Birthday (YYYY-MM-DD)</li>
+                <li>License number</li>
+                <li>Team (short name)</li>
+                <li>Role (abbreviation)</li>
+                <li>Number</li>
+                <li>Position (C or A, depending on captain or assistant captain, leave empty if neither)</li>
+            </ul>
+        </article>
+    {% endblocktranslate %}
+
+    {% if form.errors %}
+        <div class="bg-error bg-opacity-50 border-error border-2 rounded-lg p-2 m-2">
+            <div class="font-semibold text-error-content mb-1">{% translate "Error" %}</div>
+            <div class="text-sm">{% translate "Please correct the errors below before saving again." %}</div>
+        </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {%  form_field form.data_file %}
+
+        <button class="w-full mt-8 btn btn-neutral" type="submit">
+            <i class="fa-solid fa-floppy-disk"></i>{% translate "Save" %}
+        </button>
+    </form>
+{% endblock page_content %}
