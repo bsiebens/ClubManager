@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "two_factor.plugins.webauthn",
     "django_filters",
     "members",
+    "teams",
 ]
 
 AUTHENTICATION_BACKENDS = [

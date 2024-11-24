@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
+from rules import is_superuser
+from rules.contrib.models import RulesModel
 
 
 class MemberManager(models.Manager):
@@ -14,7 +16,7 @@ class MemberManager(models.Manager):
         return super().get_queryset().select_related("user")
 
 
-class Member(models.Model):
+class Member(RulesModel):
     """Each user has a member profile, containing links to other family members."""
 
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name="member", verbose_name=_("user"))
@@ -37,6 +39,9 @@ class Member(models.Model):
         verbose_name = _("member")
         verbose_name_plural = _("members")
         ordering = ["user__last_name", "user__first_name"]
+        rules_permissions = {
+            "add": is_superuser, "view": is_superuser, "change": is_superuser, "delete": is_superuser
+        }
 
     def __str__(self) -> str:
         return self.user.get_full_name()

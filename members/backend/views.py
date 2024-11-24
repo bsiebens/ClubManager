@@ -10,33 +10,34 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, FormView, UpdateView
 from django_filters.views import FilterView
+from rules.contrib.views import PermissionRequiredMixin
 
 from ..filters import MemberFilter
 from ..forms import MassUploadForm, MemberForm
 from ..models import Member
 
 
-class MemberListView(LoginRequiredMixin, UserPassesTestMixin, FilterView):
+class MemberListView(PermissionRequiredMixin, FilterView):
     filterset_class = MemberFilter
     paginate_by = 50
-    login_url = reverse_lazy("two_factor:login")
     permission_denied_message = _("You do not have permission to view this page.")
+    permission_required = "members.view_member"
 
     def test_func(self) -> bool:
         return self.request.user.is_superuser
 
     def handle_no_permission(self) -> HttpResponseRedirect:
         messages.error(self.request, self.get_permission_denied_message())
-        return HttpResponseRedirect(reverse_lazy("two_factor:login"))
+        return HttpResponseRedirect(reverse_lazy("backend:index"))
 
 
-class MemberAddView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
+class MemberAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     model = Member
     form_class = MemberForm
     success_url = reverse_lazy("backend:members:members_list")
     success_message = _("Member <strong>%(name)s</strong> has been added successfully - <strong>%(note)s</strong>")
-    login_url = reverse_lazy("two_factor:login")
     permission_denied_message = _("You do not have permission to view this page.")
+    permission_required = "members.add_member"
 
     def get_success_message(self, cleaned_data: dict[str, str]) -> str:
         return self.success_message % dict(cleaned_data, name=self.object.user.get_full_name(), note=self.object.notes)
@@ -46,16 +47,16 @@ class MemberAddView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin
 
     def handle_no_permission(self) -> HttpResponseRedirect:
         messages.error(self.request, self.get_permission_denied_message())
-        return HttpResponseRedirect(reverse_lazy("two_factor:login"))
+        return HttpResponseRedirect(reverse_lazy("backend:index"))
 
 
-class MemberEditView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
+class MemberEditView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Member
     form_class = MemberForm
     success_url = reverse_lazy("backend:members:members_list")
     success_message = _("Member <strong>%(name)s</strong> has been edited successfully - <strong>%(note)s</strong>")
     permission_denied_message = _("You do not have permission to view this page.")
-    login_url = reverse_lazy("two_factor:login")
+    permission_required = "members.change_member"
 
     def get_success_message(self, cleaned_data: dict[str, str]) -> str:
         return self.success_message % dict(cleaned_data, name=self.object.user.get_full_name(), note=self.object.notes)
@@ -65,7 +66,7 @@ class MemberEditView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
 
     def handle_no_permission(self) -> HttpResponseRedirect:
         messages.error(self.request, self.get_permission_denied_message())
-        return HttpResponseRedirect(reverse_lazy("two_factor:login"))
+        return HttpResponseRedirect(reverse_lazy("backend:index"))
 
     def get_initial(self) -> dict[str, str]:
         initial_data = super().get_initial()
@@ -78,12 +79,12 @@ class MemberEditView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
         return initial_data
 
 
-class MemberDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView):
+class MemberDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Member
     success_url = reverse_lazy("backend:members:members_list")
     success_message = _("Member <strong>%(name)s</strong> has been deleted successfully")
     permission_denied_message = _("You do not have permission to view this page.")
-    login_url = reverse_lazy("two_factor:login")
+    permission_required = "members.delete_member"
 
     def get_success_message(self, cleaned_data: dict[str, str]) -> str:
         return self.success_message % dict(cleaned_data, name=self.object.user.get_full_name(), note=self.object.notes)
@@ -93,23 +94,23 @@ class MemberDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMi
 
     def handle_no_permission(self) -> HttpResponseRedirect:
         messages.error(self.request, self.get_permission_denied_message())
-        return HttpResponseRedirect(reverse_lazy("two_factor:login"))
+        return HttpResponseRedirect(reverse_lazy("backend:index"))
 
 
-class MemberBulkLoadView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, FormView):
+class MemberBulkLoadView(PermissionRequiredMixin, SuccessMessageMixin, FormView):
     success_url = reverse_lazy("backend:members:members_list")
     success_message = _("Members have been uploaded successfully")
     permission_denied_message = _("You do not have permission to view this page.")
-    login_url = reverse_lazy("two_factor:login")
     template_name = "members/member_bulk_upload.html"
     form_class = MassUploadForm
+    permission_required = "members.add_member"
 
     def test_func(self) -> bool:
         return self.request.user.is_superuser
 
     def handle_no_permission(self) -> HttpResponseRedirect:
         messages.error(self.request, self.get_permission_denied_message())
-        return HttpResponseRedirect(reverse_lazy("two_factor:login"))
+        return HttpResponseRedirect(reverse_lazy("backend:index"))
 
     def form_valid(self, form: MassUploadForm) -> HttpResponse:
         member_data = self.request.FILES["data_file"]
