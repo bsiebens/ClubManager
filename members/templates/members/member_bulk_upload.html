@@ -13,6 +13,11 @@
 {% block page_content %}
     <h2 class="page_subtitle !border-b-0">{% translate "Load new member information" %}</h2>
 
+    <div class="bg-error bg-opacity-50 border-error border-2 rounded-lg p-2 m-2">
+        <div class="font-semibold text-error-content mb-1">{% translate "Warning" %}</div>
+        <div class="text-sm text-error-content">{% translate "This functionality is still under development and might destroy your database! Ensure you have a backup before running a mass upload of new information." %}</div>
+    </div>
+
     {% blocktranslate %}
         <article class="prose max-w-none text-justify">
             <p>Use the below form to upload a .csv file containing the information on your members. The file should be formatted in the following format:</p>
@@ -33,7 +38,7 @@
     {% if form.errors %}
         <div class="bg-error bg-opacity-50 border-error border-2 rounded-lg p-2 m-2">
             <div class="font-semibold text-error-content mb-1">{% translate "Error" %}</div>
-            <div class="text-sm">{% translate "Please correct the errors below before saving again." %}</div>
+            <div class="text-sm text-error-content">{% translate "Please correct the errors below before saving again." %}</div>
         </div>
     {% endif %}
 
