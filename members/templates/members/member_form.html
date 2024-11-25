@@ -33,7 +33,7 @@
             {% endif %}
 
             {% if member.emergency_phone %}
-                <a href="{{ member.emergency_phone.as_rfc3966 }}" class="btn btn-error"><i class="fa-solid fa-file-medical"></i>{{ member.emergency_phone_primary }}</a>
+                <a href="{{ member.emergency_phone.as_rfc3966 }}" class="btn btn-error"><i class="fa-solid fa-file-medical"></i>{{ member.emergency_phone }}</a>
             {% endif %}
 
             <a href="{% url "backend:members:members_delete" member.id %}" class="lg:hidden btn btn-error btn-outline">

@@ -117,7 +117,7 @@
             <div class="mx-auto">{% translate "No members found" %}</div>
         {% else %}
             {% for member in object_list %}
-                <a href="#">
+                <a href="{% url "backend:members:members_edit" member.id %}">
                     <div class="data_card">
                         <div>
                             {% avatar first_name=member.user.first_name last_name=member.user.last_name %}

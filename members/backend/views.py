@@ -34,12 +34,12 @@ class MemberAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     model = Member
     form_class = MemberForm
     success_url = reverse_lazy("backend:members:members_list")
-    success_message = _("Member <strong>%(name)s</strong> has been added successfully - <strong>%(note)s</strong>")
+    success_message = _("Member <strong>%(name)s</strong> has been added successfully")
     permission_denied_message = _("You do not have permission to view this page.")
     permission_required = "members.add_member"
 
     def get_success_message(self, cleaned_data: dict[str, str]) -> str:
-        return self.success_message % dict(cleaned_data, name=self.object.user.get_full_name(), note=self.object.notes)
+        return self.success_message % dict(cleaned_data, name=self.object.user.get_full_name())
 
     def test_func(self) -> bool:
         return self.request.user.is_superuser
@@ -53,12 +53,12 @@ class MemberEditView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Member
     form_class = MemberForm
     success_url = reverse_lazy("backend:members:members_list")
-    success_message = _("Member <strong>%(name)s</strong> has been edited successfully - <strong>%(note)s</strong>")
+    success_message = _("Member <strong>%(name)s</strong> has been edited successfully")
     permission_denied_message = _("You do not have permission to view this page.")
     permission_required = "members.change_member"
 
     def get_success_message(self, cleaned_data: dict[str, str]) -> str:
-        return self.success_message % dict(cleaned_data, name=self.object.user.get_full_name(), note=self.object.notes)
+        return self.success_message % dict(cleaned_data, name=self.object.user.get_full_name())
 
     def test_func(self) -> bool:
         return self.request.user.is_superuser
@@ -86,7 +86,7 @@ class MemberDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView)
     permission_required = "members.delete_member"
 
     def get_success_message(self, cleaned_data: dict[str, str]) -> str:
-        return self.success_message % dict(cleaned_data, name=self.object.user.get_full_name(), note=self.object.notes)
+        return self.success_message % dict(cleaned_data, name=self.object.user.get_full_name())
 
     def test_func(self) -> bool:
         return self.request.user.is_superuser

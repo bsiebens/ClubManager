@@ -62,7 +62,7 @@ class Member(RulesModel):
             member.user.email = email
             member.user.username = email
 
-            if password is not None or password != "":
+            if password is not None and password != "":
                 member.user.set_password(password)
 
         else:
