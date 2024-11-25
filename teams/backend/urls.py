@@ -9,4 +9,5 @@ app_name = "teams"
 urlpatterns = [
     path("seasons", views.SeasonListView.as_view(), name="seasons_list"),
     path("seasons/add", views.SeasonAddView.as_view(), name="seasons_add"),
+    path("seasons/delete/<int:pk>", views.SeasonDeleteView.as_view(), name="seasons_delete"),
 ]

@@ -55,7 +55,7 @@
                                 </div>
                             </td>
                             <td>
-                                <a class="btn btn-outline btn-error btn-sm {% if season.passed_start_date %}btn-disabled{% endif %}" href="#">
+                                <a class="btn btn-outline btn-error btn-sm {% if season.passed_start_date %}btn-disabled{% endif %}" href="{% url "backend:teams:seasons_delete" season.id %}">
                                     <i class="fa-solid fa-trash"></i>
                                     {% translate "Delete" %}
                                 </a>
@@ -71,19 +71,20 @@
         {% if object_list|length == 0 %}
             <div class="mx-auto">{% translate "No members found" %}</div>
         {% else %}
-            {% for member in object_list %}
-                <a href="#">
-                    <div class="data_card">
-                        <div>
-                            TITLE
-                        </div>
+            {% for season in object_list %}
+                <div class="data_card {% if season.current_season %}border-l-success{% endif %}">
+                    <div class="data">
+                        <div>{{ season.start_date }} {% translate "to" %} {{ season.end_date }}</div>
 
-                        <div class="data">
-                            <div>{{ member.user.get_full_name }}</div>
-                            <div>{{ member.user.email }}</div>
-                        </div>
+                        {% if season.current_season %}
+                            <div>{% translate "Current season" %}</div>
+                        {% endif %}
                     </div>
-                </a>
+
+                    <a class="btn btn-outline btn-error {% if season.passed_start_date %}btn-disabled{% endif %}" href="{% url "backend:teams:seasons_delete" season.id %}">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                </div>
             {% endfor %}
         {% endif %}
     </div>
