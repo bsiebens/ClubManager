@@ -71,7 +71,7 @@
     }
 
     .data_card > .data {
-        @apply flex flex-col;
+        @apply flex flex-col gap-1;
         @apply grow;
     }
 

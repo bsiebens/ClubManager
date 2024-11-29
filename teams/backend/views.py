@@ -1,19 +1,21 @@
 #  Copyright (c) ClubManager - Bernard Siebens 2024.
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, FormView, DeleteView
-from rules.contrib.views import PermissionRequiredMixin
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import CreateView, DeleteView, FormView, ListView, UpdateView
+from django_filters.views import FilterView
+from rules.contrib.views import PermissionRequiredMixin
 
+from ..filters import TeamRoleFilter
 from ..forms import SeasonCreationForm
-from ..models import Season
+from ..models import Season, TeamRole
 
 
 class SeasonListView(PermissionRequiredMixin, ListView):
     model = Season
-    permission_required = 'teams.view_season'
+    permission_required = "teams.view_season"
     permission_denied_message = _("You do not have permission to view this page")
 
     def handle_no_permission(self) -> HttpResponseRedirect:
@@ -26,8 +28,9 @@ class SeasonListView(PermissionRequiredMixin, ListView):
 
         return context
 
+
 class SeasonAddView(PermissionRequiredMixin, SuccessMessageMixin, FormView):
-    permission_required = 'teams.add_season'
+    permission_required = "teams.add_season"
     permission_denied_message = _("You do not have permission to view this page")
     form_class = SeasonCreationForm
     template_name = "teams/season_form.html"
@@ -42,9 +45,10 @@ class SeasonAddView(PermissionRequiredMixin, SuccessMessageMixin, FormView):
         form.save_season()
         return super().form_valid(form)
 
+
 class SeasonDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Season
-    permission_required = 'teams.delete_season'
+    permission_required = "teams.delete_season"
     permission_denied_message = _("You do not have permission to view this page")
     success_url = reverse_lazy("backend:teams:seasons_list")
     success_message = _("Season has been deleted successfully")
@@ -52,3 +56,61 @@ class SeasonDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView)
     def handle_no_permission(self) -> HttpResponseRedirect:
         messages.error(self.request, self.get_permission_denied_message())
         return HttpResponseRedirect(reverse_lazy("backend:index"))
+
+
+class TeamRoleListView(PermissionRequiredMixin, FilterView):
+    filterset_class = TeamRoleFilter
+    permission_required = "teams.view_teamrole"
+    permission_denied_message = _("You do not have permission to view this page")
+    paginate_by = 50
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        messages.error(self.request, self.get_permission_denied_message())
+        return HttpResponseRedirect(reverse_lazy("backend:index"))
+
+
+class TeamRoleAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+    model = TeamRole
+    fields = ["name", "abbreviation", "staff_role", "admin_role", "sort_order"]
+    permission_required = "teams.add_teamrole"
+    permission_denied_message = _("You do not have permission to view this page")
+    success_url = reverse_lazy("backend:teams:teamroles_list")
+    success_message = _("Team role <strong>%(name)s (%(abbreviation)s)</strong> has been added successfully")
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        messages.error(self.request, self.get_permission_denied_message())
+        return HttpResponseRedirect(reverse_lazy("backend:index"))
+
+    def get_success_message(self, cleaned_data: dict[str, str]) -> str:
+        return self.success_message % dict(cleaned_data, name=self.object.name, abbreviation=self.object.abbreviation)
+
+
+class TeamRoleEditView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = TeamRole
+    fields = ["name", "abbreviation", "staff_role", "admin_role", "sort_order"]
+    permission_required = "teams.change_teamrole"
+    permission_denied_message = _("You do not have permission to view this page")
+    success_url = reverse_lazy("backend:teams:teamroles_list")
+    success_message = _("Team role <strong>%(name)s (%(abbreviation)s)</strong> has been edited successfully")
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        messages.error(self.request, self.get_permission_denied_message())
+        return HttpResponseRedirect(reverse_lazy("backend:index"))
+
+    def get_success_message(self, cleaned_data: dict[str, str]) -> str:
+        return self.success_message % dict(cleaned_data, name=self.object.name, abbreviation=self.object.abbreviation)
+
+
+class TeamRoleDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
+    model = TeamRole
+    permission_required = "teams.delete_teamrole"
+    permission_denied_message = _("You do not have permission to view this page")
+    success_url = reverse_lazy("backend:teams:teamroles_list")
+    success_message = _("Team role <strong>%(name)s (%(abbreviation)s)</strong> has been deleted successfully")
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        messages.error(self.request, self.get_permission_denied_message())
+        return HttpResponseRedirect(reverse_lazy("backend:index"))
+
+    def get_success_message(self, cleaned_data: dict[str, str]) -> str:
+        return self.success_message % dict(cleaned_data, name=self.object.name, abbreviation=self.object.abbreviation)

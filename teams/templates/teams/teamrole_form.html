@@ -1,0 +1,70 @@
+{% extends "clubmanager/_base.html" %}
+
+{% load i18n %}
+{% load form_field %}
+{% load avatar %}
+
+{% block page_title %}
+    <h1 class="page_title">
+        <i class="fa-solid fa-user-circle"></i>{% translate "Team Roles" %}
+    </h1>
+{% endblock page_title %}
+
+{% block page_content %}
+    {% if member %}
+        <div class="flex flex-row items-center gap-x-3 mt-8">
+            {% avatar first_name=member.user.first_name last_name=member.user.last_name %}
+
+            <h2 class="page_subtitle !border-b-0 !mt-0">{{ member.user.get_full_name }}</h2>
+            {% if member.user.is_superuser %}
+                <div class="badge badge-accent">{% translate "Admin" %}</div>
+            {% endif %}
+
+            <div class="hidden laptop:flex grow justify-end">
+                <a href="{% url "backend:members:members_delete" member.id %}" class="btn btn-error btn-outline">
+                    <i class="fa-solid fa-trash"></i>{% translate "Delete" %}
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-2 mt-4 lg:grid-cols-3">
+            {% if member.phone %}
+                <a href="{{ member.phone.as_rfc3966 }}" class="btn btn-info"><i class="fa-solid fa-phone"></i>{{ member.phone }}</a>
+            {% endif %}
+
+            {% if member.emergency_phone %}
+                <a href="{{ member.emergency_phone.as_rfc3966 }}" class="btn btn-error"><i class="fa-solid fa-file-medical"></i>{{ member.emergency_phone }}</a>
+            {% endif %}
+
+            <a href="{% url "backend:members:members_delete" member.id %}" class="lg:hidden btn btn-error btn-outline">
+                <i class="mr-1 fa-solid fa-trash"></i>{% translate "Delete" %}
+            </a>
+        </div>
+    {% else %}
+        <h2 class="page_subtitle !border-b-0">{% translate "Create new team role" %}</h2>
+    {% endif %}
+
+    {% if form.errors %}
+        <div class="bg-error bg-opacity-50 border-error border-2 rounded-lg p-2 m-2">
+            <div class="font-semibold text-error-content mb-1">{% translate "Error" %}</div>
+            <div class="text-sm text-error-content">{% translate "Please correct the errors below before saving again." %}</div>
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <h2 class="page_subtitle">{% translate "Role information" %}</h2>
+        <div class="grid grid-cols-1 gap-1 gap-x-4 laptop:grid-cols-2 mt-2">
+            {% form_field form.name %}
+            {% form_field form.abbreviation %}
+            {% form_field form.staff_role %}
+            {% form_field form.admin_role %}
+            {% form_field form.sort_order %}
+        </div>
+
+        <button class="w-full mt-8 btn btn-neutral" type="submit">
+            <i class="fa-solid fa-floppy-disk"></i>{% translate "Save" %}
+        </button>
+    </form>
+{% endblock page_content %}

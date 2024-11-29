@@ -1,0 +1,26 @@
+{% extends "clubmanager/_base.html" %}
+
+{% load i18n %}
+
+{% block page_title %}
+    <h1 class="page_title">
+        <i class="fa-solid fa-user-circle"></i>{% translate "Team Roles" %}
+    </h1>
+{% endblock page_title %}
+
+{% block page_content %}
+    <div>
+        {% blocktranslate with name=object.name abbreviation=object.abbreviation %}
+            Are you sure you want to delete team role <span class="font-bold">{{ name }} ({{ abbreviation }})</span>?
+        {% endblocktranslate %}
+    </div>
+
+    <form method="post" action="{% url "backend:teams:teamroles_delete" object.id %}">
+        {% csrf_token %}
+
+        <div class="flex flex-row gap-2 mt-8">
+            <a href="{% url "backend:teams:teamroles_list" %}" class="btn">{% translate "Cancel" %}</a>
+            <button type="submit" class="btn btn-error">{% translate "Delete" %}</button>
+        </div>
+    </form>
+{% endblock page_content %}

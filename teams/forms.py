@@ -3,7 +3,9 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
+
 from .models import Season
+
 
 class SeasonCreationForm(forms.Form):
     class DurationChoices(TextChoices):

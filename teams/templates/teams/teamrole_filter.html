@@ -1,0 +1,150 @@
+{% extends "clubmanager/_base.html" %}
+
+{% load i18n %}
+{% load form_field %}
+{% load pagination_tags %}
+
+{% block page_title %}
+    <h1 class="page_title">
+        <i class="fa-solid fa-user-circle"></i>{% translate "Team Roles" %}
+    </h1>
+{% endblock page_title %}
+
+{% block page_content %}
+    <div class="action_bar">
+        <div class="filter">
+            <form>
+                {% for field in filter.form %}
+                    {% form_field field show_label=False size="extra-small" %}
+                {% endfor %}
+
+                <button type="submit">
+                    <i class="fa-solid fa-filter"></i>{% translate "Filter" %}
+                </button>
+            </form>
+        </div>
+
+        <div class="add">
+            <a class="btn" href="{% url "backend:teams:teamroles_add" %}">
+                <i class="fa-solid fa-plus"></i>{% translate "Add" %}
+            </a>
+        </div>
+    </div>
+
+    <div class="hidden mt-4 laptop:block">
+        <table class="table table-zebra">
+            <thead>
+                <tr>
+                    <th>{% translate "Name" %}</th>
+                    <th>{% translate "Abbreviation" %}</th>
+                    <th>{% translate "Staff Role" %}</th>
+                    <th>{% translate "Admin Role" %}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if object_list|length == 0 %}
+                    <tr>
+                        <td colspan="5">{% translate "No team roles found" %}</td>
+                    </tr>
+                {% else %}
+                    {% for team_role in object_list %}
+                        <tr class="hover">
+                            <td>
+                                <a href="{% url "backend:teams:teamroles_edit" team_role.id %}" class="font-bold">
+                                    {{ team_role.name }}
+                                </a>
+                            </td>
+                            <td>{{ team_role.abbreviation }}</td>
+                            <td>
+                                {% if team_role.staff_role %}
+                                    <i class="fa-solid fa-circle-check text-success"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-circle-xmark text-error"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if team_role.admin_role %}
+                                    <i class="fa-solid fa-circle-check text-success"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-circle-xmark text-error"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="flex flex-row gap-2">
+                                    <a class="btn btn-outline btn-sm" href="{% url "backend:teams:teamroles_edit" team_role.id %}">
+                                        <i class="fa-solid fa-eye"></i>{% translate "Details" %}
+                                    </a>
+
+                                    <a class="btn btn-outline btn-error btn-sm" href="{% url "backend:teams:teamroles_delete" team_role.id %}">
+                                        <i class="fa-solid fa-trash"></i>{% translate "Delete" %}
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-2 laptop:hidden flex flex-col gap-2">
+        {% if object_list|length == 0 %}
+            <div class="mx-auto">{% translate "No team roles found" %}</div>
+        {% else %}
+            {% for team_role in object_list %}
+                <div class="data_card">
+                    <a class="data" href="{% url "backend:teams:teamroles_edit" team_role.id %}">
+                        <div>{{ team_role.name }}</div>
+                        <div>{{ team_role.abbreviation }}</div>
+
+                        {% if team_role.staff_role or team_role.admin_role %}
+                            <div class="flex flex-row gap-2 mt-2">
+                                {% if team_role.admin_role %}
+                                    <div class="badge badge-sm badge-primary">{% translate "Team Admin" %}</div>
+                                {% endif %}
+                            
+                                {% if team_role.staff_role %}
+                                    <div class="badge badge-sm badge-accent">{% translate "Team Staff" %}</div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </a>
+
+                    <div>
+                        <a href="{% url "backend:teams:teamroles_delete" team_role.id %}" class="btn btn-outline btn-error">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    
+    {% if is_paginated %}
+        <div class="flex justify-center mt-4">
+            <div class="join">
+                {% if page_obj.has_previous %}
+                    <a class="join-item btn" href="?{% url_replace request "page" 1 %}">&laquo;<span
+                            class="hidden lg:inline"> {% translate "first" %}</span></a>
+                    <a class="join-item btn"
+                       href="?{% url_replace request "page" page_obj.previous_page_number %}"><span
+                            class="hidden lg:inline">{% translate "previous" %}</span><span
+                            class="lg:hidden">&lt;</span></a>
+                {% endif %}
+
+                <button class="join-item btn btn-disabled">
+                    {% blocktranslate with page=page_obj.number num_pages=page_obj.paginator.num_pages %}page {{ page }}
+                        of {{ num_pages }}{% endblocktranslate %}</button>
+
+                {% if page_obj.has_next %}
+                    <a class="join-item btn" href="?{% url_replace request "page" page_obj.next_page_number %}"><span
+                            class="hidden lg:inline">{% translate "next" %}</span><span
+                            class="lg:hidden">&gt;</span></a>
+                    <a class="join-item btn" href="?{% url_replace request "page" page_obj.paginator.num_pages %}"><span
+                            class="hidden lg:inline"> {% translate "last" %}</span> &raquo;</a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock page_content %}
