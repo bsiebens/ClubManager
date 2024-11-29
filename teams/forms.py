@@ -4,7 +4,7 @@ from django import forms
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
-from .models import Season
+from .models import Season, NumberPool
 
 
 class SeasonCreationForm(forms.Form):
@@ -38,3 +38,8 @@ class SeasonCreationForm(forms.Form):
 
         new_season = Season.objects.create(start_date=start_date, end_date=end_date)
         return new_season
+
+class NumberPoolCreationForm(forms.ModelForm):
+    class Meta:
+        model = NumberPool
+        fields = ["name", "enforce_unique_numbers"]

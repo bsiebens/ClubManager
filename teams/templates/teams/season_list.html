@@ -45,7 +45,7 @@
                     </tr>
                 {% else %}
                     {% for season in object_list %}
-                        <tr class="hover border-l-4 {% if season.current_season %}border-l-success{% endif %}">
+                        <tr class="hover">
                             <td>
                                 <div class="flex flex-col grow">
                                     <div class="font-bold">{{ season.start_date|date:"d F Y" }} {% translate "to" %} {{ season.end_date|date:"d F Y" }}</div>
@@ -69,7 +69,7 @@
 
     <div class="mt-2 laptop:hidden flex flex-col gap-2">
         {% if object_list|length == 0 %}
-            <div class="mx-auto">{% translate "No members found" %}</div>
+            <div class="mx-auto">{% translate "No seasons found" %}</div>
         {% else %}
             {% for season in object_list %}
                 <div class="data_card {% if season.current_season %}border-l-success{% endif %}">

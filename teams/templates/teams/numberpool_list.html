@@ -1,0 +1,92 @@
+{% extends "clubmanager/_base.html" %}
+
+{% load i18n %}
+{% load form_field %}
+
+{% block page_title %}
+    <h1 class="page_title">
+        <i class="fa-solid fa-layer-group"></i>{% translate "Number Pools" %}
+    </h1>
+{% endblock page_title %}
+
+{% block page_content %}
+    <div class="justify-end action_bar">
+        <form class="add_form" method="post" action="{% url "backend:teams:numberpools_add" %}">
+            {% csrf_token %}
+
+            <div class="form_label">
+                {% translate "Add a new number pool" %}
+            </div>
+
+            <div class="form">
+                {% form_field form.name show_label=False %}
+                {% form_field form.enforce_unique_numbers show_label=False %}
+
+                <button type="submit">
+                    <i class="fa-solid fa-plus"></i>
+                    {% translate "Add" %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="hidden mt-4 laptop:block">
+        <table class="table table-zebra">
+            <thead>
+                <tr>
+                    <th>{% translate "Name" %}</th>
+                    <th>{% translate "Enforce unique numbers?" %}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if object_list|length == 0 %}
+                    <tr>
+                        <td colspan="3">{% translate "No number pools found" %}</td>
+                    </tr>
+                {% else %}
+                    {% for numberpool in object_list %}
+                        <tr class="hover">
+                            <td class="font-bold">{{ numberpool.name|capfirst }}</td>
+                            <td>
+                                {% if numberpool.enforce_unique_numbers %}
+                                    <i class="fa-solid fa-circle-check text-success"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-circle-xmark text-error"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a class="btn btn-outline btn-error btn-sm {% if numberpool.name == "default" %}btn-disabled{% endif %}" href="{% url "backend:teams:numberpools_delete" numberpool.id %}">
+                                    <i class="fa-solid fa-trash"></i>
+                                    {% translate "Delete" %}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-2 laptop:hidden flex flex-col gap-2">
+        {% if object_list|length == 0 %}
+            <div class="mx-auto">{% translate "No number pools found" %}</div>
+        {% else %}
+            {% for numberpool in object_list %}
+                <div class="data_card">
+                    <div class="data">
+                        <div>{{ numberpool.name|capfirst }}</div>
+
+                        {% if numberpool.enforce_unique_numbers %}
+                            <div>{% translate "Unique numbers enforced" %}</div>
+                        {% endif %}
+                    </div>
+
+                    <a class="btn btn-outline btn-error {% if numberpool.name == "default"  %}btn-disabled{% endif %}" href="{% url "backend:teams:numberpools_delete" numberpool.id %}">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock page_content %}

@@ -48,7 +48,7 @@ class Season(RulesModel):
 class NumberPool(RulesModel):
     """A number pool consists of a pool of numbers (hence the name) that can be handed out to players. Depending on settings you can enforce unique numbers in a given pool (e.g., to avoid 2 players in a youth category to have the same number. The default number pool will allow duplicate numbers to be assigned."""
     name = models.CharField(_("name"), max_length=255, unique=True)
-    enforce_unique_numbers = models.BooleanField(_("enforce unique numbers"), default=False, help_text=_("Will not allow members that have a number to be assigned a number that is already in use by another member in the same pool"))
+    enforce_unique_numbers = models.BooleanField(_("enforce unique numbers"), default=False, help_text=_("Does not allow duplicate numbers to be assigned when checked"))
 
     class Meta:
         verbose_name = _("number pool")

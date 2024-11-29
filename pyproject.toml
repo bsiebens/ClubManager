@@ -18,6 +18,7 @@ pillow = "^11.0.0"
 django-two-factor-auth = {extras = ["webauthn"], version = "^1.17.0"}
 django-filter = "^24.3"
 python-dateutil = "^2.9.0.post0"
+redis = "^5.2.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.7.3"
@@ -28,6 +29,7 @@ flake8-todos = "^0.3.1"
 flake8-fixme = "^1.1.1"
 pytest-django = "^4.9.0"
 coverage = "^7.6.4"
+django-debug-toolbar = "^4.4.6"
 
 [tool.poetry.group.test.dependencies]
 teamcity-messages = "^1.32"

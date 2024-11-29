@@ -6,6 +6,7 @@
 {% has_perm "members.view_member" request.user as has_member_rights %}
 {% has_perm "teams.view_season" request.user as has_season_rights %}
 {% has_perm "teams.view_teamrole" request.user as has_teamrole_rights %}
+{% has_perm "teams.view_numberpool" request.user as has_numberpool_rights %}
 
 <li class="mb-4">
     {% if has_member_rights %}
@@ -34,6 +35,14 @@
             <a href="{{ teamroles_list }}" {% if teamroles_list in request.path %}class="active"{% endif %}>
                 <i class="fa-solid fa-user-circle min-w-5"></i>
                 {% translate "Team Roles" %}
+            </a>
+        {% endif %}
+
+        {% if has_numberpool_rights %}
+            {% url "backend:teams:numberpools_list" as numberpools_list %}
+            <a href="{{ numberpools_list }}" {% if numberpools_list in request.path %}class="active"{% endif %}>
+                <i class="fa-solid fa-layer-group min-w-5"></i>
+                {% translate "Number Pools" %}
             </a>
         {% endif %}
     {% endif %}
