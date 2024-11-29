@@ -45,6 +45,19 @@ class Season(RulesModel):
     def passed_start_date(self) -> bool:
         return self.start_date <= timezone.now().date()
 
+class NumberPool(RulesModel):
+    """A number pool consists of a pool of numbers (hence the name) that can be handed out to players. Depending on settings you can enforce unique numbers in a given pool (e.g., to avoid 2 players in a youth category to have the same number. The default number pool will allow duplicate numbers to be assigned."""
+    name = models.CharField(_("name"), max_length=255, unique=True)
+    enforce_unique_numbers = models.BooleanField(_("enforce unique numbers"), default=False, help_text=_("Will not allow members that have a number to be assigned a number that is already in use by another member in the same pool"))
+
+    class Meta:
+        verbose_name = _("number pool")
+        verbose_name_plural = _("number pools")
+        rules_permissions = {"add": is_superuser, "view": is_superuser, "change": is_superuser, "delete": is_superuser}
+
+    def __str__(self):
+        return self.name
+
 
 class TeamRole(RulesModel):
     """A team role defines the position of a member in a given team and can grant additional rights."""
