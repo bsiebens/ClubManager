@@ -17,4 +17,8 @@ urlpatterns = [
     path("numberpools", views.NumberPoolListView.as_view(), name="numberpools_list"),
     path("numberpools/add", views.NumberPoolAddView.as_view(), name="numberpools_add"),
     path("numberpools/delete/<int:pk>", views.NumberPoolDeleteView.as_view(), name="numberpools_delete"),
+    path("teams", views.TeamListView.as_view(), name="teams_list"),
+    path("teams/add", views.TeamAddView.as_view(), name="teams_add"),
+    path("teams/edit/<int:pk>", views.TeamEditView.as_view(), name="teams_edit"),
+    path("teams/delete/<int:pk>", views.TeamDeleteView.as_view(), name="teams_delete"),
 ]

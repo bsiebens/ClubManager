@@ -11,7 +11,7 @@ from rules.contrib.views import PermissionRequiredMixin
 
 from ..filters import TeamRoleFilter
 from ..forms import SeasonCreationForm, NumberPoolCreationForm
-from ..models import Season, TeamRole, NumberPool
+from ..models import Season, TeamRole, NumberPool, Team
 
 
 class SeasonListView(PermissionRequiredMixin, ListView):
@@ -175,3 +175,8 @@ class NumberPoolDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteV
             return HttpResponseRedirect(reverse_lazy("backend:teams:numberpools_list"))
 
         return super().form_valid(form)
+
+class TeamListView(PermissionRequiredMixin, FilterView): ...
+class TeamAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView): ...
+class TeamEditView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView): ...
+class TeamDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView): ...

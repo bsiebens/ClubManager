@@ -5,8 +5,11 @@ from datetime import date
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django_extensions.db.fields import AutoSlugField
 from rules import is_superuser
 from rules.contrib.models import RulesModel
+
+from members.models import Member
 
 
 class Season(RulesModel):
@@ -84,3 +87,42 @@ class TeamRole(RulesModel):
 
     def __str__(self):
         return self.name
+
+class Team(RulesModel):
+    """Stores information on a given team. A team can be an internal team (i.e., something composed for a given tournament) or an external one (e.g., a competition team)"""
+
+    class TeamTypes(models.TextChoices):
+        INTERNAL = "INT", _("Internal")
+        EXTERNAL = "EXT", _("External")
+
+    name = models.CharField(_("name"), max_length=250, unique=True)
+    short_name = models.CharField(_("short name"), max_length=250, unique=True, help_text=_("An optional short name"), blank=True, null=True)
+    slug = AutoSlugField(_("slug"), max_length=250, populate_from="name", unique=True, editable=True, overwrite_on_add=False)
+    type = models.CharField(_("type"), max_length=3, choices=TeamTypes.choices, default=TeamTypes.EXTERNAL, help_text=_("Internal teams are not accessible through the API"))
+    number_pool = models.ForeignKey(NumberPool, verbose_name=_("number pool"), on_delete=models.SET_DEFAULT, default="default", to_field="name")
+    logo = models.ImageField(_("logo"), upload_to="teams/logo/", null=True, blank=True)
+
+    members = models.ManyToManyField(Member, verbose_name=_("members"), through="TeamMembership")
+
+    created = models.DateTimeField(_("created"), auto_now_add=True)
+    modified = models.DateTimeField(_("modified"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("team")
+        verbose_name_plural = _("teams")
+        ordering = ["name"]
+        rules_permissions = {"add": is_superuser, "view": is_superuser, "change": is_superuser, "delete": is_superuser}
+
+    def __str__(self):
+        return self.name
+
+    def get_short_name(self) -> str:
+        """Returns the short name, or falls back to the full name if no short name is provided"""
+        if self.short_name is not None and self.short_name != "":
+            return self.short_name
+
+        return self.name
+
+class TeamMembership(RulesModel):
+    team = models.ForeignKey(Team, verbose_name=_("team"), on_delete=models.CASCADE)
+    member = models.ForeignKey(Member, verbose_name=_("member"), on_delete=models.CASCADE)
