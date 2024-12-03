@@ -9,7 +9,7 @@ from django.views.generic import CreateView, DeleteView, FormView, ListView, Upd
 from django_filters.views import FilterView
 from rules.contrib.views import PermissionRequiredMixin
 
-from ..filters import TeamRoleFilter
+from ..filters import TeamRoleFilter, TeamFilter
 from ..forms import SeasonCreationForm, NumberPoolCreationForm
 from ..models import Season, TeamRole, NumberPool, Team
 
@@ -176,7 +176,16 @@ class NumberPoolDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteV
 
         return super().form_valid(form)
 
-class TeamListView(PermissionRequiredMixin, FilterView): ...
+class TeamListView(PermissionRequiredMixin, FilterView):
+    filterset_class = TeamFilter
+    paginate_by = 50
+    permission_required = "teams.view_team"
+    permission_denied_message = _("You do not have permission to view this page")
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        messages.error(self.request, self.get_permission_denied_message())
+        return HttpResponseRedirect(reverse_lazy("backend:index"))
+
 class TeamAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView): ...
 class TeamEditView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView): ...
 class TeamDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView): ...

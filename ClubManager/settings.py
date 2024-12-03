@@ -16,6 +16,7 @@ import environ
 from django.utils.translation import gettext_lazy as _
 
 env = environ.Env(DJANGO_DEBUG=(bool, False))
+ENABLE_CACHE = False
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -145,12 +146,15 @@ USE_I18N = True
 
 USE_TZ = True
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://192.168.1.100:6379"
+if ENABLE_CACHE:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": "redis://192.168.1.100:6379"
+        }
     }
-}
+
+    CONSTANCE_DATABASE_CACHE_BACKEND = "default"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -164,7 +168,6 @@ STATIC_ROOT = Path(BASE_DIR / "static")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
-CONSTANCE_DATABASE_CACHE_BACKEND = "default"
 CONSTANCE_CONFIG = {
     "CLUBMANAGER_CLUB_NAME": ("ClubManager", _("Club name"), str),
     "CLUBMANAGER_CLUB_LOGO": ("", _("Location of the club logo"), str),
