@@ -6,29 +6,37 @@
 
 {% block page_title %}
     <h1 class="page_title">
-        <i class="fa-solid fa-user-circle"></i>{% translate "Team Roles" %}
+        <i class="fa-solid fa-people-group"></i>{% translate "Teams" %}
     </h1>
 {% endblock page_title %}
 
 {% block page_content %}
-    {% if teamrole %}
+    {% if team %}
         <div class="flex flex-row items-center gap-2 mt-8">
-            <h2 class="page_subtitle !border-b-0">{{ teamrole.name }} ({{ teamrole.abbreviation }})</h2>
+            <h2 class="page_subtitle !border-b-0 !mt-0">{{ team.name }}</h2>
+
+            {% if team.type == "INT" %}
+                <div class="badge badge-info">
+            {% else %}
+                <div class="badge badge-accent">
+            {% endif %}
+                {{ team.get_type_display }}
+            </div>
 
             <div class="flex justify-end grow">
-                <a href="{% url "backend:teams:teamroles_delete" teamrole.id %}" class="hidden laptop:flex btn btn-outline btn-error">
+                <a href="{% url "backend:teams:teams_delete" team.id %}" class="hidden laptop:flex btn btn-outline btn-error">
                     <i class="fa-solid fa-trash"></i>{% translate "Delete" %}
                 </a>
             </div>
         </div>
 
         <div class="grid grid-cols-1 gap-2 mt-2">
-            <a href="{% url "backend:teams:teamroles_delete" teamrole.id %}" class="laptop:hidden btn btn-outline btn-error">
+            <a href="{% url "backend:teams:teams_delete" team.id  %}" class="laptop:hidden btn btn-outline btn-error">
                 <i class="fa-solid fa-trash"></i>{% translate "Delete" %}
             </a>
         </div>
     {% else %}
-        <h2 class="page_subtitle !border-b-0">{% translate "Create new team role" %}</h2>
+        <h2 class="page_subtitle !border-b-0">{% translate "Create new team" %}</h2>
     {% endif %}
 
     {% if form.errors %}
@@ -38,16 +46,20 @@
         </div>
     {% endif %}
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <h2 class="page_subtitle">{% translate "Role information" %}</h2>
+        <h2 class="page_subtitle">{% translate "Team information" %}</h2>
         <div class="grid grid-cols-1 gap-1 gap-x-4 laptop:grid-cols-2 mt-2">
             {% form_field form.name %}
-            {% form_field form.abbreviation %}
-            {% form_field form.staff_role %}
-            {% form_field form.admin_role %}
-            {% form_field form.sort_order %}
+            {% form_field form.short_name %}
+            {% form_field form.type %}
+            {% form_field form.logo %}
+        </div>
+
+        <h2 class="page_subtitle">{% translate "Advanced configuration" %}</h2>
+        <div class="grid grid-cols-1 gap-1 gap-x-4 laptop:grid-cols-2 mt-2">
+            {% form_field form.number_pool %}
         </div>
 
         <button class="w-full mt-8 btn btn-neutral" type="submit">

@@ -16,7 +16,7 @@ import environ
 from django.utils.translation import gettext_lazy as _
 
 env = environ.Env(DJANGO_DEBUG=(bool, False))
-ENABLE_CACHE = False
+ENABLE_CACHE = env("DJANGO_ENABLE_CACHE", default=False)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +31,7 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DJANGO_DEBUG", default=False)
 
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost"])
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["*"])
 INTERNAL_IPS = ["127.0.0.1"]
 
 # Application definition
