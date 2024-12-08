@@ -204,7 +204,7 @@ class TeamAddView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
 class TeamEditView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Team
     fields = ["name", "short_name", "type", "number_pool", "logo"]
-    permission_required = "teams.add_team"
+    permission_required = "teams.change_team"
     permission_denied_message = _("You do not have permission to view this page")
     success_url = reverse_lazy("backend:teams:teams_list")
     success_message = _("Team <strong>%(name)s</strong> has been edited successfully")
@@ -216,4 +216,16 @@ class TeamEditView(PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
     def get_success_message(self, cleaned_data: dict[str, str]) -> str:
         return self.success_message % dict(cleaned_data, name=self.object.name)
 
-class TeamDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView): ...
+class TeamDeleteView(PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
+    model = Team
+    permission_required = "teams.delete_team"
+    permission_denied_message = _("You do not have permission to view this page")
+    success_url = reverse_lazy("backend:teams:teams_list")
+    success_message = _("Team <strong>%(name)s</strong> has been deleted successfully")
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        messages.error(self.request, self.get_permission_denied_message())
+        return HttpResponseRedirect(reverse_lazy("backend:index"))
+
+    def get_success_message(self, cleaned_data: dict[str, str]) -> str:
+        return self.success_message % dict(cleaned_data, name=self.object.name)
