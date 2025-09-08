@@ -20,7 +20,7 @@ class Member(RulesModel):
     Represents a Member associated with a user and their family details.
 
     :ivar user: The user linked to this Member instance via a one-to-one relationship.
-    :ivar family_members: A list of users designated as family members.
+    :ivar family_members: A list of members designated as family members.
     :ivar birthday: The member's date of birth.
     :ivar license: The member's license or unique identifier string.
     :ivar phone_number: The member's primary contact phone number.
@@ -28,7 +28,7 @@ class Member(RulesModel):
     """
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="member", verbose_name=_("user"))
-    family_members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="family_members", verbose_name=_("family members"), blank=True)
+    family_members = models.ManyToManyField("self", verbose_name=_("family members"), blank=True)
 
     birthday = models.DateField(_("birthday"), blank=True, null=True)
     license = models.CharField(_("license"), max_length=20, null=True, blank=True)

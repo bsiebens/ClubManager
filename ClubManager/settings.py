@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "simple_history",
     "allauth",
     "allauth.account",
+    "rest_framework",
     "members.apps.MembersConfig",
 ]
 
@@ -152,3 +153,10 @@ PHONENUMBER_DEFAULT_REGION = config("CM_CLUB_COUNTRY_CODE", default="BE", cast=s
 
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = {"email*", "email2*", "password1*", "password2*"}
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ]
+}

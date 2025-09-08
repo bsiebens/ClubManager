@@ -20,12 +20,14 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 
-from .api import api
+from .api import router
 
 urlpatterns = [
     path("accounts/", include("allauth.urls")),
+    path("_allauth/", include("allauth.headless.urls")),
     path("admin/", admin.site.urls),
-    path("api/", api.urls),
+    path("api/", include(router.urls)),
+    path("api-auth/", include("rest_framework.urls")),
 ]
 
 if settings.DEBUG:

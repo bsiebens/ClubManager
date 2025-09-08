@@ -1,7 +1,6 @@
-from ninja import NinjaAPI
+from rest_framework import routers
 
-from members.api import router as members_router
+from members.api import MembersViewSet
 
-api = NinjaAPI()
-
-api.add_router("/members", members_router)
+router = routers.DefaultRouter()
+router.register(r"members", MembersViewSet)
