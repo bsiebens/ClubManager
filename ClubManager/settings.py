@@ -31,17 +31,7 @@ INTERNAL_IPS = ["127.0.0.1"]
 
 # Application definition
 
-INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "django_htmx",
-    "constance",
-    "rules",
-]
+INSTALLED_APPS = ["django.contrib.admin", "django.contrib.auth", "django.contrib.contenttypes", "django.contrib.sessions", "django.contrib.messages", "django.contrib.staticfiles", "django_htmx", "constance", "rules", "members.apps.MembersConfig"]
 
 if DEBUG:
     INSTALLED_APPS.append("debug_toolbar")
