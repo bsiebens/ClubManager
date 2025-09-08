@@ -6,7 +6,7 @@ from .models import Member
 
 
 class FamilyMemberField(serializers.RelatedField):
-    def to_representation(self, value) -> str | None:
+    def to_representation(self, value) -> str:
         return f"{value.user.first_name} {value.user.last_name} <{value.user.email}>"
 
     def to_internal_value(self, data) -> Member:
