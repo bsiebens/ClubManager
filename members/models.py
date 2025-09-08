@@ -56,12 +56,6 @@ class Member(RulesModel):
     def __str__(self):
         return self.user.get_full_name()
 
-    def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
-        self.user.is_active = False
-        self.user.save(update_fields=["is_active"])
-
-        return 1, {"members.Member": 1}
-
     @classmethod
     def create_member(cls, first_name: str, last_name: str, email: str, password: str | None) -> "Member":
         # Check first to see if a user already exists with the given email address
