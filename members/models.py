@@ -26,19 +26,19 @@ class Member(RulesModel):
     :ivar phone_number: The member's primary contact phone number.
     :ivar emergency_phone_number: An emergency contact phone number for the member.
     """
-    
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="member", verbose_name=_("user"))
     family_members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="family_members", verbose_name=_("family members"), blank=True)
-    
+
     birthday = models.DateField(_("birthday"), blank=True, null=True)
     license = models.CharField(_("license"), max_length=20, null=True, blank=True)
-    
+
     phone_number = PhoneNumberField(_("phone number"), blank=True, null=True)
     emergency_phone_number = PhoneNumberField(_("emergency phone number"), blank=True, null=True)
-    
+
     objects = MemberManager()
     history = HistoricalRecords()
-    
+
     class Meta:
         verbose_name = _("member")
         verbose_name_plural = _("members")
@@ -52,12 +52,17 @@ class Member(RulesModel):
         permissions = [
             ("member_manager", _("Can manage members")),
         ]
-    
+
     def __str__(self):
         return self.user.get_full_name()
-    
+
     def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
         self.user.is_active = False
         self.user.save(update_fields=["is_active"])
-        
+
         return 1, {"members.Member": 1}
+
+    @classmethod
+    def create_member(cls, first_name: str, last_name: str, email: str, password: str | None) -> "Member":
+        # Check first to see if a user already exists with the given email address
+        ...
