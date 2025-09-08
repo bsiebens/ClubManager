@@ -3,7 +3,7 @@ name = "clubmanager"
 version = "0.1.0"
 description = "Software to manage (sport)clubs, built out of frustration with the available commercial tools."
 authors = [
-    {name = "Bernard Siebens",email = "bernard@siebens.org"}
+    { name = "Bernard Siebens", email = "bernard@siebens.org" }
 ]
 readme = "README.md"
 requires-python = ">=3.13,<4.0"
@@ -28,3 +28,6 @@ django-debug-toolbar = "^6.0.0"
 
 [tool.poetry]
 package-mode = false
+
+[tool.black]
+line-length = 250
