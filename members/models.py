@@ -55,8 +55,3 @@ class Member(RulesModel):
 
     def __str__(self):
         return self.user.get_full_name()
-
-    @classmethod
-    def create_member(cls, first_name: str, last_name: str, email: str, password: str | None) -> "Member":
-        # Check first to see if a user already exists with the given email address
-        ...
