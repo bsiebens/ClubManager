@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django_htmx",
     "constance",
     "rules.apps.AutodiscoverRulesConfig",
+    "simple_history",
     "members.apps.MembersConfig",
 ]
 
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "simple_history.middleware.HistoryRequestMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
 ]
 
@@ -140,3 +142,6 @@ CONSTANCE_CONFIG = {
     "CM_CLUB_LOGO": ("", "Location of the club logo", str),
     "CM_CLUB_HOME_LOCATION": (config("CM_CLUB_HOME_LOCATION", default="Home", cast=str), "Location of the home games", str),
 }
+
+PHONENUMBER_DEFAULT_FORMAT = "INTERNATIONAL"
+PHONENUMBER_DEFAULT_REGION = config("CM_CLUB_COUNTRY_CODE", default="BE", cast=str)
