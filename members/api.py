@@ -6,7 +6,7 @@ from .models import Member
 
 
 class FamilyMemberField(serializers.RelatedField):
-    def to_representation(self, value) -> str:
+    def to_representation(self, value) -> str | None:
         return f"{value.user.first_name} {value.user.last_name} <{value.user.email}>"
 
     def to_internal_value(self, data) -> Member:
@@ -55,6 +55,12 @@ class MemberSerializer(serializers.ModelSerializer):
         instance.family_members.set(family_members)
 
         return instance
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["family_members"] = [member for member in data["family_members"] if member != f"{instance.user.first_name} {instance.user.last_name} <{instance.user.email}>"]
+
+        return data
 
 
 class MembersViewSet(AutoListPermissionViewSetMixin, viewsets.ModelViewSet):
