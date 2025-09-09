@@ -1,0 +1,86 @@
+{% load static %}
+{% load django_htmx %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>ClubManager{% if config.CM_CLUB_NAME != "ClubManager" %} - {{ config.CM_CLUB_NAME }}{% endif %}</title>
+
+    <link rel="stylesheet" href="{% static "css/clubmanager.css" %}" type="text/css" />
+    <!--suppress JSUnresolvedLibraryURL -->
+    <script src="https://kit.fontawesome.com/8189f10079.js" crossorigin="anonymous"></script>
+
+    <script src="{% static "js/htmx.js" %}"></script>
+    <script src="{% static "js/htmx-ext-ws.js" %}"></script>
+</head>
+<body hx-headers='{"X_CSRFTOKEN": "{{ csrf_token }}"}' hx-ext="ws" ws-connect="/ws/notifications/">
+
+    <div class="navbar bg-neutral text-neutral-content w-full px-4">
+        <div class="flex-1 mx-2 px-2 gap-2 flex flex-row items-center text-2xl font-jersey tracking-wide justify-center lg:justify-start">
+            <a href="{% url "home" %}">
+                {% if config.CM_CLUB_LOGO != "" %}
+                    <div class="h-16 aspect-[1/1] my-2 hidden lg:flex">
+                        <img src="{% static config.CM_CLUB_LOGO %}" class="p-1 bg-base-100 rounded-full object-contain" alt="{{ config.CM_CLUB_NAME }} logo" />
+                    </div>
+                {% endif %}
+                <div class="hidden lg:flex">
+                    {% if config.CM_CLUB_NAME != "ClubManager" %}
+                        {{ config.CM_CLUB_NAME }}
+                    {% endif %}
+                    ClubManager
+                </div>
+                <div class="lg:hidden">
+                    {% if config.CM_CLUB_NAME != "ClubManager" %}
+                        {{ config.CM_CLUB_NAME }}
+                    {% else %}
+                        ClubManager
+                    {% endif %}
+                </div>
+            </a>
+        </div>
+
+        <div class="hidden lg:block">
+            <ul class="menu menu-horizontal">
+                <li class="border-b border-neutral">
+                    <a href="">
+                        <i class="fa-solid fa-calendar-days"></i>{% translate "Calendar" %}
+                    </a>
+                </li>
+
+                <li class="border-b border-neutral">
+                    <a href="">
+                        <i class="fa-solid fa-comments"></i>{% translate "Messages" %}
+                    </a>
+                </li>
+
+                <li class="border-b border-neutral">
+                    <a href="">
+                        <div id="notification-icon">
+                            {% if unread_notification_count > 0 %}
+                                <span class="indicator">
+                                    <span class="indicator-item status status-error"></span>
+                                    <i class="fa-solid fa-bell"></i>
+                                </span>
+                            {% else %}
+                                <i class="fa-solid fa-bell"></i>
+                            {% endif %}
+                        </div>{% translate "Notifications" %}
+                    </a>
+                </li>
+
+                <li class="border-b border-neutral">
+                    <a href="">
+                        <i class="fa-solid fa-gears"></i>{% translate "Settings" %}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>

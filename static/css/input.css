@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Graduate&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+@import "tailwindcss" source(none);
+
+@theme {
+    --font-jersey: Graduate, sans-serif;
+    --font-sans: Open Sans, sans-serif;
+}
+
+@plugin "@tailwindcss/typography";
+@plugin "./daisyui.js" {
+    themes: emerald --default, dim --prefersdarks;
+}
+
+@source "../../templates";
+
+@custom-variant dark (&:where([data-theme="dim"], [data-theme="dim"] *));

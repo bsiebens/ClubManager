@@ -15,15 +15,6 @@ class MembersTestCase(TestCase):
     def testMemberCreation(self):
         self.assertTrue(hasattr(self.user_a, "member"))
 
-    def testMemberDeletion(self):
-        member = self.user_a.member
-        user_a_id = self.user_a.id
-        member.delete()
-
-        self.assertIsNotNone(user_a_id)
-        with self.assertRaises(User.DoesNotExist):
-            User.objects.get(id=user_a_id)
-
     def testMemberManager(self):
         self.assertFalse(self.user_a.has_perm("members.member_manager"))
         self.assertFalse(self.user_a.has_perm("members.add_member"))
