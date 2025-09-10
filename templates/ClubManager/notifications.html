@@ -1,0 +1,64 @@
+{% extends "ClubManager/base.html" %}
+
+{% load i18n %}
+{% load partials %}
+
+{% block content %}
+    <div class="flex flex-row items-center">
+        <h1 class="text-3xl font-bold grow">{% translate "Notifications" %}</h1>
+
+        <div class="flex flex-col gap-1">
+            <a class="btn btn-xs" href="{% url "clubmanager:notifications-mark-read" %}" id="markReadButton" hx-target="#notificationList" hx-get="{% url "clubmanager:notifications-mark-read" %}">{% translate "Mark all as read" %}</a>
+            <a class="btn btn-xs" href="{% url "clubmanager:notifications-delete-read" %}" id="deleteReadButton" hx-target="#notificationList" hx-get="{% url "clubmanager:notifications-delete-read" %}">{% translate "Delete read notifications" %}</a>
+        </div>
+    </div>
+
+    {% partialdef list inline %}
+        <ul class="list bg-base-100 mt-4" id="notificationList" hx-swap-oob="true">
+            {% if notifications|length == 0 %}
+                <span class="items-center"><i class="fa-solid fa-thumbs-up mr-2"></i>{% translate "All caught up!" %}</span>
+            {% endif %}
+
+            {% for notification in notifications %}
+                {% if notification.get_absolute_url != "" %}
+                    <a href="{{ notification.get_absolute_url }}">
+                {% endif %}
+
+                <li class="list-row items-center">
+                    <div>
+                        {% if not notification.is_read %}
+                            <div class="indicator">
+                                <span class="indicator-item status status-error"></span>
+                        {% endif %}
+
+                        {% if notification.notification_type == "event" %}
+                            <i class="fa-solid fa-calendar-days text-xl opacity-75"></i>
+                        {% endif %}
+
+                        {% if not notification.is_read %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <div class="font-semibold">{{ notification.get_subject }}</div>
+                        <div class="opacity-60 text-xs">{{ notification.get_text }}</div>
+                        <div class="opacity-60 text-xs lg:hidden">{{ notification.added|date:"d b Y H:i" }}</div>
+                    </div>
+
+                    <div class="text-xs opacity-60 font-semibold hidden lg:block">{{ notification.added|date:"d b Y H:i" }}</div>
+
+                    {% if notification.get_absolute_url != "" %}
+                        <i class="fa-solid fa-chevron-right text-xl"></i>
+                    {% else %}
+                        <i class="fa-solid fa-chevron-right text-xl opacity-0"></i>
+                    {% endif %}
+                </li>
+
+                {% if notification.get_absolute_url != "" %}
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endpartialdef %}
+{% endblock content %}

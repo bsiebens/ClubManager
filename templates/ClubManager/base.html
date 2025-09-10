@@ -18,7 +18,7 @@
     <script src="{% static "js/htmx.js" %}"></script>
     <script src="{% static "js/htmx-ext-ws.js" %}"></script>
 </head>
-<body hx-headers='{"X_CSRFTOKEN": "{{ csrf_token }}"}' hx-ext="ws" ws-connect="/ws/notifications/">
+<body hx-headers='{"X_CSRFTOKEN": "{{ csrf_token }}"}'>
     {% url "clubmanager:news" as news %}
 
     <div class="navbar bg-neutral text-neutral-content w-full px-4 py-2">
@@ -60,8 +60,8 @@
                 </li>
 
                 <li class="border-b border-neutral">
-                    <a href="">
-                        <div id="notification-icon">
+                    <a href="{% url "clubmanager:notifications" %}">
+                        <div id="notificationIcon" hx-get="{% url "clubmanager:notifications-check" %}" hx-trigger="click from:#deleteReadButton, click from:#markReadButton, every 60s">
                             {% if unread_notification_count > 0 %}
                                 <span class="indicator">
                                     <span class="indicator-item status status-error"></span>
