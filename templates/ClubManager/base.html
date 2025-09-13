@@ -1,6 +1,7 @@
 {% load static %}
 {% load django_htmx %}
 {% load i18n %}
+{% load partials %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -62,14 +63,16 @@
                 <li class="border-b border-neutral">
                     <a href="{% url "clubmanager:notifications" %}">
                         <div id="notificationIcon" hx-get="{% url "clubmanager:notifications-check" %}" hx-trigger="click from:#deleteReadButton, click from:#markReadButton, every 60s">
-                            {% if unread_notification_count > 0 %}
-                                <span class="indicator">
-                                    <span class="indicator-item status status-error"></span>
+                            {% partialdef notification_icon inline %}
+                                {% if unread_notification_count > 0 %}
+                                    <span class="indicator">
+                                        <span class="indicator-item status status-error"></span>
+                                        <i class="fa-solid fa-bell"></i>
+                                    </span>
+                                {% else %}
                                     <i class="fa-solid fa-bell"></i>
-                                </span>
-                            {% else %}
-                                <i class="fa-solid fa-bell"></i>
-                            {% endif %}
+                                {% endif %}
+                            {% endpartialdef notification_icon %}
                         </div><span class="hidden lg:block">{% translate "Notifications" %}</span>
                     </a>
                 </li>

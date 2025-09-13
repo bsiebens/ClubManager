@@ -1,10 +1,8 @@
-<div id="notificationIcon">
-    {% if unread_notifications %}
-        <span class="indicator">
-            <span class="indicator-item status status-error"></span>
-            <i class="fa-solid fa-bell"></i>
-        </span>
-    {% else %}
+{% if unread_notifications %}
+    <span class="indicator">
+        <span class="indicator-item status status-error"></span>
         <i class="fa-solid fa-bell"></i>
-    {% endif %}
-</div>
+    </span>
+{% else %}
+    <i class="fa-solid fa-bell"></i>
+{% endif %}
