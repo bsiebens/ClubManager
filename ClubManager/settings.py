@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "generic_notifications",
     "members.apps.MembersConfig",
     "notifications.apps.NotificationsConfig",
+    "teams.apps.TeamsConfig",
 ]
 
 if DEBUG:
@@ -156,6 +157,10 @@ CONSTANCE_CONFIG = {
     "CM_CLUB_LOGO": ("", "Location of the club logo", str),
     "CM_CLUB_HOME_LOCATION": (config("CM_CLUB_HOME_LOCATION", default="Home", cast=str), "Location of the home games", str),
 }
+
+CM_DEFAULT_SEASON_MONTH = config("CM_DEFAULT_SEASON_MONTH", default=8, cast=int)
+CM_DEFAULT_SEASON_DAY = config("CM_DEFAULT_SEASON_DAY", default=1, cast=int)
+CM_DEFAULT_SEASON_DURATION = config("CM_DEFAULT_SEASON_DURATION", default="1y", cast=str)
 
 PHONENUMBER_DEFAULT_FORMAT = "INTERNATIONAL"
 PHONENUMBER_DEFAULT_REGION = config("CM_CLUB_COUNTRY_CODE", default="BE", cast=str)
