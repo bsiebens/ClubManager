@@ -31,8 +31,10 @@
                                 <span class="indicator-item status status-error"></span>
                         {% endif %}
 
-                        {% if notification.notification_type == "event" %}
+                        {% if notification.notification_type == "calendar" %}
                             <i class="fa-solid fa-calendar-days text-xl opacity-75"></i>
+                        {% else %}
+                            <i class="fa-solid fa-bell text-xl opacity-75"></i>                            
                         {% endif %}
 
                         {% if not notification.is_read %}

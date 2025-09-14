@@ -82,6 +82,14 @@
                         <i class="fa-solid fa-gears"></i>{% translate "Settings" %}
                     </a>
                 </li>
+
+                {% if request.user.is_staff %}
+                    <li class="border-b border-neutral hidden lg:block">
+                        <a href="">
+                            <i class="fa-solid fa-user-shield"></i>{% translate "Admin" %}
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>
@@ -94,7 +102,7 @@
 
     <footer class="footer footer-horizontal bg-neutral text-neutral-content items-center p-4 lg:flex">
         <aside class="grid-flow-col items-center text-sm grow">
-            <p><i class="fa-solid fa-heart mr-2"></i>Open source software / MIT License / Bernard Siebens</p>
+            <p class="font-jersey">MIT License <i class="fa-solid fa-copyright"></i> {% now "Y" %} Bernard Siebens</p>
         </aside>
         <nav class="grid-flow-col gap-4 md:place-self-center md:justify-self-end items-center">
             <a href="https://github.com/bernardsiebens/clubmanager" target="_blank">
