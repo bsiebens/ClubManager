@@ -7,6 +7,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
+from recurrence.fields import RecurrenceField
 from rules import is_superuser
 from rules.contrib.models import RulesModel
 
@@ -132,7 +133,6 @@ class Activity(PolymorphicModel):
             self.gathering_time = self.start_time
 
         super().save(*args, **kwargs)
-        self.generate_registrations()
 
     def clean(self):
         if isinstance(self, Event) and self.type.type != ActivityType.ActivityTypes.EVENT:
@@ -203,7 +203,7 @@ class Game(Activity):
     team = models.ForeignKey("teams.Team", on_delete=models.CASCADE, verbose_name=_("team"), related_name="games")
     opponent = models.ForeignKey(Opponent, on_delete=models.CASCADE, verbose_name=_("opponent"), blank=True, null=True, related_name="games")
     season = models.ForeignKey(Season, on_delete=models.CASCADE, verbose_name=_("season"), related_name="games")
-    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, verbose_name=_("competition"), related_name="games")
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, verbose_name=_("competition"), related_name="games", blank=True, null=True)
     competition_game_id = models.CharField(_("competition id"), max_length=255, blank=True, null=True)
 
     is_live = models.BooleanField(_("live"), default=False)
@@ -240,10 +240,130 @@ class Game(Activity):
             competition().update_game_information(game=self)
 
 
-class Practice(Activity): ...
+class Practice(Activity):
+    recurrences = RecurrenceField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("practice")
+        verbose_name_plural = _("practices")
+
+    def __str__(self):
+        return _("Practice {start_time} to {end_time}").format(start_time=self.start_time.strftime("%d/%m/%Y %H:%M"), end_time=self.end_time.strftime("%d/%m%Y %H:%M"))
+
+    def generate_occurrences(self) -> "list[PracticeOccurrence]":
+        """
+        Synchronizes PracticeOccurrence instances for this Practice series.
+        - Updates existing occurrences if their times have changed.
+        - Creates new occurrences if needed.
+        - Removes occurrences that no longer match the recurrence rule.
+        """
+
+        duration = self.end_time - self.start_time
+        gathering_time_delay = self.start_time - self.gathering_time
+        registration_deadline_delay = self.start_time - self.registration_deadline
+
+        # Generate a list of all expected start_dates
+        expected_start_times = set()
+        maximum_end_date = self.start_time + datetime.timedelta(days=365)
+
+        if self.recurrences.count() != 0:
+            for dt in self.recurrences.occurrences(dtstart=self.start_time, dtend=maximum_end_date):
+                print(dt)
+                expected_start_times.add(dt)
+
+        else:
+            print("doing this also")
+            expected_start_times.add(self.start_time)
+
+        print(expected_start_times)
+
+        # Fetch all existing occurrences for this series
+        existing_occurrences = {occ.start_time: occ for occ in self.occurrences.filter(is_override=False)}
+        occurrences = []
+
+        # Remove any occurrence no longer in the recurrence rule
+        occurrences_to_remove = set()
+        for occ_start_time, occ in existing_occurrences.items():
+            if occ_start_time not in expected_start_times:
+                occurrences_to_remove.add(occ.id)
+
+        PracticeOccurrence.objects.filter(id__in=occurrences_to_remove).delete()
+
+        # Create or update occurrences as needed
+        for start_time in expected_start_times:
+            end_time = start_time + duration
+            gathering_time = start_time - gathering_time_delay
+            registration_deadline = start_time - registration_deadline_delay
+            occurrence = existing_occurrences.get(start_time)
+
+            if occurrence is not None:
+                fields_to_update = {
+                    "end_time": end_time,
+                    "gathering_time": gathering_time,
+                    "type": self.type,
+                    "location": self.location,
+                    "title": self.title,
+                    "description": self.description,
+                    "require_registration": self.require_registration,
+                    "registration_deadline": registration_deadline,
+                }
+
+                updated = False
+                regenerate_registrations = False
+
+                for field, value in fields_to_update.items():
+                    if getattr(occurrence, field) != value:
+                        setattr(occurrence, field, value)
+                        updated = True
+
+                    if set(occurrence.teams.all()) != self.teams.all():
+                        occurrence.teams.set(self.teams.all())
+                        regenerate_registrations = True
+
+                    if set(occurrence.members.all()) != self.members.all():
+                        occurrence.members.set(self.members.all())
+                        regenerate_registrations = True
+
+                    if updated:
+                        occurrence.save()
+
+                    if regenerate_registrations:
+                        occurrence.generate_registrations()
+
+                occurrences.append(occurrence)
+
+            else:
+                occurrence = PracticeOccurrence.objects.get_or_create(
+                    series=self,
+                    is_override=False,
+                    owner=self.owner,
+                    start_time=start_time,
+                    end_time=end_time,
+                    gathering_time=gathering_time,
+                    registration_deadline=registration_deadline,
+                    type=self.type,
+                    location=self.location,
+                    title=self.title,
+                    description=self.description,
+                    require_registration=self.require_registration,
+                )[0]
+                occurrence.teams.set(self.teams.all())
+                occurrence.members.set(self.members.all())
+                occurrences.append(occurrence)
+
+        return occurrences
 
 
-class PracticeOccurrence(Activity): ...
+class PracticeOccurrence(Activity):
+    series = models.ForeignKey(Practice, on_delete=models.CASCADE, verbose_name=_("series"), related_name="occurrences")
+    is_override = models.BooleanField(_("is override"), default=False, help_text=_("If set, this occurrence is an override and not part of the original series"))
+
+    class Meta:
+        verbose_name = _("practice occurrence")
+        verbose_name_plural = _("practice occurrences")
+
+    def __str__(self):
+        return _("Practice {start_time} to {end_time}").format(start_time=self.start_time.strftime("%d/%m/%Y %H:%M"), end_time=self.end_time.strftime("%d/%m%Y %H:%M"))
 
 
 class RegistrationManager(models.Manager):
