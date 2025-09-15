@@ -23,3 +23,21 @@ def is_team_admin(user: AbstractUser | None, teammembership: "TeamMembership | N
         return False
 
     return TeamMembership.objects.filter(team=teammembership.team, member__user=user, role__admin_role=True, season=Season.for_date()).exists()
+
+
+@rules.predicate
+def is_a_team_admin(user: AbstractUser | None) -> bool:
+    """
+    Determine if a user is a team admin.
+
+    :param user: The user to check for team admin privileges; can be None.
+    :return: A boolean indicating whether the user is a team admin for the given
+        team membership.
+    """
+
+    from .models import Season, TeamMembership
+
+    if user is None:
+        return False
+
+    return TeamMembership.objects.filter(member__user=user, role__admin_role=True, season=Season.for_date()).exists()

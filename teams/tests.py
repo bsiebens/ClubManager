@@ -7,7 +7,7 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from .models import create_default_season, team_season_file_path, Team, Season, TeamPicture, TeamRole, TeamMembership
-from .rules import is_team_admin
+from .rules import is_team_admin, is_a_team_admin
 
 
 class CreateDefaultSeasonTests(TestCase):
@@ -104,6 +104,29 @@ class IsTeamAdminRuleTest(TestCase):
         team_membership_first_team = TeamMembership.objects.create(team=self.team, member=self.member, role=self.member_role, season=self.season)
 
         self.assertFalse(is_team_admin(self.member.user, team_membership_first_team))
+
+
+class IsATeamAdminRuleTest(TestCase):
+    def setUp(self):
+        start_date, end_date = create_default_season()
+
+        self.member = get_user_model().objects.create(first_name="John", last_name="Doe", email="johndoe@test.com", username="johndoe").member
+        self.member2 = get_user_model().objects.create(first_name="Jane", last_name="Doe", email="janedoe@test.com", username="janedoe").member
+        self.team = Team.objects.create(name="Test Team")
+        self.season = Season.objects.get_or_create(start_date=start_date, end_date=end_date)[0]
+        self.admin_role = TeamRole.objects.create(name="Admin Role", abbreviation="AR", admin_role=True, sort_order=1)
+        self.member_role = TeamRole.objects.create(name="Member Role", abbreviation="MR", admin_role=False, sort_order=2)
+
+    def testIsATeamAdminWithAdminRole(self):
+        TeamMembership.objects.create(team=self.team, member=self.member, role=self.admin_role, season=self.season)
+        self.assertTrue(is_a_team_admin(self.member.user))
+
+    def testIsATeamAdminWithMemberRole(self):
+        TeamMembership.objects.create(team=self.team, member=self.member, role=self.member_role, season=self.season)
+        self.assertFalse(is_a_team_admin(self.member.user))
+
+    def testIsATeamAdminWithNoneUser(self):
+        self.assertFalse(is_a_team_admin(None))
 
 
 class SeasonTest(TestCase):
