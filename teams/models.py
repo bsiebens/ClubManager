@@ -1,7 +1,7 @@
 import datetime
 
+from constance import config
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
@@ -13,22 +13,26 @@ from rules.contrib.models import RulesModel
 from .rules import is_team_admin
 
 
-def create_default_season() -> tuple[datetime.date, datetime.date]:
+def create_default_season(day: int | None = None, month: int | None = None, duration: str | None = None) -> tuple[datetime.date, datetime.date]:
     """Creates a default season based on the current date."""
+
+    day = config.CM_DEFAULT_SEASON_DAY if day is None else day
+    month = config.CM_DEFAULT_SEASON_MONTH if month is None else month
+    duration = config.CM_DEFAULT_SEASON_DURATION if duration is None else duration
 
     current_date = timezone.now()
 
     # Determine the start year based on the current date
     start_year = current_date.year
-    if current_date.month < settings.CM_DEFAULT_SEASON_MONTH or (current_date.month == settings.CM_DEFAULT_SEASON_MONTH and current_date.day < settings.CM_DEFAULT_SEASON_DAY):
+    if current_date.month < month or (current_date.month == month and current_date.day < day):
         start_year -= 1
 
     # Create the start date
-    start_date = datetime.date(year=start_year, month=settings.CM_DEFAULT_SEASON_MONTH, day=settings.CM_DEFAULT_SEASON_DAY)
+    start_date = datetime.date(year=start_year, month=month, day=day)
 
     # Calculate the end date based on the range string
-    range_value = int(settings.CM_DEFAULT_SEASON_DURATION[:-1])
-    range_unit = settings.CM_DEFAULT_SEASON_DURATION[-1]
+    range_value = int(duration[:-1])
+    range_unit = duration[-1]
 
     end_date = start_date
     match range_unit:

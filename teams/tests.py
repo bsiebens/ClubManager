@@ -3,7 +3,7 @@ import datetime
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.utils import timezone
 
 from .models import create_default_season, team_season_file_path, Team, Season, TeamPicture, TeamRole, TeamMembership
@@ -11,53 +11,54 @@ from .rules import is_team_admin, is_a_team_admin
 
 
 class CreateDefaultSeasonTests(TestCase):
-    @override_settings(CM_DEFAULT_SEASON_MONTH=9, CM_DEFAULT_SEASON_DAY=1, CM_DEFAULT_SEASON_DURATION="1y")
     @patch("teams.models.timezone.now")
     def testStartsPreviousYearIfBeforeSeasonStart(self, mock_now):
         mock_now.return_value = timezone.make_aware(datetime.datetime(2025, 8, 31, 12, 0, 0))
-        start, end = create_default_season()
+        start, end = create_default_season(day=1, month=9, duration="1y")
         self.assertEqual(start, datetime.date(2024, 9, 1))
         expected_end = datetime.date(2025, 8, 31)
         self.assertEqual(end, expected_end)
 
-    @override_settings(CM_DEFAULT_SEASON_MONTH=9, CM_DEFAULT_SEASON_DAY=1, CM_DEFAULT_SEASON_DURATION="1y")
     @patch("teams.models.timezone.now")
     def testStartsCurrentYearOnOrAfterSeasonStart(self, mock_now):
         mock_now.return_value = timezone.make_aware(datetime.datetime(2025, 9, 1, 0, 0, 0))
-        start, end = create_default_season()
+        start, end = create_default_season(day=1, month=9, duration="1y")
         self.assertEqual(start, datetime.date(2025, 9, 1))
         self.assertEqual(end, datetime.date(2026, 8, 31))
 
-    @override_settings(CM_DEFAULT_SEASON_MONTH=2, CM_DEFAULT_SEASON_DAY=29, CM_DEFAULT_SEASON_DURATION="6m")
     @patch("teams.models.timezone.now")
     def testMonthDurationSixMonthsMinusOneDay(self, mock_now):
         mock_now.return_value = timezone.make_aware(datetime.datetime(2024, 3, 1, 0, 0, 0))
-        start, end = create_default_season()
+        start, end = create_default_season(day=29, month=2, duration="6m")
         self.assertEqual(start, datetime.date(2024, 2, 29))
         self.assertEqual(end, datetime.date(2024, 8, 28))
 
-    @override_settings(CM_DEFAULT_SEASON_MONTH=1, CM_DEFAULT_SEASON_DAY=1, CM_DEFAULT_SEASON_DURATION="10d")
     @patch("teams.models.timezone.now")
     def testDayDurationMinusOneDay(self, mock_now):
         mock_now.return_value = timezone.make_aware(datetime.datetime(2025, 1, 1, 0, 0, 0))
-        start, end = create_default_season()
+        start, end = create_default_season(day=1, month=1, duration="10d")
         self.assertEqual(start, datetime.date(2025, 1, 1))
         self.assertEqual(end, datetime.date(2025, 1, 10))
 
-    @override_settings(CM_DEFAULT_SEASON_MONTH=1, CM_DEFAULT_SEASON_DAY=1, CM_DEFAULT_SEASON_DURATION="2w")
     @patch("teams.models.timezone.now")
     def testWeekDurationTwoWeeksMinusOneDay(self, mock_now):
         mock_now.return_value = timezone.make_aware(datetime.datetime(2025, 1, 1, 0, 0, 0))
-        start, end = create_default_season()
+        start, end = create_default_season(day=1, month=1, duration="2w")
         self.assertEqual(start, datetime.date(2025, 1, 1))
         self.assertEqual(end, datetime.date(2025, 1, 14))
 
-    @override_settings(CM_DEFAULT_SEASON_MONTH=9, CM_DEFAULT_SEASON_DAY=1, CM_DEFAULT_SEASON_DURATION="3x")
     @patch("teams.models.timezone.now")
     def testInvalidDurationUnitRaises(self, mock_now):
         mock_now.return_value = timezone.make_aware(datetime.datetime(2025, 9, 1, 0, 0, 0))
         with self.assertRaises(ValueError):
-            create_default_season()
+            create_default_season(day=1, month=9, duration="3x")
+
+    @patch("teams.models.timezone.now")
+    def testNoInput(self, mock_now):
+        mock_now.return_value = timezone.make_aware(datetime.datetime(2025, 9, 1, 0, 0, 0))
+        start, end = create_default_season()
+        self.assertEqual(start, datetime.date(2025, 8, 1))
+        self.assertEqual(end, datetime.date(2026, 7, 31))
 
 
 class TeamSeasonFilePathTests(TestCase):
