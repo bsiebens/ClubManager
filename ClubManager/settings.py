@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "template_partials",
     "generic_notifications",
+    "polymorphic",
     "members.apps.MembersConfig",
     "notifications.apps.NotificationsConfig",
     "teams.apps.TeamsConfig",

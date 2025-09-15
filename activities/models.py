@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from polymorphic.models import PolymorphicModel
 from rules import is_superuser
-from rules.contrib.models import RulesModel
+from rules.contrib.models import RulesModel, RulesModelBase, RulesModelMixin
 
 from teams.rules import is_a_team_admin
 
@@ -80,3 +81,13 @@ class ActivityType(RulesModel):
 
     def __str__(self):
         return self.name
+
+
+class Activity(RulesModelMixin, PolymorphicModel, metaclass=RulesModelBase):
+    owner = models.ForeignKey("members.Member", on_delete=models.CASCADE, verbose_name=_("owner"))
+
+    class Meta:
+        verbose_name = _("activity")
+        verbose_name_plural = _("activities")
+        ordering = ["-start_date"]
+        rules_permissions = {"add": is_superuser | is_a_team_admin, "view": is_superuser | is_a_team_admin, "change": is_superuser | is_a_team_admin, "delete": is_superuser | is_a_team_admin}
