@@ -795,6 +795,22 @@ files = [
 Django = ">=3.2"
 
 [[package]]
+name = "django-recurrence"
+version = "1.11.1"
+description = "Django utility wrapping dateutil.rrule"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "django-recurrence-1.11.1.tar.gz", hash = "sha256:9c89444e651a78c587f352c5f63eda48ab2f53996347b9fcdff2d248f4fcff70"},
+    {file = "django_recurrence-1.11.1-py3-none-any.whl", hash = "sha256:0c65f30872599b5813a9bab6952dada23c55894f28674490a753ada559f14bc5"},
+]
+
+[package.dependencies]
+django = ">=2.2"
+python-dateutil = "*"
+
+[[package]]
 name = "django-simple-history"
 version = "3.10.1"
 description = "Store model history and view/revert changes from admin site."
@@ -1759,4 +1775,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<4.0"
-content-hash = "76fb6d690c1de577f9108125703082e5110f558284c475fc100d4579b8b6c2a6"
+content-hash = "b54c5069404f86d02fb2bc990d77d9b1ca28cc30df4e1bec21e67b1809147243"

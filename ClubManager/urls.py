@@ -20,6 +20,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
+from django.views.i18n import JavaScriptCatalog
 
 from .api import router
 
@@ -34,3 +35,9 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns = urlpatterns + debug_toolbar_urls()
+
+js_info_dict = {
+    "packages": ("recurrence",),
+}
+
+urlpatterns = urlpatterns + [path("jsi18n/", JavaScriptCatalog.as_view(packages=["recurrence"]), name="javascript-catalog")]

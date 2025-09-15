@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "template_partials",
     "generic_notifications",
     "polymorphic",
+    "recurrence",
     "members.apps.MembersConfig",
     "notifications.apps.NotificationsConfig",
     "teams.apps.TeamsConfig",
