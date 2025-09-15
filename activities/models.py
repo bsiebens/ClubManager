@@ -1,9 +1,17 @@
+import datetime
+import importlib
+from collections import OrderedDict
+
+from constance import config
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
 from rules import is_superuser
-from rules.contrib.models import RulesModel, RulesModelBase, RulesModelMixin
+from rules.contrib.models import RulesModel
 
+from members.models import Member
+from teams.models import Season
 from teams.rules import is_a_team_admin
 
 
@@ -83,11 +91,239 @@ class ActivityType(RulesModel):
         return self.name
 
 
-class Activity(RulesModelMixin, PolymorphicModel, metaclass=RulesModelBase):
+class Activity(PolymorphicModel):
     owner = models.ForeignKey("members.Member", on_delete=models.CASCADE, verbose_name=_("owner"))
+    teams = models.ManyToManyField("teams.Team", verbose_name=_("teams"), blank=True, related_name="activities")
+    members = models.ManyToManyField("members.Member", verbose_name=_("members"), blank=True, related_name="activities", help_text=_("Additional members to add, these are included in addition to the included teams"))
+
+    type = models.ForeignKey(ActivityType, on_delete=models.CASCADE, verbose_name=_("type"))
+    start_time = models.DateTimeField(_("start time"))
+    end_time = models.DateTimeField(_("end time"), blank=True, null=True)
+    gathering_time = models.DateTimeField(_("gathering time"), blank=True, null=True, help_text=_("Date and time when members need to be present at the location"))
+
+    location = models.CharField(_("location"), max_length=255, blank=True, null=True)
+    title = models.CharField(_("title"), max_length=255, blank=True, null=True)
+    description = models.TextField(_("description"), blank=True, null=True)
+
+    require_registration = models.BooleanField(_("require registration"), default=False, help_text=_("If set, members must register for the activity"))
+    registration_deadline = models.DateTimeField(_("registration deadline"), blank=True, null=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = _("activity")
         verbose_name_plural = _("activities")
-        ordering = ["-start_date"]
-        rules_permissions = {"add": is_superuser | is_a_team_admin, "view": is_superuser | is_a_team_admin, "change": is_superuser | is_a_team_admin, "delete": is_superuser | is_a_team_admin}
+        ordering = ["start_time", "end_time"]
+
+    def __str__(self):
+        if self.title is not None and self.title != "":
+            return self.title
+
+        return _("Activity from {start_time} to {end_time}").format(start_time=self.start_time.strftime("%d/%m/%Y %H:%M"), end_time=self.end_time.strftime("%d/%m%Y %H:%M"))
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+
+        if self.end_time is None:
+            self.end_time = self.start_time + datetime.timedelta(hours=config.CM_DEFAULT_ACTIVITY_DURATION)
+
+        if self.gathering_time is None:
+            self.gathering_time = self.start_time
+
+        super().save(*args, **kwargs)
+        self.generate_registrations()
+
+    def clean(self):
+        if isinstance(self, Event) and self.type.type != ActivityType.ActivityTypes.EVENT:
+            raise ValueError(_("Events can only be of type 'event'"))
+
+        if isinstance(self, Game) and self.type.type != ActivityType.ActivityTypes.GAME:
+            raise ValueError(_("Games can only be of type 'game'"))
+
+        if isinstance(self, (Practice, PracticeOccurrence)) and self.type.type != ActivityType.ActivityTypes.PRACTICE:
+            raise ValueError(_("Practices can only be of type 'practice'"))
+
+    @property
+    def is_open(self) -> bool:
+        """Returns whether the activity is open for registration"""
+        if self.require_registration:
+            return timezone.now() <= self.registration_deadline
+
+        return True
+
+    @property
+    def completed_registrations(self) -> int:
+        """Returns the number of completed registrations for the activity"""
+        return self.registrations.exclude(response=Registration.ResponseOptions.NO_RESPONSE).count()
+
+    @property
+    def total_registrations(self) -> int:
+        """Returns the total number of registrations for the activity"""
+        return self.registrations.count()
+
+    def generate_registrations(self) -> None:
+        """Generates new registrations for the activity based on the current members and teams"""
+
+        if self.require_registration and not isinstance(self, Practice):
+            # We don't generate registrations for practices as they are covered through PracticeOccurrence objects
+            members = Member.objects.filter(team_memberships__season=Season.for_date(), team_memberships__team__in=self.teams.all())
+            if not self.type.staff_registration_required:
+                members = members.exclude(team_memberships__role__staff_role=True, team_memberships__role__admin_role=True)
+
+            members = members | self.members.all()
+
+            existing_registrations = self.registrations.all()
+            member_ids = set(member.id for member in members)
+
+            for registration in existing_registrations:
+                if registration.member.id not in member_ids:
+                    registration.delete()
+                else:
+                    member_ids.remove(registration.member.id)
+
+            new_registrations = [Registration(activity=self, member=member) for member in Member.objects.filter(id__in=member_ids)]
+            Registration.objects.bulk_create(new_registrations)
+
+
+class Event(Activity):
+    class Meta:
+        verbose_name = _("event")
+        verbose_name_plural = _("events")
+        ordering = ["start_time", "end_time", "title"]
+
+    def __str__(self):
+        if self.title is not None and self.title != "":
+            return self.title
+
+        return _("Event from {start_time} to {end_time}").format(start_time=self.start_time.strftime("%d/%m/%Y %H:%M"), end_time=self.end_time.strftime("%d/%m%Y %H:%M"))
+
+
+class Game(Activity):
+    team = models.ForeignKey("teams.Team", on_delete=models.CASCADE, verbose_name=_("team"), related_name="games")
+    opponent = models.ForeignKey(Opponent, on_delete=models.CASCADE, verbose_name=_("opponent"), blank=True, null=True, related_name="games")
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, verbose_name=_("season"), related_name="games")
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, verbose_name=_("competition"), related_name="games")
+    competition_game_id = models.CharField(_("competition id"), max_length=255, blank=True, null=True)
+
+    is_live = models.BooleanField(_("live"), default=False)
+    score_team = models.IntegerField(_("score team"), default=0)
+    score_opponent = models.IntegerField(_("score opponent"), default=0)
+
+    class Meta:
+        verbose_name = _("game")
+        verbose_name_plural = _("games")
+        ordering = ["start_time", "end_time", "title"]
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        self.season = Season.for_date(current_date=self.start_time)
+
+        self.title = f"{self.team} ({self.start_time.strftime('%d/%m/%Y %H:%M')} @ {self.location})"
+        if self.opponent is not None:
+            self.title = f"{self.team} vs {self.opponent} ({self.start_time.strftime('%d/%m/%Y %H:%M')} @ {self.location})"
+
+        super().save(*args, **kwargs)
+
+    @property
+    def is_home_game(self) -> bool:
+        """Check if the game is a home game"""
+        return self.location.lower() == config.CM_CLUB_HOME_LOCATION.lower()
+
+    def update_game_information(self) -> None:
+        if self.competition is not None:
+            module = importlib.import_module(self.competition.module)
+            competition = getattr(module, self.competition.name)
+
+            competition().update_game_information(game=self)
+
+
+class Practice(Activity): ...
+
+
+class PracticeOccurrence(Activity): ...
+
+
+class RegistrationManager(models.Manager):
+    def grouped_by_response(self, buckets=None, order_inside_bucket: bool = True) -> "OrderedDict[str, list[Registration]]":
+        """
+        Groups registrations into specified buckets based on their response options.
+
+        This method organizes a list of `Registration` objects into groups (buckets)
+        defined by their response statuses. By default, it categorizes responses
+        into `attending`, `not_attending`, and `no_response` buckets, allowing
+        customization via the `buckets` parameter. Additionally, individual
+        buckets can be ordered by members' last and first names if desired.
+
+        :param buckets: The mapping of bucket names to corresponding sets of
+          response statuses. If not provided, a default set of buckets will be used.
+        :param order_inside_bucket: A boolean flag indicating whether to order
+          registrations within each bucket by members' last and first names.
+        :return: An `OrderedDict` where keys are bucket names and values are lists
+          of `Registration` objects corresponding to each bucket.
+        """
+
+        if buckets is None:
+            buckets = OrderedDict(
+                [
+                    (
+                        "attending",
+                        {
+                            Registration.ResponseOptions.ATTENDING,
+                            Registration.ResponseOptions.SELECTED,
+                            Registration.ResponseOptions.NOT_SELECTED,
+                        },
+                    ),
+                    ("not attending", {Registration.ResponseOptions.NOT_ATTENDING}),
+                    ("no response", {Registration.ResponseOptions.NO_RESPONSE}),
+                ]
+            )
+
+        response_to_bucket = {status: bucket_name for bucket_name, statuses in buckets.items() for status in statuses}
+        grouped = OrderedDict((bucket_name, []) for bucket_name in buckets.keys())
+        queryset = self.select_related("member")
+
+        for registration in queryset:
+            bucket_name = response_to_bucket.get(registration.response)
+            if bucket_name is not None:
+                grouped[bucket_name].append(registration)
+
+        if order_inside_bucket:
+            for bucket_list in grouped.values():
+                bucket_list.sort(
+                    key=lambda r: (
+                        (getattr(r.member.user, "last_name", "") or "").lower(),
+                        (getattr(r.member.user, "first_name", "") or "").lower(),
+                    )
+                )
+
+        return grouped
+
+
+class Registration(models.Model):
+    class ResponseOptions(models.TextChoices):
+        NO_RESPONSE = "no_response", _("No response")
+        ATTENDING = "attending", _("Attending")
+        NOT_ATTENDING = "not_attending", _("Not attending")
+        SELECTED = "selected", _("Selected")
+        NOT_SELECTED = "not_selected", _("Not selected")
+
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="registrations", verbose_name=_("activity"))
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="registrations", verbose_name=_("member"))
+    response = models.CharField(_("response"), max_length=15, choices=ResponseOptions.choices, default=ResponseOptions.NO_RESPONSE)
+    comment = models.TextField(_("comment"), blank=True)
+
+    objects = RegistrationManager()
+
+    created = models.DateTimeField(_("created"), auto_now_add=True)
+    modified = models.DateTimeField(_("modified"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("registration")
+        verbose_name_plural = _("registrations")
+        unique_together = ("activity", "member")
+
+    def __str__(self):
+        return f"{self.member} - {self.activity} ({self.response})"
