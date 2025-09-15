@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "members.apps.MembersConfig",
     "notifications.apps.NotificationsConfig",
     "teams.apps.TeamsConfig",
+    "activities.apps.ActivitiesConfig",
 ]
 
 if DEBUG:
