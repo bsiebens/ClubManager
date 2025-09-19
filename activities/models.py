@@ -132,6 +132,9 @@ class Activity(PolymorphicModel):
         if self.gathering_time is None:
             self.gathering_time = self.start_time
 
+        if self.registration_deadline is None:
+            self.registration_deadline = self.start_time
+
         super().save(*args, **kwargs)
 
     def clean(self):
@@ -174,7 +177,7 @@ class Activity(PolymorphicModel):
             members = members | self.members.all()
 
             existing_registrations = self.registrations.all()
-            member_ids = set(member.id for member in members)
+            member_ids = set(member["id"] for member in members.values("id"))
 
             for registration in existing_registrations:
                 if registration.member.id not in member_ids:
@@ -241,7 +244,7 @@ class Game(Activity):
 
 
 class Practice(Activity):
-    recurrences = RecurrenceField(null=True, blank=True)
+    recurrences = RecurrenceField(null=True, blank=True, include_dtstart=False)
 
     class Meta:
         verbose_name = _("practice")
@@ -267,15 +270,13 @@ class Practice(Activity):
         maximum_end_date = self.start_time + datetime.timedelta(days=365)
 
         if self.recurrences.count() != 0:
-            for dt in self.recurrences.occurrences(dtstart=self.start_time, dtend=maximum_end_date):
-                print(dt)
+            counter = 0
+            for dt in self.recurrences.between(self.start_time, maximum_end_date, dtstart=self.start_time, inc=True):
+                counter += 1
                 expected_start_times.add(dt)
 
         else:
-            print("doing this also")
             expected_start_times.add(self.start_time)
-
-        print(expected_start_times)
 
         # Fetch all existing occurrences for this series
         existing_occurrences = {occ.start_time: occ for occ in self.occurrences.filter(is_override=False)}
