@@ -1,0 +1,77 @@
+{% extends "ClubManager/base.html" %}
+
+{% load i18n %}
+{% load partials %}
+
+{% block title %}{% translate "Calendar" %}{% endblock title %}
+
+{% block content %}
+    <div class="grow flex flex-col gap-4 lg:gap-8 w-full lg:mr-4">
+        {% for activity in activities %}
+            <div class="flex flex-row gap-4">
+                <div class="w-14 opacity-75 mx-auto">
+                    {% ifchanged %}
+                        <div class="border border-base-300 rounded-md items-center w-full shadow-md">
+                            <div class="text-center w-full font-semibold text-xs font-jersey border-b border-base-300 rounded-t-md px-2 py-1 bg-accent text-accent-content">{{ activity.start_time|date:"D" }}</div>
+                            <div class="text-center w-full font-semibold font-jersey text-2xl px-2">{{ activity.start_time|date:"d" }}</div>
+                            <div class="text-center w-full font-semibold text-xs font-jersey pb-1">{{ activity.start_time|date:"M" }}</div>
+                        </div>
+                    {% endifchanged %}
+                </div>
+                <div>
+                    {% if activity.type.type == "practice" %}
+                        <i class="fa-solid fa-dumbbell text-xl bg-base-300 p-2 m-1 mask mask-circle"></i>
+                    {% elif activity.type.type == "game" %}
+                        <i class="fa-solid fa-hockey-puck text-xl bg-base-300 p-2 m-1 mask mask-circle"></i>
+                    {% else %}
+                        <i class="fa-solid fa-calendar-days text-xl bg-base-300 p-2 m-1 mask mask-circle"></i>
+                    {% endif %}
+                </div>
+                <div class="grow py-2 border-base-300 border rounded-lg p-4 shadow-md gap-1">
+                    <div class="pl-4 border-l-4 my-2 {% if activity.type.type == "practice" %}border-primary{% elif activity.type.type == "game" %}border-secondary{% else %}border-accent{% endif %}">
+                        <div class="flex flex-row justify-between items-center">
+                            <div class="font-jersey font-bold text-lg">
+                                {% if activity.type.type == "practice" %}
+                                    {% translate "Practice" %}
+                                {% elif activity.type.type == "game" %}
+                                    {{ activity.team }}{% if activity.opponent %} vs. {{ activity.opponent }}{% endif %}
+                                {% else %}
+                                    {{ activity.title }}
+                                {% endif %}
+                            </div>
+                            <div class="flex flex-row gap-2 items-center">
+                                <div class="text-xs font-semibold">
+                                    {% if activity.is_open %}
+                                        <div class="status status-success mr-2"></div>{% translate "registrations open" %}
+                                    {% else %}
+                                        <div class="status status-error mr-2"></div>{% translate "registrations closed" %}
+                                    {% endif %}
+                                </div>
+                                <div class="badge badge-sm {% if activity.type.type == "practice" %}badge-primary{% elif activity.type.type == "game" %}badge-secondary{% else %}badge-accent{% endif %} shadow-md">{{ activity.type|lower }}</div>
+                            </div>
+                        </div>
+                        <div class="flex flex-row gap-2 opacity-75 text-xs mt-2">
+                            <div class="basis-1/4"><i class="fa-solid fa-clock mr-2"></i>{{ activity.start_time|date:"H:i" }} - {{ activity.end_time|date:"H:i" }}</div>
+                            <div class="basis-1/4"><i class="fa-solid fa-arrows-to-circle mr-2"></i>{{ activity.gathering_time|date:"H:i" }}</div>
+                            <div class="basis-1/2">
+                                {% if activity.location is not None %}<i class="fa-solid fa-map-marker-alt mr-2"></i>{{ activity.location }}{% endif %}
+                            </div>
+                        </div>
+                        <div class="mt-2 border-t border-base-300 pt-2 flex flex-col gap-2">
+                            {% for registration in activity.my_registrations %}
+                                <div class="flex flex-row items-center justify-between font-jersey text-sm">
+                                    <div class="">{{ registration.member }}</div>
+                                    <div class="flex flex-row gap-8 lg:gap-4">
+                                        <i class="fa-solid fa-check"></i>
+                                        <i class="fa-solid fa-check"></i>
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}

@@ -163,6 +163,7 @@ CONSTANCE_CONFIG = {
     "CM_DEFAULT_SEASON_MONTH": (config("CM_DEFAULT_SEASON_MONTH", default=8, cast=int), "Default season start month", int),
     "CM_DEFAULT_SEASON_DAY": (config("CM_DEFAULT_SEASON_DAY", default=1, cast=int), "Default season start day", int),
     "CM_DEFAULT_SEASON_DURATION": (config("CM_DEFAULT_SEASON_DURATION", default="1y", cast=str), "Default season duration", str),
+    "CM_INSTAGRAM_HANDLE": (config("CM_INSTAGRAM_HANDLE", default="ClubManager", cast=str), "Instagram handle", str),
 }
 
 PHONENUMBER_DEFAULT_FORMAT = "INTERNATIONAL"

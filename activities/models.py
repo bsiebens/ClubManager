@@ -177,7 +177,7 @@ class Activity(PolymorphicModel):
             members = members | self.members.all()
 
             existing_registrations = self.registrations.all()
-            member_ids = set(member["id"] for member in members.values("id"))
+            member_ids = set(members.values_list("id", flat=True))
 
             for registration in existing_registrations:
                 if registration.member.id not in member_ids:
