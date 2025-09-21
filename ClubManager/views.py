@@ -79,6 +79,50 @@ def calendar(request: HttpRequest) -> HttpResponse:
     return render(request, "ClubManager/calendar.html", {"activities": activities})
 
 
+def update_registration(request: HttpRequest) -> HttpResponse:
+    registration_id, registration_response = request.POST.get("response_button").split("|")
+    registration = Registration.objects.get(id=registration_id)
+
+    # Verify if we have access to this registration
+    if registration.member.user == request.user or registration.member in request.user.member.family_members.all():
+        registration.response = registration_response
+        registration.save(update_fields=["response"])
+
+    buckets = OrderedDict(
+        [
+            (_("attending"), {Registration.ResponseOptions.ATTENDING}),
+            (_("selected"), {Registration.ResponseOptions.SELECTED}),
+            (_("not selected"), {Registration.ResponseOptions.NOT_SELECTED}),
+            (_("not attending"), {Registration.ResponseOptions.NOT_ATTENDING}),
+            (_("no response"), {Registration.ResponseOptions.NO_RESPONSE}),
+        ]
+    )
+
+    activity = registration.activity
+    all_registrations = activity.registrations.grouped_by_response(buckets=buckets)
+
+    return render(request, "ClubManager/registration_update.html", {"registration": registration, "activity": activity, "all_registrations": all_registrations})
+
+
+def update_registration_modal(request: HttpRequest) -> HttpResponse:
+    buckets = OrderedDict(
+        [
+            (_("attending"), {Registration.ResponseOptions.ATTENDING}),
+            (_("selected"), {Registration.ResponseOptions.SELECTED}),
+            (_("not selected"), {Registration.ResponseOptions.NOT_SELECTED}),
+            (_("not attending"), {Registration.ResponseOptions.NOT_ATTENDING}),
+            (_("no response"), {Registration.ResponseOptions.NO_RESPONSE}),
+        ]
+    )
+
+    print(request.GET)
+
+    activity = Activity.objects.get(id=request.GET["activity_id"])
+    all_registrations = activity.registrations.grouped_by_response(buckets=buckets)
+
+    return render(request, "ClubManager/calendar.html#registration_status_modal", {"activity": activity, "all_registrations": all_registrations})
+
+
 def notifications(request: HttpRequest, mark_read: bool = False, delete_read: bool = False) -> HttpResponse:
     template_name = "ClubManager/notifications.html"
     if request.htmx:

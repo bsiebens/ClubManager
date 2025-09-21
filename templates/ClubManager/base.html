@@ -20,7 +20,7 @@
         <script src="{% static "js/htmx.js" %}"></script>
         <script src="{% static "js/htmx-ext-ws.js" %}"></script>
     </head>
-    <body hx-headers='{"X_CSRFTOKEN": "{{ csrf_token }}"}'>
+    <body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
         {% url "clubmanager:news" as news %}
 
         <div class="flex flex-col h-screen">
