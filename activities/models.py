@@ -110,8 +110,6 @@ class Activity(PolymorphicModel):
     require_registration = models.BooleanField(_("require registration"), default=False, help_text=_("If set, members must register for the activity"))
     registration_deadline = models.DateTimeField(_("registration deadline"), blank=True, null=True)
 
-    history = HistoricalRecords(excluded_fields=["created", "modified"])
-
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -193,6 +191,8 @@ class Activity(PolymorphicModel):
 
 
 class Event(Activity):
+    history = HistoricalRecords(excluded_fields=["created", "updated"])
+
     class Meta:
         verbose_name = _("event")
         verbose_name_plural = _("events")
@@ -215,6 +215,8 @@ class Game(Activity):
     is_live = models.BooleanField(_("live"), default=False)
     score_team = models.IntegerField(_("score team"), default=0)
     score_opponent = models.IntegerField(_("score opponent"), default=0)
+
+    history = HistoricalRecords(excluded_fields=["created", "updated", "is_live", "score_team", "score_opponent"])
 
     class Meta:
         verbose_name = _("game")
@@ -248,6 +250,8 @@ class Game(Activity):
 
 class Practice(Activity):
     recurrences = RecurrenceField(null=True, blank=True, include_dtstart=False)
+
+    history = HistoricalRecords(excluded_fields=["created", "updated"])
 
     class Meta:
         verbose_name = _("practice")
@@ -362,6 +366,8 @@ class PracticeOccurrence(Activity):
     series = models.ForeignKey(Practice, on_delete=models.CASCADE, verbose_name=_("series"), related_name="occurrences")
     is_override = models.BooleanField(_("is override"), default=False, help_text=_("If set, this occurrence is an override and not part of the original series"))
 
+    history = HistoricalRecords(excluded_fields=["created", "updated"])
+
     class Meta:
         verbose_name = _("practice occurrence")
         verbose_name_plural = _("practice occurrences")
@@ -440,10 +446,10 @@ class Registration(models.Model):
     comment = models.TextField(_("comment"), blank=True)
 
     objects = RegistrationManager()
-    history = HistoricalRecords(excluded_fields=["created", "modified"])
+    history = HistoricalRecords(excluded_fields=["created", "updated"])
 
     created = models.DateTimeField(_("created"), auto_now_add=True)
-    modified = models.DateTimeField(_("modified"), auto_now=True)
+    updated = models.DateTimeField(_("modified"), auto_now=True)
 
     class Meta:
         verbose_name = _("registration")
