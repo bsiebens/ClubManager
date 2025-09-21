@@ -11,9 +11,9 @@ urlpatterns = [
     path("news/", views.news, name="news"),
     path("calendar/", views.calendar, name="calendar"),
     path("calendar/registration/update/", views.update_registration, name="registration-update"),
-    path("calendar/registration/modal/", views.update_registration_modal, name="registration-update-modal"),
     path("notifications/", views.notifications, name="notifications"),
-    path("notifications/mark-read/", views.notifications, {"mark_read": True}, name="notifications-mark-read"),
+    path("notifications/mark-read/", views.notifications, {"mark_all_read": True}, name="notifications-mark-all-read"),
+    path("notifications/mark-read/<int:notification_id>/", views.notifications, name="notifications-mark-read"),
     path("notifications/delete-read/", views.notifications, {"delete_read": True}, name="notifications-delete-read"),
     path("notifications/check/", notifications_views.check_notifications, name="notifications-check"),
 ]

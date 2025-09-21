@@ -10,6 +10,7 @@ from polymorphic.models import PolymorphicModel
 from recurrence.fields import RecurrenceField
 from rules import is_superuser
 from rules.contrib.models import RulesModel
+from simple_history.models import HistoricalRecords
 
 from members.models import Member
 from teams.models import Season
@@ -108,6 +109,8 @@ class Activity(PolymorphicModel):
 
     require_registration = models.BooleanField(_("require registration"), default=False, help_text=_("If set, members must register for the activity"))
     registration_deadline = models.DateTimeField(_("registration deadline"), blank=True, null=True)
+
+    history = HistoricalRecords(excluded_fields=["created", "modified"])
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -437,6 +440,7 @@ class Registration(models.Model):
     comment = models.TextField(_("comment"), blank=True)
 
     objects = RegistrationManager()
+    history = HistoricalRecords(excluded_fields=["created", "modified"])
 
     created = models.DateTimeField(_("created"), auto_now_add=True)
     modified = models.DateTimeField(_("modified"), auto_now=True)

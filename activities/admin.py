@@ -1,5 +1,6 @@
 # Register your models here.
 from django.contrib import admin
+from simple_history.admin import SimpleHistoryAdmin
 
 from .models import Opponent, Competition, Activity, ActivityType, Game, Event, Practice, PracticeOccurrence, Registration
 
@@ -11,4 +12,4 @@ admin.site.register(Game)
 admin.site.register(Event)
 admin.site.register(Practice)
 admin.site.register(PracticeOccurrence)
-admin.site.register(Registration)
+admin.site.register(Registration, SimpleHistoryAdmin)

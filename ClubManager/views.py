@@ -5,7 +5,9 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django_htmx.http import HttpResponseClientRedirect
 from generic_notifications.channels import WebsiteChannel
+from generic_notifications.models import Notification
 from generic_notifications.utils import mark_notifications_as_read, get_notifications
 
 from activities.models import Activity, Practice, Registration
@@ -104,33 +106,20 @@ def update_registration(request: HttpRequest) -> HttpResponse:
     return render(request, "ClubManager/registration_update.html", {"registration": registration, "activity": activity, "all_registrations": all_registrations})
 
 
-def update_registration_modal(request: HttpRequest) -> HttpResponse:
-    buckets = OrderedDict(
-        [
-            (_("attending"), {Registration.ResponseOptions.ATTENDING}),
-            (_("selected"), {Registration.ResponseOptions.SELECTED}),
-            (_("not selected"), {Registration.ResponseOptions.NOT_SELECTED}),
-            (_("not attending"), {Registration.ResponseOptions.NOT_ATTENDING}),
-            (_("no response"), {Registration.ResponseOptions.NO_RESPONSE}),
-        ]
-    )
-
-    print(request.GET)
-
-    activity = Activity.objects.get(id=request.GET["activity_id"])
-    all_registrations = activity.registrations.grouped_by_response(buckets=buckets)
-
-    return render(request, "ClubManager/calendar.html#registration_status_modal", {"activity": activity, "all_registrations": all_registrations})
-
-
-def notifications(request: HttpRequest, mark_read: bool = False, delete_read: bool = False) -> HttpResponse:
+def notifications(request: HttpRequest, notification_id: int | None = None, mark_all_read: bool = False, delete_read: bool = False) -> HttpResponse:
     template_name = "ClubManager/notifications.html"
     if request.htmx:
         template_name += "#list"
 
-    if mark_read:
+    if mark_all_read:
         mark_notifications_as_read(request.user)
         # send_notification_to_consumer(request.user)
+
+    if notification_id is not None:
+        notification = Notification.objects.get(id=notification_id)
+        notification.mark_as_read()
+
+        return HttpResponseClientRedirect(notification.get_absolute_url())
 
     if delete_read:
         request.user.notifications.filter(read__isnull=False).delete()

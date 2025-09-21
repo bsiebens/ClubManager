@@ -8,8 +8,8 @@
 {% block content %}
     <div class="grow">
         {% if notifications|length > 0 %}
-            <div class="flex flex-row gap-2 justify-end -mt-14">
-                <a class="btn btn-xs" href="{% url "clubmanager:notifications-mark-read" %}" id="markReadButton" hx-target="#notificationList" hx-get="{% url "clubmanager:notifications-mark-read" %}">{% translate "Mark all as read" %}</a>
+            <div class="flex flex-row gap-2 justify-center lg:justify-end lg:-mt-14">
+                <a class="btn btn-xs" href="{% url "clubmanager:notifications-mark-all-read" %}" id="markReadButton" hx-target="#notificationList" hx-get="{% url "clubmanager:notifications-mark-all-read" %}">{% translate "Mark all as read" %}</a>
                 <a class="btn btn-xs" href="{% url "clubmanager:notifications-delete-read" %}" id="deleteReadButton" hx-target="#notificationList" hx-get="{% url "clubmanager:notifications-delete-read" %}">{% translate "Delete read notifications" %}</a>
             </div>
         {% endif %}
@@ -22,7 +22,7 @@
 
                 {% for notification in notifications %}
                     {% if notification.get_absolute_url != "" %}
-                        <a href="{{ notification.get_absolute_url }}">
+                        <a href="{{ notification.get_absolute_url }}" hx-get="{% url "clubmanager:notifications-mark-read" notification.id %}">
                     {% endif %}
 
                     <li class="list-row items-center">
@@ -33,9 +33,17 @@
                             {% endif %}
 
                             {% if notification.notification_type == "calendar" %}
-                                <i class="fa-solid fa-calendar-days text-xl opacity-75"></i>
+                                <i class="fa-solid fa-calendar-days text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
+                            {% elif notification.notification_type == "registration" %}
+                                {% if notification.target.type.type == "practice" %}
+                                    <i class="fa-solid fa-dumbbell text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
+                                {% elif notification.target.type.type == "game" %}
+                                    <i class="fa-solid fa-hockey-puck text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-calendar-days text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
+                                {% endif %}
                             {% else %}
-                                <i class="fa-solid fa-bell text-xl opacity-75"></i>
+                                <i class="fa-solid fa-bell text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
                             {% endif %}
 
                             {% if not notification.is_read %}
@@ -45,7 +53,7 @@
 
                         <div>
                             <div class="font-semibold">{{ notification.get_subject }}</div>
-                            <div class="opacity-60 text-xs">{{ notification.get_text }}</div>
+                            <div class="opacity-60 text-xs">{{ notification.get_text|safe }}</div>
                             <div class="opacity-60 text-xs lg:hidden">{{ notification.added|date:"d b Y H:i" }}</div>
                         </div>
 
