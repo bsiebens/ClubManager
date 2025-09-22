@@ -108,14 +108,6 @@
                                 {% endfor %}
                             </ul>
 
-                            {% for registration in activity.my_registrations %}
-                                <dialog class="modal modal-bottom sm:modal-middle" id="registration_comment_{{ registration.pk }}" x-show="show" x-on:click="show = false">
-                                    <div class="modal-box min-w-1/2 max-w-5xl">
-                                        {% include "ClubManager/calendar_not_attending.html#not_attending_form" %}
-                                    </div>
-                                </dialog>
-                            {% endfor %}
-
                             <button class="btn btn-outline btn-sm my-1" onclick="registrations_activity_{{ activity.pk }}.showModal()"><i class="fa-solid fa-list"></i>{% translate "All members" %}</button>
 
                             {% with all_registrations=activity.all_registrations %}
