@@ -43,7 +43,7 @@ def notifications(request: HttpRequest, notification_pk: int | None = None, mark
 
     notifications_for_user = get_notifications(user=request.user, channel=WebsiteChannel)
 
-    return AlpineTemplateResponse(request, "ClubManager/notifications.html", {"notifications": notifications_for_user})
+    return AlpineTemplateResponse(request, "ClubManager/notifications.html", {"notifications": notifications_for_user}, partial_template="notification_update")
 
 
 @login_required

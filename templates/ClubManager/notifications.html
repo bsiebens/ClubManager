@@ -5,47 +5,16 @@
 
 {% block title %}{% translate "Notifications" %}{% endblock title %}
 
+{% partialdef notification_update %}
+    {% partial notification_list %}
+    {% include "notifications/notification.html" %}
+{% endpartialdef %}
+
 {% block content %}
     {% if notifications|length > 0 %}
         <div class="flex flex-row gap-2 justify-center lg:justify-end lg:-mt-14">
-            <a
-                class="btn btn-xs"
-                x-target="notification_list"
-                href="{% url "clubmanager:notifications-mark-all-read" %}"
-                x-on:click="
-                    fetch('{% url "clubmanager:notifications-check" %}', {
-                        headers: {
-                            'X-Alpine-Request': 'true',
-                            'X-Alpine-Target': 'notification_icon'
-                    },
-                    credentials: 'same-origin'
-                    })
-                    .then(res => res.ok ? res.text() : '')
-                    .then(html => { if (html) document.getElementById('notification_icon').innerHTML = html })
-                    .catch(() => {});
-                "
-            >
-                {% translate "Mark all as read" %}
-            </a>
-            <a
-                class="btn btn-xs"
-                x-target="notification_list"
-                href="{% url "clubmanager:notifications-delete-all-read" %}"
-                x-on:click="
-                    fetch('{% url "clubmanager:notifications-check" %}', {
-                        headers: {
-                            'X-Alpine-Request': 'true',
-                            'X-Alpine-Target': 'notification_icon'
-                    },
-                    credentials: 'same-origin'
-                    })
-                    .then(res => res.ok ? res.text() : '')
-                    .then(html => { if (html) document.getElementById('notification_icon').innerHTML = html })
-                    .catch(() => {});
-                "
-            >
-                {% translate "Delete all read notifications" %}
-            </a>
+            <a class="btn btn-xs" x-target="notification_list notification_icon" href="{% url "clubmanager:notifications-mark-all-read" %}">{% translate "Mark all as read" %}</a>
+            <a class="btn btn-xs" x-target="notification_list" href="{% url "clubmanager:notifications-delete-all-read" %}">{% translate "Delete all read notifications" %}</a>
         </div>
     {% endif %}
 

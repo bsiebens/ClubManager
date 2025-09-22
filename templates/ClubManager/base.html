@@ -65,7 +65,7 @@
 
                         <li class="border-b border-neutral">
                             <a href="{% url "clubmanager:notifications" %}">
-                                <div id="notificationIcon" x-data x-init="
+                                <div x-data x-init="
                                     const update = async () => {
                                         try {
                                             const res = await fetch('{% url "clubmanager:notifications-check" %}', {
@@ -80,7 +80,7 @@
                                         } catch (e) { console.error(e); }
                                     };
                                     update();
-                                    setInterval(update, 10000);
+                                    setInterval(update, 60000);
                                     ">
                                     {% partialdef notification_icon inline %}
                                         {% if unread_notification_count > 0 %}
