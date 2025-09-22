@@ -41,7 +41,15 @@ def calendar(request: HttpRequest, registration_pk: int | None = None, response:
             registration.comment = request.POST.get("comment")
             registration.save(update_fields=["response", "comment"])
 
-        return redirect("clubmanager:calendar")
+            activity = registration.activity
+            all_registrations = grouped_by_response(activity.registrations.all(), buckets, order_inside_bucket=True)
+
+            context.update({"activity": activity, "registration": registration, "all_registrations": all_registrations})
+
+        print(is_alpine(request))
+
+        if not is_alpine(request):
+            return redirect("clubmanager:calendar")
 
     else:
         if registration_pk is not None and response in ["attending", "not_attending", "no_response"]:
@@ -49,9 +57,8 @@ def calendar(request: HttpRequest, registration_pk: int | None = None, response:
 
             # Verify if we have access to the registration
             if registration.member.user == request.user or registration.member in request.user.member.family_members.all():
-                if response == "not_attending":
-                    if not is_alpine(request):
-                        return AlpineTemplateResponse(request, "ClubManager/calendar_not_attending.html", {"registration": registration})
+                if response == "not_attending" and not is_alpine(request):
+                    return AlpineTemplateResponse(request, "ClubManager/calendar_not_attending.html", {"registration": registration})
 
                 else:
                     registration.response = response
@@ -88,6 +95,7 @@ def calendar(request: HttpRequest, registration_pk: int | None = None, response:
 
             context.update({"activities": activities})
 
+    print("running")
     return AlpineTemplateResponse(request, "ClubManager/calendar.html", context, partial_template="registration_update")
 
 

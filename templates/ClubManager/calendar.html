@@ -96,7 +96,7 @@
                                                 {% if activity.is_open %}
                                                     <a x-target="registration_status_{{ registration.pk }} registrations_activity_{{ activity.pk }}" href="{% url "clubmanager:calendar-update-response" registration.pk "attending" %}" class="btn btn-circle btn-sm {% if registration.response == "attending" %}btn-success{% endif %}"><i class="fa-solid fa-check"></i></a>
                                                     <a x-target="registration_status_{{ registration.pk }} registrations_activity_{{ activity.pk }}" href="{% url "clubmanager:calendar-update-response" registration.pk "no_response" %}" class="btn btn-circle btn-sm {% if registration.response == "no_response" %}btn-info{% endif %}"><i class="fa-solid fa-question"></i></a>
-                                                    <a x-data x-on:click.prevent="$dispatch('open-modal', { pk: '{{ registration.pk }}' })" href="{% url "clubmanager:calendar-update-response" registration.pk "not_attending" %}" class="btn btn-circle btn-sm {% if registration.response == "not_attending" %}btn-error{% endif %}"><i class="fa-solid fa-times"></i></a>
+                                                    <a x-data x-on:click.prevent="$dispatch('open-modal', { registration_pk: '{{ registration.pk }}', activity_pk: '{{ activity.pk }}' })" href="{% url "clubmanager:calendar-update-response" registration.pk "not_attending" %}" class="btn btn-circle btn-sm {% if registration.response == "not_attending" %}btn-error{% endif %}"><i class="fa-solid fa-times"></i></a>
                                                 {% else %}
                                                     <div class="btn btn-circle {% if registration.response == "attending" %}btn-success{% endif %} btn-sm pointer-events-none"><i class="fa-solid fa-check"></i></div>
                                                     <div class="btn btn-circle {% if registration.response == "no_response" %}btn-info{% endif %} btn-sm pointer-events-none"><i class="fa-solid fa-check"></i></div>
@@ -146,25 +146,27 @@
         {% endfor %}
     </div>
 
-    <div x-data="{ show: false, pk: null }" x-on:open-modal.window="
-        pk = $event.detail.pk;
+    <div x-data="{ show: false, registration_pk: null, activity_pk: null, comment: '' }" x-on:open-modal.window="
+        registration_pk = $event.detail.registration_pk;
+        activity_pk = $event.detail.activity_pk;
+        comment = '';
         show = true;
         $refs.modal.showModal();">
 
-        <dialog x-ref="modal" class="modal modal-bottom sm:modal-middle" x-show="show" x-on:close="show = false">
+        <dialog x-ref="modal" class="modal modal-bottom sm:modal-middle" x-show="show" x-on:close="show = false; comment = '';" x-on:registration-updated.window="$refs.modal.close()">
             <div class="modal-box min-w-1/2 max-w-5xl">
                 <h3 class="text-lg font-bold mb-2">{% translate "Not attending" %}</h3>
                 <div class="text-sm mb-2">{% translate "Please provide a reason why you cannot attend." %}</div>
 
-                <form method="post" action="{% url 'clubmanager:calendar' %}">
+                <form method="post" action="{% url 'clubmanager:calendar' %}" x-target:dynamic="`registration_status_${registration_pk} registrations_activity_${activity_pk}`" x-on:submit="$refs.modal.close(); show = false;">
                     {% csrf_token %}
-                    <textarea name="comment" class="textarea w-full"></textarea>
-                    <input type="hidden" name="registration_pk" x-bind:value="pk" />
+                    <textarea name="comment" class="textarea w-full" x-model="comment"></textarea>
+                    <input type="hidden" name="registration_pk" x-bind:value="registration_pk" />
                     <input type="hidden" name="response" value="not_attending" />
 
                     <div class="modal-action">
                         <button type="submit" class="btn btn-neutral"><i class="fa-solid fa-floppy-disk"></i>{% translate "Save" %}</button>
-                        <button type="button" class="btn btn-neutral btn-outline" x-on:click="$refs.modal.close(); show = false;">{% translate "Cancel" %}</button>
+                        <button type="button" class="btn btn-neutral btn-outline" x-on:click="$refs.modal.close(); show = false; comment = '';">{% translate "Cancel" %}</button>
                     </div>
                 </form>
             </div>
