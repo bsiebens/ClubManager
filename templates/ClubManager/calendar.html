@@ -6,6 +6,11 @@
 
 {% block title %}{% translate "Calendar" %}{% endblock title %}
 
+{% partialdef registration_update %}
+    {% partial registration_status_list %}
+    {% partial registration_status_modal %}
+{% endpartialdef %}
+
 {% block content %}
     <div class="flex flex-col gap-4 lg:gap-8 w-full lg:mr-4">
         {% for activity in activities %}
@@ -21,13 +26,7 @@
                 </div>
 
                 <div class="hidden lg:flex">
-                    {% if activity.type.type == "practice" %}
-                        <i class="fa-solid fa-dumbbell text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
-                    {% elif activity.type.type == "game" %}
-                        <i class="fa-solid fa-hockey-puck text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
-                    {% else %}
-                        <i class="fa-solid fa-calendar-days text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
-                    {% endif %}
+                    <i class="{{ activity.type.logo }} text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
                 </div>
 
                 <div class="border border-base-300 rounded-lg p-4 shadow-md gap-1 w-full flex flex-row gap-2">
@@ -95,36 +94,9 @@
                                                 <div>{% translate "not selected" %}</div>
                                             {% else %}
                                                 {% if activity.is_open %}
-                                                    <div>
-                                                        <form method="post">
-                                                            {% csrf_token %}
-                                                            <input type="hidden" name="registration_pk" value="{{ registration.pk }}" />
-                                                            <input type="hidden" name="registration_response" value="attending" />
-                                                            <button type="submit" class="btn btn-circle btn-sm {% if registration.response == "attending" %}btn-success{% endif %}">
-                                                                <i class="fa-solid fa-check"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                    <div>
-                                                        <form method="post">
-                                                            {% csrf_token %}
-                                                            <input type="hidden" name="registration_pk" value="{{ registration.pk }}" />
-                                                            <input type="hidden" name="registration_response" value="no_response" />
-                                                            <button type="submit" class="btn btn-circle btn-sm {% if registration.response == "no_response" %}btn-info{% endif %}">
-                                                                <i class="fa-solid fa-question"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                    <div>
-                                                        <form method="post">
-                                                            {% csrf_token %}
-                                                            <input type="hidden" name="registration_pk" value="{{ registration.pk }}" />
-                                                            <input type="hidden" name="registration_response" value="not_attending" />
-                                                            <button type="submit" class="btn btn-circle btn-sm {% if registration.response == "not_attending" %}btn-error{% endif %}">
-                                                                <i class="fa-solid fa-times"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
+                                                    <a x-target="registration_status_{{ registration.pk }} registrations_activity_{{ activity.pk }}" href="{% url "clubmanager:calendar-update-response" registration.pk "attending" %}" class="btn btn-circle btn-sm {% if registration.response == "attending" %}btn-success{% endif %}"><i class="fa-solid fa-check"></i></a>
+                                                    <a x-target="registration_status_{{ registration.pk }} registrations_activity_{{ activity.pk }}" href="{% url "clubmanager:calendar-update-response" registration.pk "no_response" %}" class="btn btn-circle btn-sm {% if registration.response == "no_response" %}btn-info{% endif %}"><i class="fa-solid fa-question"></i></a>
+                                                    <a x-target="registration_status_{{ registration.pk }} registrations_activity_{{ activity.pk }}" href="{% url "clubmanager:calendar-update-response" registration.pk "not_attending" %}" class="btn btn-circle btn-sm {% if registration.response == "not_attending" %}btn-error{% endif %}"><i class="fa-solid fa-times"></i></a>
                                                 {% else %}
                                                     <div class="btn btn-circle {% if registration.response == "attending" %}btn-success{% endif %} btn-sm pointer-events-none"><i class="fa-solid fa-check"></i></div>
                                                     <div class="btn btn-circle {% if registration.response == "no_response" %}btn-info{% endif %} btn-sm pointer-events-none"><i class="fa-solid fa-check"></i></div>
@@ -136,9 +108,9 @@
                                 {% endfor %}
                             </ul>
 
-                            <button class="btn btn-outline btn-sm my-1" onclick="registrations_activity_{{ activity.pk }}.showModal()"><i class="fa-solid fa-eye"></i>{% translate "show all registered members" %}</button>
+                            <button class="btn btn-outline btn-sm my-1" onclick="registrations_activity_{{ activity.pk }}.showModal()"><i class="fa-solid fa-list"></i>{% translate "all members" %}</button>
 
-                            {% with all_registrations=activity.all_registrations.grouped_by_response %}
+                            {% with all_registrations=activity.all_registrations %}
                                 {% partialdef registration_status_modal inline %}
                                     <dialog class="modal modal-bottom sm:modal-middle" id="registrations_activity_{{ activity.pk }}">
                                         <div class="modal-box min-w-1/2 max-w-5xl">

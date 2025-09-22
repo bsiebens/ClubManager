@@ -17,6 +17,60 @@ from teams.models import Season
 from teams.rules import is_a_team_admin
 
 
+def grouped_by_response(registrations, buckets=None, order_inside_bucket: bool = True) -> "OrderedDict[str, list[Registration]]":
+    """
+    Groups registrations into specified buckets based on their response options.
+
+    This method organizes a list of `Registration` objects into groups (buckets)
+    defined by their response statuses. By default, it categorizes responses
+    into `attending`, `not_attending`, and `no_response` buckets, allowing
+    customization via the `buckets` parameter. Additionally, individual
+    buckets can be ordered by members' last and first names if desired.
+
+    :param buckets: The mapping of bucket names to corresponding sets of
+      response statuses. If not provided, a default set of buckets will be used.
+    :param order_inside_bucket: A boolean flag indicating whether to order
+      registrations within each bucket by members' last and first names.
+    :return: An `OrderedDict` where keys are bucket names and values are lists
+      of `Registration` objects corresponding to each bucket.
+    """
+
+    if buckets is None:
+        buckets = OrderedDict(
+            [
+                (
+                    "attending",
+                    {
+                        Registration.ResponseOptions.ATTENDING,
+                        Registration.ResponseOptions.SELECTED,
+                        Registration.ResponseOptions.NOT_SELECTED,
+                    },
+                ),
+                ("not attending", {Registration.ResponseOptions.NOT_ATTENDING}),
+                ("no response", {Registration.ResponseOptions.NO_RESPONSE}),
+            ]
+        )
+
+    response_to_bucket = {status: bucket_name for bucket_name, statuses in buckets.items() for status in statuses}
+    grouped = OrderedDict((bucket_name, []) for bucket_name in buckets.keys())
+
+    for registration in registrations:
+        bucket_name = response_to_bucket.get(registration.response)
+        if bucket_name is not None:
+            grouped[bucket_name].append(registration)
+
+    if order_inside_bucket:
+        for bucket_list in grouped.values():
+            bucket_list.sort(
+                key=lambda r: (
+                    (getattr(r.member.user, "last_name", "") or "").lower(),
+                    (getattr(r.member.user, "first_name", "") or "").lower(),
+                )
+            )
+
+    return grouped
+
+
 class Opponent(RulesModel):
     """
     Represents an opponent in a competition or event.
@@ -394,58 +448,7 @@ class PracticeOccurrence(Activity):
 
 class RegistrationManager(models.Manager):
     def grouped_by_response(self, buckets=None, order_inside_bucket: bool = True) -> "OrderedDict[str, list[Registration]]":
-        """
-        Groups registrations into specified buckets based on their response options.
-
-        This method organizes a list of `Registration` objects into groups (buckets)
-        defined by their response statuses. By default, it categorizes responses
-        into `attending`, `not_attending`, and `no_response` buckets, allowing
-        customization via the `buckets` parameter. Additionally, individual
-        buckets can be ordered by members' last and first names if desired.
-
-        :param buckets: The mapping of bucket names to corresponding sets of
-          response statuses. If not provided, a default set of buckets will be used.
-        :param order_inside_bucket: A boolean flag indicating whether to order
-          registrations within each bucket by members' last and first names.
-        :return: An `OrderedDict` where keys are bucket names and values are lists
-          of `Registration` objects corresponding to each bucket.
-        """
-
-        if buckets is None:
-            buckets = OrderedDict(
-                [
-                    (
-                        "attending",
-                        {
-                            Registration.ResponseOptions.ATTENDING,
-                            Registration.ResponseOptions.SELECTED,
-                            Registration.ResponseOptions.NOT_SELECTED,
-                        },
-                    ),
-                    ("not attending", {Registration.ResponseOptions.NOT_ATTENDING}),
-                    ("no response", {Registration.ResponseOptions.NO_RESPONSE}),
-                ]
-            )
-
-        response_to_bucket = {status: bucket_name for bucket_name, statuses in buckets.items() for status in statuses}
-        grouped = OrderedDict((bucket_name, []) for bucket_name in buckets.keys())
-        queryset = self.select_related("member")
-
-        for registration in queryset:
-            bucket_name = response_to_bucket.get(registration.response)
-            if bucket_name is not None:
-                grouped[bucket_name].append(registration)
-
-        if order_inside_bucket:
-            for bucket_list in grouped.values():
-                bucket_list.sort(
-                    key=lambda r: (
-                        (getattr(r.member.user, "last_name", "") or "").lower(),
-                        (getattr(r.member.user, "first_name", "") or "").lower(),
-                    )
-                )
-
-        return grouped
+        return grouped_by_response(self.get_queryset().select_related("member"), buckets, order_inside_bucket)
 
 
 class Registration(models.Model):
