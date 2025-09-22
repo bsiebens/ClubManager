@@ -26,7 +26,7 @@ from .api import router
 
 urlpatterns = [
     path("", RedirectView.as_view(pattern_name="clubmanager:news"), name="home"),
-    path("clubmanager/", include("ClubManager.clubmanager_urls")),
+    path("clubmanager/", include("ClubManager.frontend.urls")),
     path("accounts/", include("allauth.urls")),
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),

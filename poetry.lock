@@ -385,7 +385,7 @@ version = "8.2.1"
 description = "Composable command line interface toolkit"
 optional = false
 python-versions = ">=3.10"
-groups = ["dev"]
+groups = ["main", "dev"]
 files = [
     {file = "click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b"},
     {file = "click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202"},
@@ -400,7 +400,7 @@ version = "0.4.6"
 description = "Cross-platform colored terminal text."
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
-groups = ["dev"]
+groups = ["main", "dev"]
 markers = "platform_system == \"Windows\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
@@ -723,22 +723,6 @@ files = [
 django = ">=4.2.0"
 
 [[package]]
-name = "django-htmx"
-version = "1.23.2"
-description = "Extensions for using Django with htmx."
-optional = false
-python-versions = ">=3.9"
-groups = ["main"]
-files = [
-    {file = "django_htmx-1.23.2-py3-none-any.whl", hash = "sha256:c288fe92bdcfa7c2ed9665d6d23cc55c6693a7cc8d22cf0a01e1e38318874030"},
-    {file = "django_htmx-1.23.2.tar.gz", hash = "sha256:65a8c8825fcae983b94aedce26af96a70717ab185d55cdb8a7a4bb68863ab079"},
-]
-
-[package.dependencies]
-asgiref = ">=3.6"
-django = ">=4.2"
-
-[[package]]
 name = "django-ninja"
 version = "1.4.3"
 description = "Django Ninja - Fast Django REST framework"
@@ -826,6 +810,26 @@ files = [
 django = ">=4.2"
 
 [[package]]
+name = "django-tailwind-cli"
+version = "4.4.0"
+description = "Django and Tailwind integration based on the prebuilt Tailwind CSS CLI."
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "django_tailwind_cli-4.4.0-py3-none-any.whl", hash = "sha256:976fb98aca8c0fee80ab3bdb77845efd28904ce6c47db0e518425d9f60ea23a8"},
+    {file = "django_tailwind_cli-4.4.0.tar.gz", hash = "sha256:7dd5c33b9d40538492728ec20e79efb08b54571074698f78b0943f0cf79881d0"},
+]
+
+[package.dependencies]
+django = ">=4.0"
+django-typer = ">=2.1.2"
+semver = ">=3.0.4"
+
+[package.extras]
+django-extensions = ["django-extensions (>=3.2)", "werkzeug (>=3.0)"]
+
+[[package]]
 name = "django-template-partials"
 version = "25.1"
 description = "Reusable named inline-partials for the Django Template Language"
@@ -843,6 +847,27 @@ Django = "*"
 [package.extras]
 docs = ["Sphinx"]
 tests = ["coverage", "django_coverage_plugin"]
+
+[[package]]
+name = "django-typer"
+version = "3.3.1"
+description = "Use Typer to define the CLI for your Django management commands."
+optional = false
+python-versions = "<4.0,>=3.9"
+groups = ["main"]
+files = [
+    {file = "django_typer-3.3.1-py3-none-any.whl", hash = "sha256:86ad7d1048726b628bdd1f46d9706cd3bc9c259cb913b3c4a4e1d2040f5c728d"},
+    {file = "django_typer-3.3.1.tar.gz", hash = "sha256:c999cd5976921cb4dff52e184eb43aa6beda82bc4c28698280ad23de35bcdf6c"},
+]
+
+[package.dependencies]
+click = ">=8.1.8,<8.4"
+django = ">=3.2,<6.0"
+shellingham = ">=1.5.4,<2.0"
+typer-slim = ">=0.18.0,<0.20.0"
+
+[package.extras]
+rich = ["rich (>=10.11.0,<15.0.0)"]
 
 [[package]]
 name = "djangorestframework"
@@ -1529,6 +1554,18 @@ files = [
 ]
 
 [[package]]
+name = "semver"
+version = "3.0.4"
+description = "Python helper for Semantic Versioning (https://semver.org)"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "semver-3.0.4-py3-none-any.whl", hash = "sha256:9c824d87ba7f7ab4a1890799cec8596f15c1241cb473404ea1cb0c55e4b04746"},
+    {file = "semver-3.0.4.tar.gz", hash = "sha256:afc7d8c584a5ed0a11033af086e8af226a9c0b206f313e0301f8dd7b6b589602"},
+]
+
+[[package]]
 name = "service-identity"
 version = "24.2.0"
 description = "Service identity verification for pyOpenSSL & cryptography."
@@ -1573,6 +1610,18 @@ doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-
 enabler = ["pytest-enabler (>=2.2)"]
 test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "ini2toml[lite] (>=0.14)", "jaraco.develop (>=7.21) ; python_version >= \"3.9\" and sys_platform != \"cygwin\"", "jaraco.envs (>=2.2)", "jaraco.path (>=3.7.2)", "jaraco.test (>=5.5)", "packaging (>=24.2)", "pip (>=19.1)", "pyproject-hooks (!=1.1)", "pytest (>=6,!=8.1.*)", "pytest-home (>=0.5)", "pytest-perf ; sys_platform != \"cygwin\"", "pytest-subprocess", "pytest-timeout", "pytest-xdist (>=3)", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel (>=0.44.0)"]
 type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.develop (>=7.21) ; sys_platform != \"cygwin\"", "mypy (==1.14.*)", "pytest-mypy"]
+
+[[package]]
+name = "shellingham"
+version = "1.5.4"
+description = "Tool to Detect Surrounding Shell"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686"},
+    {file = "shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de"},
+]
 
 [[package]]
 name = "six"
@@ -1658,6 +1707,25 @@ files = [
 all = ["twisted (>=22.10.0)", "zope.interface (>=5.2.0)"]
 dev = ["black (>=25.1.0)", "flake8 (>=7.3.0)", "pyenchant (>=1.6.6)", "pytest (>=2.6.4)", "pytest-cov (>=1.8.1)", "sphinx (>=7.2.6)", "sphinx-autoapi (>=3.0.0)", "sphinx-rtd-theme (>=2.0.0)", "sphinxcontrib-bibtex (>=2.6.1)", "sphinxcontrib-images (>=0.9.4)", "sphinxcontrib-spelling (>=2.1.2)", "tox (>=2.1.1)", "tox-gh-actions (>=2.2.0)", "twine (>=1.6.5)", "wheel"]
 twisted = ["twisted (>=22.10.0)", "zope.interface (>=5.2.0)"]
+
+[[package]]
+name = "typer-slim"
+version = "0.19.1"
+description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "typer_slim-0.19.1-py3-none-any.whl", hash = "sha256:e050c351613b4855844ef116244b66fb71c3864ae23c997c1c2c7f890fd89f90"},
+    {file = "typer_slim-0.19.1.tar.gz", hash = "sha256:4fb75d0688419f130ff8962e679aa2341ff258b8fa36c41e35d994aa7f1cf8fd"},
+]
+
+[package.dependencies]
+click = ">=8.0.0"
+typing-extensions = ">=3.7.4.3"
+
+[package.extras]
+standard = ["rich (>=10.11.0)", "shellingham (>=1.3.0)"]
 
 [[package]]
 name = "typing-extensions"
@@ -1775,4 +1843,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<4.0"
-content-hash = "b54c5069404f86d02fb2bc990d77d9b1ca28cc30df4e1bec21e67b1809147243"
+content-hash = "977d5d48d3c117ec2b27e2d3befe0b44bbfb1c641910156b648692db1e35e12b"

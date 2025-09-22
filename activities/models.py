@@ -79,6 +79,7 @@ class ActivityType(RulesModel):
     name = models.CharField(_("name"), max_length=250, unique=True)
     type = models.CharField(_("type"), max_length=10, choices=ActivityTypes.choices, default=ActivityTypes.OTHER)
     staff_registration_required = models.BooleanField(_("staff registration required"), default=False, help_text=_("If set, requires staff members to also register their attendance for this activity type"))
+    logo = models.CharField(_("logo"), max_length=255, blank=True, null=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -91,6 +92,21 @@ class ActivityType(RulesModel):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        match self.type:
+            case self.ActivityTypes.EVENT:
+                self.logo = "fa-solid fa-calendar-days"
+            case self.ActivityTypes.GAME:
+                self.logo = "fa-solid fa-trophy"
+            case self.ActivityTypes.PRACTICE:
+                self.logo = "fa-solid fa-hockey-puck"
+            case self.ActivityTypes.OTHER:
+                self.logo = "fa-solid fa-calendar-days"
+            case _:
+                raise ValueError(_("Invalid activity type"))
+
+        super().save(*args, **kwargs)
 
 
 class Activity(PolymorphicModel):
@@ -178,15 +194,15 @@ class Activity(PolymorphicModel):
             members = members | self.members.all()
 
             existing_registrations = self.registrations.all()
-            member_ids = set(members.values_list("id", flat=True))
+            member_pks = set(members.values_list("pk", flat=True))
 
             for registration in existing_registrations:
-                if registration.member.id not in member_ids:
+                if registration.member.pk not in member_pks:
                     registration.delete()
                 else:
-                    member_ids.remove(registration.member.id)
+                    member_pks.remove(registration.member.pk)
 
-            new_registrations = [Registration(activity=self, member=member) for member in Member.objects.filter(id__in=member_ids)]
+            new_registrations = [Registration(activity=self, member=member) for member in Member.objects.filter(pk__in=member_pks)]
             Registration.objects.bulk_create(new_registrations)
 
 

@@ -79,7 +79,7 @@
                             <ul class="list">
                                 {% for registration in activity.my_registrations %}
                                     {% partialdef registration_status_list inline %}
-                                        <li class="list-row items-center" id="registration_status_{{ registration.id }}">
+                                        <li class="list-row items-center" id="registration_status_{{ registration.pk }}">
                                             <div class="list-col-grow">
                                                 <div class="flex flex-row gap-2 items-center">
                                                     <div class="hidden lg:flex">{% avatar first_name=registration.member.user.first_name last_name=registration.member.user.last_name width="sm" %}</div>
@@ -96,19 +96,34 @@
                                             {% else %}
                                                 {% if activity.is_open %}
                                                     <div>
-                                                        <button class="btn btn-circle btn-sm {% if registration.response == "attending" %}btn-success{% endif %}" name="response_button" value="{{ registration.id }}|attending" hx-swap="outerHTML" hx-target="#registration_status_{{ registration.id }}" hx-post="{% url "clubmanager:registration-update" %}">
-                                                            <i class="fa-solid fa-check"></i>
-                                                        </button>
+                                                        <form method="post">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="registration_pk" value="{{ registration.pk }}" />
+                                                            <input type="hidden" name="registration_response" value="attending" />
+                                                            <button type="submit" class="btn btn-circle btn-sm {% if registration.response == "attending" %}btn-success{% endif %}">
+                                                                <i class="fa-solid fa-check"></i>
+                                                            </button>
+                                                        </form>
                                                     </div>
                                                     <div>
-                                                        <button class="btn btn-circle btn-sm {% if registration.response == "no_response" %}btn-info{% endif %}" name="response_button" value="{{ registration.id }}|no_response" hx-swap="outerHTML" hx-target="#registration_status_{{ registration.id }}" hx-post="{% url "clubmanager:registration-update" %}">
-                                                            <i class="fa-solid fa-question"></i>
-                                                        </button>
+                                                        <form method="post">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="registration_pk" value="{{ registration.pk }}" />
+                                                            <input type="hidden" name="registration_response" value="no_response" />
+                                                            <button type="submit" class="btn btn-circle btn-sm {% if registration.response == "no_response" %}btn-info{% endif %}">
+                                                                <i class="fa-solid fa-question"></i>
+                                                            </button>
+                                                        </form>
                                                     </div>
                                                     <div>
-                                                        <button class="btn btn-circle btn-sm {% if registration.response == "not_attending" %}btn-error{% endif %}" name="response_button" value="{{ registration.id }}|not_attending" hx-swap="outerHTML" hx-target="#registration_status_{{ registration.id }}" hx-post="{% url "clubmanager:registration-update" %}">
-                                                            <i class="fa-solid fa-times"></i>
-                                                        </button>
+                                                        <form method="post">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="registration_pk" value="{{ registration.pk }}" />
+                                                            <input type="hidden" name="registration_response" value="not_attending" />
+                                                            <button type="submit" class="btn btn-circle btn-sm {% if registration.response == "not_attending" %}btn-error{% endif %}">
+                                                                <i class="fa-solid fa-times"></i>
+                                                            </button>
+                                                        </form>
                                                     </div>
                                                 {% else %}
                                                     <div class="btn btn-circle {% if registration.response == "attending" %}btn-success{% endif %} btn-sm pointer-events-none"><i class="fa-solid fa-check"></i></div>
@@ -121,18 +136,18 @@
                                 {% endfor %}
                             </ul>
 
-                            <button class="btn btn-outline btn-sm my-1" onclick="registrations_activity_{{ activity.id }}.showModal()"><i class="fa-solid fa-eye"></i>{% translate "show all registered members" %}</button>
+                            <button class="btn btn-outline btn-sm my-1" onclick="registrations_activity_{{ activity.pk }}.showModal()"><i class="fa-solid fa-eye"></i>{% translate "show all registered members" %}</button>
 
                             {% with all_registrations=activity.all_registrations.grouped_by_response %}
                                 {% partialdef registration_status_modal inline %}
-                                    <dialog class="modal modal-bottom sm:modal-middle" id="registrations_activity_{{ activity.id }}" hx-swap-oob="true">
+                                    <dialog class="modal modal-bottom sm:modal-middle" id="registrations_activity_{{ activity.pk }}">
                                         <div class="modal-box min-w-1/2 max-w-5xl">
                                             <h3 class="text-lg font-bold mb-2">{% translate "Registrations" %}</h3>
 
                                             {% for status, registrations in all_registrations.items %}
                                                 {% if registrations|length > 0 %}
                                                     <div class="pb-1 mb-2 border-b border-base-300 text-sm font-semibold">{{ status|capfirst }} ({{ registrations|length }})</div>
-                                                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
+                                                    <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
                                                         {% for registration in registrations %}
                                                             <div class="flex flex-row gap-1 items-center">
                                                                 <div class="hidden lg:flex">{% avatar first_name=registration.member.user.first_name last_name=registration.member.user.last_name width="sm" %}</div>

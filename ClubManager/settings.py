@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_htmx",
     "constance",
     "rules.apps.AutodiscoverRulesConfig",
     "simple_history",
@@ -50,6 +49,7 @@ INSTALLED_APPS = [
     "generic_notifications",
     "polymorphic",
     "recurrence",
+    "django_tailwind_cli",
     "members.apps.MembersConfig",
     "notifications.apps.NotificationsConfig",
     "teams.apps.TeamsConfig",
@@ -69,7 +69,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
     "allauth.account.middleware.AccountMiddleware",
-    "django_htmx.middleware.HtmxMiddleware",
 ]
 
 if DEBUG:
@@ -142,6 +141,8 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+TAILWIND_CLI_SRC_CSS = "static/css/source.css"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
