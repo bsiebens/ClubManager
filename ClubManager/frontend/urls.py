@@ -16,6 +16,6 @@ urlpatterns = [
     path("notifications/mark-all-read/", views.notifications, {"mark_read": True}, name="notifications-mark-all-read"),
     path("notifications/delete-all-read/", views.notifications, {"delete_read": True}, name="notifications-delete-all-read"),
     path("notifications/check/", notifications_views.check_notifications, name="notifications-check"),
-    path("messages/", views.messages, name="messages"),
+    path("chat/", views.chat, name="messages"),
     path("settings/", views.settings, name="settings"),
 ]

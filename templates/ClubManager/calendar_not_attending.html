@@ -1,0 +1,23 @@
+{% extends "ClubManager/base.html" %}
+
+{% load i18n %}
+{% load partials %}
+
+{% block title %}{% translate "Calendar" %}{% endblock title %}
+
+{% block content %}
+    <h3 class="text-lg font-bold mb-2">{% translate "Not attending" %}</h3>
+    <div class="text-sm mb-2">{% translate "Please provide a reason why you cannot attend." %}</div>
+
+    <form method="POST" action="{% url "clubmanager:calendar" %}">
+        {% csrf_token %}
+        <input type="hidden" name="registration_pk" value="{{ registration.pk }}" />
+        <input type="hidden" name="response" value="not_attending" />
+
+        <textarea name="comment" class="textarea w-full"></textarea>
+
+        <div class="modal-action">
+            <button type="submit" class="btn btn-neutral"><i class="fa-solid fa-floppy-disk"></i>{% translate "Save" %}</button>
+        </div>
+    </form>
+{% endblock content %}

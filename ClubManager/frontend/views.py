@@ -33,42 +33,60 @@ def calendar(request: HttpRequest, registration_pk: int | None = None, response:
     )
     context = {}
 
-    if registration_pk is not None and response in ["attending", "not_attending", "no_response"]:
-        registration = get_object_or_404(Registration, pk=registration_pk)
+    if request.method == "POST":
+        registration = get_object_or_404(Registration, pk=request.POST.get("registration_pk"))
 
-        # Verify if we have access to the registration
         if registration.member.user == request.user or registration.member in request.user.member.family_members.all():
-            registration.response = response
-            registration.save(update_fields=["response"])
+            registration.response = request.POST.get("response")
+            registration.comment = request.POST.get("comment")
+            registration.save(update_fields=["response", "comment"])
 
-        activity = registration.activity
-        all_registrations = grouped_by_response(activity.registrations.all(), buckets, order_inside_bucket=True)
-
-        context.update({"activity": activity, "registration": registration, "all_registrations": all_registrations})
-
-        if not is_alpine(request):
-            return redirect("clubmanager:calendar")
+        return redirect("clubmanager:calendar")
 
     else:
-        members = Member.objects.filter(Q(user=request.user) | Q(family_members__user=request.user)).distinct().values_list("pk", flat=True)
-        teams = Team.objects.filter(teammembership__season=Season.for_date(), teammembership__member__in=members).distinct().values_list("pk", flat=True)
-        activities = (
-            Activity.objects.not_instance_of(Practice)
-            .filter(Q(teams__in=teams) | Q(members__in=members))
-            .filter(start_time__gte=timezone.now())
-            .select_related("type")
-            .prefetch_related(Prefetch("registrations", queryset=Registration.objects.filter(member__in=members).select_related("member", "member__user").order_by("member__user__last_name", "member__user__first_name"), to_attr="my_registrations"))
-            .prefetch_related(Prefetch("registrations", queryset=Registration.objects.select_related("member", "member__user").order_by("member__user__last_name", "member__user__first_name"), to_attr="all_registrations"))
-            .order_by("start_time")
-        )
+        if registration_pk is not None and response in ["attending", "not_attending", "no_response"]:
+            registration = get_object_or_404(Registration, pk=registration_pk)
 
-        activities = list(activities)
-        for activity in activities:
-            # Ensure the attribute exists (it should due to prefetch), then wrap
-            if hasattr(activity, "all_registrations") and isinstance(activity.all_registrations, list):
-                activity.all_registrations = grouped_by_response(activity.all_registrations, buckets, order_inside_bucket=True)
+            # Verify if we have access to the registration
+            if registration.member.user == request.user or registration.member in request.user.member.family_members.all():
+                if response == "not_attending":
+                    if not is_alpine(request):
+                        return AlpineTemplateResponse(request, "ClubManager/calendar_not_attending.html", {"registration": registration})
 
-        context.update({"activities": activities})
+                else:
+                    registration.response = response
+                    registration.save(update_fields=["response"])
+
+            activity = registration.activity
+            all_registrations = grouped_by_response(activity.registrations.all(), buckets, order_inside_bucket=True)
+
+            context.update({"activity": activity, "registration": registration, "all_registrations": all_registrations})
+
+            if not is_alpine(request):
+                return redirect("clubmanager:calendar")
+
+        else:
+            members = Member.objects.filter(Q(user=request.user) | Q(family_members__user=request.user)).distinct().values_list("pk", flat=True)
+            teams = Team.objects.filter(teammembership__season=Season.for_date(), teammembership__member__in=members).distinct().values_list("pk", flat=True)
+            activities = (
+                Activity.objects.not_instance_of(Practice)
+                .filter(Q(teams__in=teams) | Q(members__in=members))
+                .filter(start_time__gte=timezone.now())
+                .select_related("type")
+                .prefetch_related(
+                    Prefetch("registrations", queryset=Registration.objects.filter(member__in=members).select_related("member", "member__user").order_by("member__user__last_name", "member__user__first_name"), to_attr="my_registrations")
+                )
+                .prefetch_related(Prefetch("registrations", queryset=Registration.objects.select_related("member", "member__user").order_by("member__user__last_name", "member__user__first_name"), to_attr="all_registrations"))
+                .order_by("start_time")
+            )
+
+            activities = list(activities)
+            for activity in activities:
+                # Ensure the attribute exists (it should due to prefetch), then wrap
+                if hasattr(activity, "all_registrations") and isinstance(activity.all_registrations, list):
+                    activity.all_registrations = grouped_by_response(activity.all_registrations, buckets, order_inside_bucket=True)
+
+            context.update({"activities": activities})
 
     return AlpineTemplateResponse(request, "ClubManager/calendar.html", context, partial_template="registration_update")
 
@@ -93,7 +111,7 @@ def notifications(request: HttpRequest, notification_pk: int | None = None, mark
 
 
 @login_required
-def messages(request: HttpRequest) -> HttpResponse: ...
+def chat(request: HttpRequest) -> HttpResponse: ...
 
 
 @login_required
