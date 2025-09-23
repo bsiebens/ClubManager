@@ -28,6 +28,7 @@ DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = ["127.0.0.1", "192.168.1.100"]
 INTERNAL_IPS = ["127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = ["http://192.168.1.100:8001"]
 
 # Application definition
 
