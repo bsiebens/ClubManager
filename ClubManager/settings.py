@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
-import dj_database_url
-from decouple import config
+from decouple import config, Csv
+from dj_database_url import parse as db_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,9 +27,10 @@ SECRET_KEY = config("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = ["127.0.0.1", "192.168.1.100"]
+ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1,192.168.1.100", cast=Csv())
 INTERNAL_IPS = ["127.0.0.1"]
-CSRF_TRUSTED_ORIGINS = ["http://192.168.1.100:8001"]
+
+CSRF_TRUSTED_ORIGINS = config("DJANGO_CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
 
 # Application definition
 
@@ -101,7 +102,7 @@ ASGI_APPLICATION = "ClubManager.asgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": dj_database_url.parse(config("DJANGO_DATABASE_URL", default="sqlite:///db.sqlite3", cast=str))
+    "default": config("DJANGO_DATABASE_URL", default="sqlite:///db.sqlite3", cast=db_url)
 }
 
 # Password validation
