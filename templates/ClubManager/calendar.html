@@ -35,9 +35,7 @@
                     <div class="flex flex-col w-full">
                         <div class="flex flex-row justify-between items-center">
                             <div class="font-jersey font-bold text-lg">
-                                {% if activity.type.type == "practice" %}
-                                    {% translate "Practice" %}
-                                {% elif activity.type.type == "game" %}
+                                {% if activity.type.type == "game" %}
                                     {% if activity.opponent %}
                                         <span class="lg:hidden">{{ activity.team.short_name }}</span><span class="hidden lg:inline">{{ activity.team.name }}</span> vs. {{ activity.opponent }}
                                     {% else %}

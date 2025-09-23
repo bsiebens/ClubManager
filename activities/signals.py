@@ -2,13 +2,12 @@ from django.db.models.signals import post_save, post_delete, m2m_changed
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from generic_notifications import send_notification
 
-from notifications.notifications import RegistrationNotification
+from notifications.notifications import RegistrationNotification, CalendarNotification
 from teams.models import TeamMembership
-from .models import Practice, Event, Game, Activity, PracticeOccurrence, Registration, ActivityType
+from .models import Practice, Event, Game, Activity, PracticeOccurrence, Registration
 
 
 @receiver(post_save, sender=Practice)
@@ -49,38 +48,51 @@ def activity_m2m_changed_handler(instance, action, **kwargs) -> None:
 
 @receiver(post_save, sender=Activity)
 @receiver(post_save, sender=Registration)
-def send_notification_to_user(sender, instance, created, **kwargs) -> None:
+def send_notifications(sender, instance, created, **kwargs) -> None:
+    recipients = []
+    notification_text = None
+    notification_url = None
+    notification_type = None
+    notification_subject = f"{instance.activity.title} ({instance.activity.start_time.strftime('%d/%m/%Y %H:%M')})"
+    send_notification_to_users = False
+
     if isinstance(instance, Registration) and (instance.response == Registration.ResponseOptions.SELECTED or instance.response == Registration.ResponseOptions.NOT_SELECTED):
-        current_state = instance.history.last()
-        activity = instance.activity
-        activity_title = activity.title
         recipients = {instance.member.user, *[member.user for member in instance.member.family_members.all()]}
+        notification_type = RegistrationNotification
 
-        print(recipients)
-
-        if activity.type.type == ActivityType.ActivityTypes.PRACTICE:
-            activity_title = _("Practice")
-
-        elif activity.type.type == ActivityType.ActivityTypes.GAME:
-            if activity.opponent is not None:
-                activity_title = f"{activity.team.name} vs. {activity.opponent.name} @ {activity.location}"
-            else:
-                activity_title = _("Game {team}").format(team=activity.team.name)
-
-        notification_subject = _("{activity} ({date})").format(activity=activity_title, date=activity.start_time.strftime("%d/%m/%Y %H:%M"))
-        notification_text = mark_safe(_("Status for {member} has been changed to <b>{response}</b>").format(member=instance.member.user.get_full_name(), response=instance.get_response_display().upper()))
+        notification_text = _("Status for {member} changed to <b>{response}</b>").format(member=instance.member.user.get_full_name(), response=instance.get_response_display().upper())
         notification_url = reverse("clubmanager:calendar")
 
-        if current_state.prev_record is not None:
-            difference = current_state.diff_against(current_state.prev_record)
-
+        if instance.history.last().prev_record is not None:
+            difference = instance.history.last().diff_against(instance.history.last().prev_record)
             if "response" in difference.changed_fields:
-                for recipient in recipients:
-                    send_notification(recipient=recipient, notification_type=RegistrationNotification, target=instance.activity, subject=notification_subject, text=notification_text, url=notification_url)
+                send_notification_to_users = True
 
         else:
-            for recipient in recipients:
-                send_notification(recipient=recipient, notification_type=RegistrationNotification, target=instance.activity, subject=notification_subject, text=notification_text, url=notification_url)
+            send_notification_to_users = True
 
-    else:
-        ...
+    if isinstance(instance, Activity):
+        notification_type = CalendarNotification
+        notification_text = _("A new activity for {member} has been added to the calendar.").format(member=instance.member.user.get_full_name())
+        notification_url = reverse("clubmanager:calendar")
+
+        if instance.history.last().prev_record is None:
+            recipients = {instance.member.user, *[member.user for member in instance.member.family_members.all()]}
+
+            send_notification_to_users = True
+
+    if send_notification_to_users:
+        for recipient in recipients:
+            send_notification(recipient=recipient, notification_type=notification_type, target=instance.activity, subject=notification_subject, text=notification_text, url=notification_url)
+
+
+@receiver(post_delete, sender=Activity)
+def send_delete_notifications(sender, instance, **kwargs) -> None:
+    recipients = {instance.member.user, *[member.user for member in instance.member.family_members.all()]}
+    notification_subject = f"{instance.activity.title} ({instance.activity.start_time.strftime('%d/%m/%Y %H:%M')})"
+    notification_text = _("Activity has been cancelled for {member}.").format(member=instance.member.user.get_full_name())
+    notification_url = reverse("clubmanager:calendar")
+    notification_type = CalendarNotification
+
+    for recipient in recipients:
+        send_notification(recipient=recipient, notification_type=notification_type, target=instance.activity, subject=notification_subject, text=notification_text, url=notification_url)

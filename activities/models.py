@@ -269,10 +269,16 @@ class Event(Activity):
         ordering = ["start_time", "end_time", "title"]
 
     def __str__(self):
-        if self.title is not None and self.title != "":
-            return self.title
+        return self.title
 
-        return _("Event from {start_time} to {end_time}").format(start_time=self.start_time.strftime("%d/%m/%Y %H:%M"), end_time=self.end_time.strftime("%d/%m%Y %H:%M"))
+    def save(self, *args, **kwargs):
+        if self.title is None or self.title == "":
+            self.title = _("Event")
+
+            if self.location is not None and self.location != "":
+                self.title = _("Event @ {location}").format(location=self.location)
+
+        super().save(*args, **kwargs)
 
 
 class Game(Activity):
@@ -299,9 +305,13 @@ class Game(Activity):
     def save(self, *args, **kwargs):
         self.season = Season.for_date(current_date=self.start_time)
 
-        self.title = f"{self.team} ({self.start_time.strftime('%d/%m/%Y %H:%M')} @ {self.location})"
+        self.title = _("Game {team}").format(team=self.team.name)
+
         if self.opponent is not None:
-            self.title = f"{self.team} vs {self.opponent} ({self.start_time.strftime('%d/%m/%Y %H:%M')} @ {self.location})"
+            home_team = self.team if self.is_home_game else self.opponent
+            away_team = self.opponent if self.is_home_game else self.team
+
+            self.title = f"{home_team.name} vs. {away_team.name} @ {self.location}"
 
         super().save(*args, **kwargs)
 
@@ -328,7 +338,11 @@ class Practice(Activity):
         verbose_name_plural = _("practices")
 
     def __str__(self):
-        return _("Practice {start_time} to {end_time}").format(start_time=self.start_time.strftime("%d/%m/%Y %H:%M"), end_time=self.end_time.strftime("%d/%m%Y %H:%M"))
+        return self.title
+
+    def save(self, *args, **kwargs):
+        self.title = _("Practice Series")
+        super().save(*args, **kwargs)
 
     def generate_occurrences(self) -> "list[PracticeOccurrence]":
         """
@@ -443,7 +457,11 @@ class PracticeOccurrence(Activity):
         verbose_name_plural = _("practice occurrences")
 
     def __str__(self):
-        return _("Practice {start_time} to {end_time}").format(start_time=self.start_time.strftime("%d/%m/%Y %H:%M"), end_time=self.end_time.strftime("%d/%m%Y %H:%M"))
+        return self.title
+
+    def save(self, *args, **kwargs):
+        self.title = _("Practice")
+        super().save(*args, **kwargs)
 
 
 class RegistrationManager(models.Manager):
@@ -476,4 +494,6 @@ class Registration(models.Model):
         unique_together = ("activity", "member")
 
     def __str__(self):
-        return f"{self.member} - {self.activity} ({self.response})"
+        return f"{self.member} // {self.activity.title} ({self.get_response_display()})"
+
+        # return f"{self.member} - {self.activity} ({self.response})"
