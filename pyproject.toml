@@ -30,6 +30,8 @@ dependencies = [
     "requests (>=2.32.5,<3.0.0)",
     "django-recurrence (>=1.11.1,<2.0.0)",
     "django-tailwind-cli (>=4.4.0,<5.0.0)",
+    "django-debug-toolbar (>=6.0.0)",
+    "gunicorn (>=23.0.0,<24.0.0)",
 ]
 
 [build-system]
@@ -42,7 +44,6 @@ poetry-core = ">=2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
-django-debug-toolbar = "^6.0.0"
 coverage = ">=7.10.6,<8.0.0"
 
 [tool.poetry]
