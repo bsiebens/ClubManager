@@ -8,9 +8,9 @@ def create_default_activity_types(apps, schema_editor):
 
     # Create default activity types
     try:
-        ActivityType.objects.create(name="Event", type="event")
-        ActivityType.objects.create(name="Game", type="game")
-        ActivityType.objects.create(name="Practice", type="practice")
+        ActivityType.objects.create(name="Event", type="event", logo="fa-solid fa-calendar-days")
+        ActivityType.objects.create(name="Game", type="game", logo="fa-solid fa-trophy")
+        ActivityType.objects.create(name="Practice", type="practice", logo="fa-solid fa-hockey-puck")
     except:
         pass
 
