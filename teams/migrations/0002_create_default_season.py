@@ -7,12 +7,14 @@ from teams.models import create_default_season
 
 
 def create_first_season(apps, schema_editor):
+    # noinspection PyPep8Naming
     Season = apps.get_model("teams", "Season")
     start_date, end_date = create_default_season(day=config("CM_DEFAULT_SEASON_DAY", default=1, cast=int), month=config("CM_DEFAULT_SEASON_MONTH", default=8, cast=int), duration=config("CM_DEFAULT_SEASON_DURATION", default="1y", cast=str))
     Season.objects.get_or_create(start_date=start_date, end_date=end_date)
 
 
 def remove_seasons(apps, schema_editor):
+    # noinspection PyPep8Naming
     Season = apps.get_model("teams", "Season")
     Season.objects.all().delete()
 

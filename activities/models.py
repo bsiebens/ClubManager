@@ -27,6 +27,7 @@ def grouped_by_response(registrations, buckets=None, order_inside_bucket: bool =
     customization via the `buckets` parameter. Additionally, individual
     buckets can be ordered by members' last and first names if desired.
 
+    :param registrations: The list of `Registration` objects to group.
     :param buckets: The mapping of bucket names to corresponding sets of
       response statuses. If not provided, a default set of buckets will be used.
     :param order_inside_bucket: A boolean flag indicating whether to order

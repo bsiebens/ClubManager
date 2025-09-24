@@ -4,6 +4,7 @@ from django.db import migrations
 
 
 def create_competition_group(apps, schema_editor):
+    # noinspection PyPep8Naming
     Competition = apps.get_model("activities", "Competition")
 
     try:
@@ -15,6 +16,7 @@ def create_competition_group(apps, schema_editor):
 
 
 def remove_competition_group(apps, schema_editor):
+    # noinspection PyPep8Naming
     Competition = apps.get_model("activities", "Competition")
 
     try:

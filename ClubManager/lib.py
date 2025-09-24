@@ -8,6 +8,7 @@ def is_alpine(request: HttpRequest) -> bool:
 
 
 class AlpineTemplateResponse(BaseTemplateResponse):
+    # noinspection PyMethodMayBeStatic
     def get_ajax_template(self, request: HttpRequest, template: str, partial_template: str | None = None) -> str:
         if is_alpine(request):
             # Use the target ID from the request as the partial name.

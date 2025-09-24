@@ -4,6 +4,7 @@ from django.db import migrations
 
 
 def create_default_activity_types(apps, schema_editor):
+    # noinspection PyPep8Naming
     ActivityType = apps.get_model("activities", "ActivityType")
 
     # Create default activity types
@@ -16,6 +17,7 @@ def create_default_activity_types(apps, schema_editor):
 
 
 def remove_default_activity_types(apps, schema_editor):
+    # noinspection PyPep8Naming
     ActivityType = apps.get_model("activities", "ActivityType")
 
     # Remove default activity types
