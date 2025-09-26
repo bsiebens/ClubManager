@@ -1,17 +1,13 @@
 from collections import OrderedDict
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Prefetch
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from generic_notifications.channels import WebsiteChannel
 from generic_notifications.utils import get_notifications, mark_notifications_as_read
 
-from activities.models import Activity, Practice, Registration, grouped_by_response
-from members.models import Member
-from teams.models import Team, Season
+from activities.models import Activity, Registration, grouped_by_response
 from ..lib import AlpineTemplateResponse, is_alpine
 
 
@@ -71,21 +67,7 @@ def calendar(request: HttpRequest, registration_pk: int | None = None, response:
                 return redirect("clubmanager:calendar")
 
         else:
-            members = Member.objects.filter(Q(user=request.user) | Q(family_members__user=request.user)).distinct().values_list("pk", flat=True)
-            teams = Team.objects.filter(teammembership__season=Season.for_date(), teammembership__member__in=members).distinct().values_list("pk", flat=True)
-            activities = (
-                Activity.objects.not_instance_of(Practice)
-                .filter(Q(teams__in=teams) | Q(members__in=members))
-                .filter(start_time__gte=timezone.now())
-                .select_related("type")
-                .prefetch_related(
-                    Prefetch("registrations", queryset=Registration.objects.filter(member__in=members).select_related("member", "member__user").order_by("member__user__last_name", "member__user__first_name"), to_attr="my_registrations")
-                )
-                .prefetch_related(Prefetch("registrations", queryset=Registration.objects.select_related("member", "member__user").order_by("member__user__last_name", "member__user__first_name"), to_attr="all_registrations"))
-                .order_by("start_time")
-            )
-
-            activities = list(activities)
+            activities = list(Activity.for_user(request.user, include_registrations=True))
             for activity in activities:
                 # Ensure the attribute exists (it should due to prefetch), then wrap
                 if hasattr(activity, "all_registrations") and isinstance(activity.all_registrations, list):
