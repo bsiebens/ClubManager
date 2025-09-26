@@ -49,16 +49,21 @@
                             <div class="badge badge-sm {% if activity.type.type == "practice" %}badge-primary{% elif activity.type.type == "game" %}badge-accent{% else %}badge-secondary{% endif %} shadow-md">{{ activity.type|lower }}</div>
                         </div>
 
-                        <div class="flex flex-row gap-2 opacity-75 text-md mt-2">
-                            <div class="basis-2/3 lg:basis-1/4 flex items-center"><span class="icon icon-rounded icon-20 mr-1">schedule</span><span class="lg:hidden">{{ activity.start_time|date:"D d/m" }} </span>{{ activity.start_time|date:"H:i" }} - {{ activity.end_time|date:"H:i" }}</div>
-                            <div class="basis-1/3 lg:basis-1/4 flex items-center"><span class="icon icon-rounded icon-20 mr-1">arrows_input</span>{{ activity.gathering_time|date:"H:i" }}</div>
-                            <div class="hidden lg:flex basis-1/2 flex items-center">
+                        <div class="flex flex-col lg:flex-row gap-2 opacity-75 text-md mt-2 w-full justify-between">
+                            <div class="flex flex-row basis-1/2">
+                                <div class="flex items-center grow"><span class="icon icon-rounded icon-20 mr-1">schedule</span><span class="lg:hidden">{{ activity.start_time|date:"D d/m" }} </span>{{ activity.start_time|date:"H:i" }} - {{ activity.end_time|date:"H:i" }}</div>
+                                <div class="flex items-center grow"><span class="icon icon-rounded icon-20 mr-1">arrows_input</span>{{ activity.gathering_time|date:"H:i" }}</div>
+                            </div>
+                            <div class="flex items-center basis-1/2">
                                 {% if activity.location is not None %}<span class="icon icon-rounded icon-20 mr-1">location_on</span>{{ activity.location }}{% endif %}
                             </div>
-                        </div>
 
-                        <div class="lg:hidden opacity-75 text-md flex items-center mt-1">
-                            {% if activity.location is not None %}<span class="icon icon-rounded icon-20 mr-1">location_on</span>{{ activity.location }}{% endif %}
+
+{#                            <div class="basis-2/3 lg:basis-1/4 flex items-center"><span class="icon icon-rounded icon-20 mr-1">schedule</span><span class="lg:hidden">{{ activity.start_time|date:"D d/m" }} </span>{{ activity.start_time|date:"H:i" }} - {{ activity.end_time|date:"H:i" }}</div>#}
+{#                            <div class="basis-1/3 lg:basis-1/4 flex items-center"><span class="icon icon-rounded icon-20 mr-1">arrows_input</span>{{ activity.gathering_time|date:"H:i" }}</div>#}
+{#                            <div class="hidden lg:flex basis-1/2 flex items-center">#}
+{#                                {% if activity.location is not None %}<span class="icon icon-rounded icon-20 mr-1">location_on</span>{{ activity.location }}{% endif %}#}
+{#                            </div>#}
                         </div>
 
                         <div class="mt-2 border-t border-base-300 pt-2 flex flex-col gap-2">
@@ -163,7 +168,7 @@
                     <input type="hidden" name="response" value="not_attending" />
 
                     <div class="modal-action">
-                        <button type="submit" class="btn btn-neutral"><i class="fa-solid fa-floppy-disk"></i>{% translate "Save" %}</button>
+                        <button type="submit" class="btn btn-neutral"><span class="icon icon-rounded icon-20">save</span>{% translate "Save" %}</button>
                         <button type="button" class="btn btn-neutral btn-outline" x-on:click="$refs.modal.close(); show = false; comment = '';">{% translate "Cancel" %}</button>
                     </div>
                 </form>
