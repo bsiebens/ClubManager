@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 from constance import config
 from django.db import models
+from django.db.models import Q, Prefetch
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
@@ -13,7 +14,7 @@ from rules.contrib.models import RulesModel
 from simple_history.models import HistoricalRecords
 
 from members.models import Member
-from teams.models import Season
+from teams.models import Season, Team
 from teams.rules import is_a_team_admin
 
 
@@ -189,6 +190,15 @@ class Activity(PolymorphicModel):
         verbose_name_plural = _("activities")
         ordering = ["start_time", "end_time"]
 
+    @classmethod
+    def for_user(cls, user) -> list["Activity"]:
+        members = Member.objects.filter(Q(user=user) | Q(family_members__user=user)).distinct().values_list("pk", flat=True)
+        teams = Team.objects.filter(teammembership__season=Season.for_date(), teammembership__member__in=members).distinct().values_list("pk", flat=True)
+        
+        activities = cls.objects.not_instance_of(Practice).filter(Q(teams__in=teams) | Q(members__in=members)).filter(start_time__gte=timezone.now()).select_related("type").prefetch_related(Prefetch("registrations", queryset=Registration.objects.filter(member__in=members).select_related("member", "member__user").order_by("member__user__last_name", "member__user__first_name"), to_attr="my_registrations")).prefetch_related(Prefetch("registrations", queryset=Registration.objects.select_related("member", "member__user").order_by("member__user__last_name", "member__user__first_name"), to_attr="all_registrations")).order_by("start_time")
+        
+        return activities
+
     def __str__(self):
         if self.title is not None and self.title != "":
             return self.title
@@ -259,7 +269,6 @@ class Activity(PolymorphicModel):
 
             new_registrations = [Registration(activity=self, member=member) for member in Member.objects.filter(pk__in=member_pks)]
             Registration.objects.bulk_create(new_registrations)
-
 
 class Event(Activity):
     history = HistoricalRecords(excluded_fields=["created", "updated"])
