@@ -152,13 +152,17 @@ class ActivityType(RulesModel):
     def save(self, *args, **kwargs):
         match self.type:
             case self.ActivityTypes.EVENT:
-                self.logo = "fa-solid fa-calendar-days"
+                # self.logo = "fa-solid fa-calendar-days"
+                self.logo = "calendar_month"
             case self.ActivityTypes.GAME:
-                self.logo = "fa-solid fa-trophy"
+                # self.logo = "fa-solid fa-trophy"
+                self.logo = "sports_hockey"
             case self.ActivityTypes.PRACTICE:
-                self.logo = "fa-solid fa-hockey-puck"
+                # self.logo = "fa-solid fa-hockey-puck"
+                self.logo = "fitness_center"
             case self.ActivityTypes.OTHER:
-                self.logo = "fa-solid fa-calendar-days"
+                # self.logo = "fa-solid fa-calendar-days"
+                self.logo = "calendar_month"
             case _:
                 raise ValueError(_("Invalid activity type"))
 

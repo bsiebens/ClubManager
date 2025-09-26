@@ -25,8 +25,8 @@
                     {% endifchanged %}
                 </div>
 
-                <div class="hidden lg:flex">
-                    <i class="{{ activity.type.logo }} text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
+                <div class="hidden lg:flex items-start">
+                    <span class="icon icon-rounded text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-85">{{ activity.type.logo }}</span>
                 </div>
 
                 <div class="border border-base-300 rounded-lg p-4 shadow-md gap-1 w-full flex flex-row gap-2">
@@ -34,7 +34,7 @@
 
                     <div class="flex flex-col w-full">
                         <div class="flex flex-row justify-between items-center">
-                            <div class="font-jersey font-bold text-lg">
+                            <div class="font-jersey font-bold text-xl">
                                 {% if activity.type.type == "game" %}
                                     {% if activity.opponent %}
                                         <span class="lg:hidden">{{ activity.team.short_name }}</span><span class="hidden lg:inline">{{ activity.team.name }}</span> vs. {{ activity.opponent }}
@@ -49,16 +49,16 @@
                             <div class="badge badge-sm {% if activity.type.type == "practice" %}badge-primary{% elif activity.type.type == "game" %}badge-accent{% else %}badge-secondary{% endif %} shadow-md">{{ activity.type|lower }}</div>
                         </div>
 
-                        <div class="flex flex-row gap-2 opacity-75 text-xs mt-2">
-                            <div class="basis-2/3 lg:basis-1/4"><i class="fa-solid fa-clock mr-2"></i><span class="lg:hidden">{{ activity.start_time|date:"D d/m" }} </span>{{ activity.start_time|date:"H:i" }} - {{ activity.end_time|date:"H:i" }}</div>
-                            <div class="basis-1/3 lg:basis-1/4"><i class="fa-solid fa-arrows-to-circle mr-2"></i>{{ activity.gathering_time|date:"H:i" }}</div>
-                            <div class="hidden lg:flex basis-1/2">
-                                {% if activity.location is not None %}<i class="fa-solid fa-map-marker-alt mr-2"></i>{{ activity.location }}{% endif %}
+                        <div class="flex flex-row gap-2 opacity-75 text-md mt-2">
+                            <div class="basis-2/3 lg:basis-1/4 flex items-center"><span class="icon icon-rounded icon-20 mr-1">schedule</span><span class="lg:hidden">{{ activity.start_time|date:"D d/m" }} </span>{{ activity.start_time|date:"H:i" }} - {{ activity.end_time|date:"H:i" }}</div>
+                            <div class="basis-1/3 lg:basis-1/4 flex items-center"><span class="icon icon-rounded icon-20 mr-1">arrows_input</span>{{ activity.gathering_time|date:"H:i" }}</div>
+                            <div class="hidden lg:flex basis-1/2 flex items-center">
+                                {% if activity.location is not None %}<span class="icon icon-rounded icon-20 mr-1">location_on</span>{{ activity.location }}{% endif %}
                             </div>
                         </div>
 
-                        <div class="lg:hidden opacity-75 text-xs">
-                            {% if activity.location is not None %}<i class="fa-solid fa-map-marker-alt mr-2"></i>{{ activity.location }}{% endif %}
+                        <div class="lg:hidden opacity-75 text-md flex items-center mt-1">
+                            {% if activity.location is not None %}<span class="icon icon-rounded icon-20 mr-1">location_on</span>{{ activity.location }}{% endif %}
                         </div>
 
                         <div class="mt-2 border-t border-base-300 pt-2 flex flex-col gap-2">
@@ -85,20 +85,20 @@
                                             </div>
 
                                             {% if registration.response == "selected" %}
-                                                <div class="btn btn-circle btn-success btn-sm pointer-events-none"><i class="fa-solid fa-check"></i></div>
+                                                <div class="btn btn-circle btn-success btn-sm pointer-events-none"><span class="icon icon-rounded">check</span></div>
                                                 <div>{% translate "selected" %}</div>
                                             {% elif registration.response == "not_selected" %}
-                                                <div class="btn btn-circle btn-error btn-sm pointer-events-none"><i class="fa-solid fa-times"></i></div>
+                                                <div class="btn btn-circle btn-error btn-sm pointer-events-none"><span class="icon icon-rounded">close</span></div>
                                                 <div>{% translate "not selected" %}</div>
                                             {% else %}
                                                 {% if activity.is_open %}
-                                                    <a x-target="registration_status_{{ registration.pk }} registrations_activity_{{ activity.pk }}" href="{% url "clubmanager:calendar-update-response" registration.pk "attending" %}" class="btn btn-circle btn-sm {% if registration.response == "attending" %}btn-success{% endif %}"><i class="fa-solid fa-check"></i></a>
-                                                    <a x-target="registration_status_{{ registration.pk }} registrations_activity_{{ activity.pk }}" href="{% url "clubmanager:calendar-update-response" registration.pk "no_response" %}" class="btn btn-circle btn-sm {% if registration.response == "no_response" %}btn-info{% endif %}"><i class="fa-solid fa-question"></i></a>
-                                                    <a x-data x-on:click.prevent="$dispatch('open-modal', { registration_pk: '{{ registration.pk }}', activity_pk: '{{ activity.pk }}' })" href="{% url "clubmanager:calendar-update-response" registration.pk "not_attending" %}" class="btn btn-circle btn-sm {% if registration.response == "not_attending" %}btn-error{% endif %}"><i class="fa-solid fa-times"></i></a>
+                                                    <a x-target="registration_status_{{ registration.pk }} registrations_activity_{{ activity.pk }}" href="{% url "clubmanager:calendar-update-response" registration.pk "attending" %}" class="btn btn-circle btn-sm {% if registration.response == "attending" %}btn-success{% endif %}"><span class="icon icon-rounded">check</span></a>
+                                                    <a x-target="registration_status_{{ registration.pk }} registrations_activity_{{ activity.pk }}" href="{% url "clubmanager:calendar-update-response" registration.pk "no_response" %}" class="btn btn-circle btn-sm {% if registration.response == "no_response" %}btn-info{% endif %}"><span class="icon icon-rounded icon-20">question_mark</span></a>
+                                                    <a x-data x-on:click.prevent="$dispatch('open-modal', { registration_pk: '{{ registration.pk }}', activity_pk: '{{ activity.pk }}' })" href="{% url "clubmanager:calendar-update-response" registration.pk "not_attending" %}" class="btn btn-circle btn-sm {% if registration.response == "not_attending" %}btn-error{% endif %}"><span class="icon icon-rounded">close</span></a>
                                                 {% else %}
-                                                    <div class="btn btn-circle {% if registration.response == "attending" %}btn-success{% endif %} btn-sm pointer-events-none"><i class="fa-solid fa-check"></i></div>
-                                                    <div class="btn btn-circle {% if registration.response == "no_response" %}btn-info{% endif %} btn-sm pointer-events-none"><i class="fa-solid fa-check"></i></div>
-                                                    <div class="btn btn-circle {% if registration.response == "not_attending" %}btn-error{% endif %} btn-sm pointer-events-none"><i class="fa-solid fa-check"></i></div>
+                                                    <div class="btn btn-circle {% if registration.response == "attending" %}btn-success{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded">check</span></div>
+                                                    <div class="btn btn-circle {% if registration.response == "no_response" %}btn-info{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded icon-20">question_mark</span></div>
+                                                    <div class="btn btn-circle {% if registration.response == "not_attending" %}btn-error{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded">close</span></div>
                                                 {% endif %}
                                             {% endif %}
                                         </li>
@@ -106,7 +106,7 @@
                                 {% endfor %}
                             </ul>
 
-                            <button class="btn btn-outline btn-sm my-1" onclick="registrations_activity_{{ activity.pk }}.showModal()"><i class="fa-solid fa-list"></i>{% translate "All members" %}</button>
+                            <button class="btn btn-outline btn-sm my-1" onclick="registrations_activity_{{ activity.pk }}.showModal()"><span class="icon icon-rounded icon-20">list</span>{% translate "All members" %}</button>
 
                             {% with all_registrations=activity.all_registrations %}
                                 {% partialdef registration_status_modal inline %}
