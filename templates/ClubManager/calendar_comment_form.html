@@ -14,7 +14,7 @@
         <input type="hidden" name="registration_pk" value="{{ registration.pk }}" />
         <input type="hidden" name="response" value="not_attending" />
 
-        <textarea name="comment" class="textarea w-full"></textarea>
+        <textarea name="comment" class="textarea w-full" required></textarea>
 
         <div class="modal-action">
             <button type="submit" class="btn btn-neutral"><i class="fa-solid fa-floppy-disk"></i>{% translate "Save" %}</button>

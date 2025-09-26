@@ -158,7 +158,7 @@
 
                 <form method="post" action="{% url 'clubmanager:calendar' %}" x-target:dynamic="`registration_status_${registration_pk} registrations_activity_${activity_pk}`" x-on:submit="$refs.modal.close(); show = false;">
                     {% csrf_token %}
-                    <textarea name="comment" class="textarea w-full" x-model="comment"></textarea>
+                    <textarea name="comment" class="textarea w-full" x-model="comment" required></textarea>
                     <input type="hidden" name="registration_pk" x-bind:value="registration_pk" />
                     <input type="hidden" name="response" value="not_attending" />
 
