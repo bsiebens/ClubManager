@@ -21,7 +21,10 @@
     {% partialdef notification_list inline %}
         <ul class="list bg-base-100 my-8" id="notification_list">
             {% if notifications|length == 0 %}
-                <span class="items-center"><i class="fa-solid fa-thumbs-up mr-2"></i>{% translate "All caught up!" %}</span>
+                <span class="items-center flex flex-row gap-2">
+                    <span class="icon icon-rounded">thumb_up</span>
+                    <span>{% translate "All caught up!" %}</span>
+                </span>
             {% endif %}
 
             {% for notification in notifications %}
@@ -31,32 +34,23 @@
 
                 <li class="list-row items-center">
                     <div>
-                        {% if not notification.is_read %}
-                            <div class="indicator">
-                                <span class="indicator-item status status-error"></span>
-                        {% endif %}
-
                         {% if notification.notification_type == "calendar" %}
-                            <i class="fa-solid fa-calendar-days text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
+                            <span class="icon icon-rounded text-xl bg-base-300 p-2 mask mask-circle opacity-85">calendar_month</span>
                         {% elif notification.notification_type == "registration" %}
                             {% if notification.target.type.type == "practice" %}
-                                <i class="fa-solid fa-hockey-puck text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
+                                <span class="icon icon-rounded text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-85">fitness_center</span>
                             {% elif notification.target.type.type == "game" %}
-                                <i class="fa-solid fa-trophy text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
+                                <span class="icon icon-rounded text-xl bg-base-300 p-2 mask mask-circle opacity-85">sports_hockey</span>
                             {% else %}
-                                <i class="fa-solid fa-calendar-days text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
+                                <span class="icon icon-rounded text-xl bg-base-300 p-2 mask mask-circle opacity-85">calendar_month</span>
                             {% endif %}
                         {% else %}
-                            <i class="fa-solid fa-bell text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-75"></i>
-                        {% endif %}
-
-                        {% if not notification.is_read %}
-                            </div>
+                            <span class="icon icon-rounded text-xl bg-base-300 p-2 mask mask-circle opacity-85">notifications</span>
                         {% endif %}
                     </div>
 
                     <div>
-                        <div class="font-semibold">{{ notification.get_subject }}</div>
+                        <div class="font-semibold items-center">{{ notification.get_subject }}{% if not notification.is_read %}<div class="status status-error ml-2"></div>{% endif %}</div>
                         <div class="opacity-60 text-xs">{{ notification.get_text|safe }}</div>
                         <div class="opacity-60 text-xs lg:hidden">{{ notification.added|date:"d b Y H:i" }}</div>
                     </div>
@@ -64,9 +58,9 @@
                     <div class="text-xs opacity-60 font-semibold hidden lg:block">{{ notification.added|date:"d b Y H:i" }}</div>
 
                     {% if notification.get_absolute_url != "" %}
-                        <i class="fa-solid fa-chevron-right text-xl"></i>
+                        <span class="icon icon-rounded icon-40 text-5xl">chevron_right</span>
                     {% else %}
-                        <i class="fa-solid fa-chevron-right text-xl opacity-0"></i>
+                        <span class="icon icon-rounded text-4xl opacity-0">chevron_right</span>
                     {% endif %}
                 </li>
 

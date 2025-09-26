@@ -47,16 +47,19 @@ def activity_m2m_changed_handler(instance, action, **kwargs) -> None:
 
 
 @receiver(post_save, sender=Activity)
+@receiver(post_save, sender=Event)
+@receiver(post_save, sender=Game)
+@receiver(post_save, sender=PracticeOccurrence)
 @receiver(post_save, sender=Registration)
 def send_notifications(sender, instance, created, **kwargs) -> None:
     recipients = []
     notification_text = None
     notification_url = None
     notification_type = None
-    notification_subject = f"{instance.activity.title} ({instance.activity.start_time.strftime('%d/%m/%Y %H:%M')})"
     send_notification_to_users = False
 
     if isinstance(instance, Registration) and (instance.response == Registration.ResponseOptions.SELECTED or instance.response == Registration.ResponseOptions.NOT_SELECTED):
+        notification_subject = f"{instance.activity.title} ({instance.activity.start_time.strftime('%d/%m/%Y %H:%M')})"
         recipients = {instance.member.user, *[member.user for member in instance.member.family_members.all()]}
         notification_type = RegistrationNotification
 
@@ -71,19 +74,27 @@ def send_notifications(sender, instance, created, **kwargs) -> None:
         else:
             send_notification_to_users = True
 
-    if isinstance(instance, Activity):
-        notification_type = CalendarNotification
-        notification_text = _("A new activity for {member} has been added to the calendar.").format(member=instance.member.user.get_full_name())
-        notification_url = reverse("clubmanager:calendar")
-
-        if instance.history.last().prev_record is None:
-            recipients = {instance.member.user, *[member.user for member in instance.member.family_members.all()]}
-
-            send_notification_to_users = True
-
+    # if isinstance(instance, (Event, Game, PracticeOccurrence)):
+    #     notification_subject = f"{instance.title} ({instance.start_time.strftime('%d/%m/%Y %H:%M')})"
+    #     notification_type = CalendarNotification
+    #     notification_url = reverse("clubmanager:calendar")
+    #
+    #     if instance.history.last().prev_record is None:
+    #
+    #
+    #         recipients = {instance.member.user, *[member.user for member in instance.member.family_members.all()]}
+    #         notification_text = _("A new activity for {member} has been added to the calendar.")
+    #         send_notification_to_users = True
+    #
+    #     else:
+    #         notification_text = _("Activity for {member} has been updated to the calendar.")
+    #         recipients = {instance.member.user, *[member.user for member in instance.member.family_members.all()]}
+    #         send_notification_to_users = True
+            
     if send_notification_to_users:
         for recipient in recipients:
-            send_notification(recipient=recipient, notification_type=notification_type, target=instance.activity, subject=notification_subject, text=notification_text, url=notification_url)
+            # notification_text = notification_text.format(member=recipient.get_full_name())
+            send_notification(recipient=recipient, notification_type=notification_type, target=instance, subject=notification_subject, text=notification_text, url=notification_url)
 
 
 @receiver(post_delete, sender=Activity)

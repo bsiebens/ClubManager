@@ -32,7 +32,9 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns = urlpatterns + debug_toolbar_urls()
+    urlpatterns += [
+        path("__reload__/", include("django_browser_reload.urls")),
+    ] + debug_toolbar_urls()
 
 js_info_dict = {
     "packages": ("recurrence",),

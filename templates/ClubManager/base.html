@@ -1,7 +1,7 @@
 {% load static %}
 {% load i18n %}
 {% load partials %}
-{% load tailwind_cli %}
+{% load tailwind_tags %}
 
 {% with CM_CLUB_NAME=config.CM_CLUB_NAME CM_CLUB_LOGO=config.CM_CLUB_LOGO %}
     <!DOCTYPE html>
@@ -15,6 +15,8 @@
 
         {% tailwind_css %}
 
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
         <script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.12.4/dist/cdn.min.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 
@@ -22,7 +24,11 @@
         <script src="https://kit.fontawesome.com/8189f10079.js" crossorigin="anonymous"></script>
     </head>
     <body>
-        {% url "clubmanager:news" as news %}
+        {% url "clubmanager:news" as news_url %}
+        {% url "clubmanager:calendar" as calendar_url %}
+        {% url "clubmanager:notifications" as notifications_url %}
+        {% url "clubmanager:messages" as messages_url %}
+        {% url "clubmanager:settings" as settings_url %}
 
         <div class="flex flex-col h-screen">
             <div class="navbar bg-neutral text-neutral-content w-full px-4 py-2 z-50 min-h-fit">
@@ -51,20 +57,26 @@
 
                 <div>
                     <ul class="menu menu-horizontal">
-                        <li class="border-b border-neutral hidden lg:block">
-                            <a href="{% url "clubmanager:calendar" %}">
-                                <i class="fa-solid fa-calendar-days"></i>{% translate "Calendar" %}
+                        <li class="border-b border-neutral {% if calendar_url in request.path %}border-neutral-content{% endif %} hidden lg:block">
+                            <a href="{% url "clubmanager:calendar" %}" class="group">
+                                <span class="flex flex-row items-center gap-2">
+                                    <span class="icon icon-rounded group-hover:icon-filled {% if calendar_url in request.path %}icon-filled{% endif %}">calendar_month</span>
+                                    <span class="hidden lg:block">{% translate "Calendar" %}</span>
+                                </span>
                             </a>
                         </li>
 
-                        <li class="border-b border-neutral hidden lg:block">
-                            <a href="">
-                                <i class="fa-solid fa-comments"></i>{% translate "Messages" %}
+                        <li class="border-b border-neutral {% if messages_url in request.path %}border-neutral-content{% endif %} hidden lg:block">
+                            <a href="" class="group">
+                                <span class="flex flex-row items-center gap-2">
+                                    <span class="icon icon-rounded group-hover:icon-filled {% if messages_url in request.path %}icon-filled{% endif %}">chat_bubble</span>
+                                    <span class="hidden lg:block">{% translate "Messages" %}</span>
+                                </span>
                             </a>
                         </li>
 
-                        <li class="border-b border-neutral">
-                            <a href="{% url "clubmanager:notifications" %}">
+                        <li class="border-b border-neutral {% if notifications_url in request.path %}border-neutral-content icon-filled{% endif %}">
+                            <a href="{% url "clubmanager:notifications" %}" class="group flex flex-row items-center gap-2">
                                 <div x-data x-init="
                                     const update = async () => {
                                         try {
@@ -81,31 +93,37 @@
                                     };
                                     update();
                                     setInterval(update, 60000);
-                                    ">
+                                    " class="flex flex-row items-center">
                                     {% partialdef notification_icon inline %}
                                         {% if unread_notification_count > 0 %}
                                             <span class="indicator" id="notification_icon">
                                                 <span class="indicator-item status status-error"></span>
-                                                <i class="fa-solid fa-bell"></i>
+                                                <span class="icon icon-rounded group-hover:icon-filled">notifications</span>
                                             </span>
                                         {% else %}
-                                            <i class="fa-solid fa-bell" id="notification_icon"></i>
+                                            <span id="notification_icon" class="icon icon-rounded group-hover:icon-filled">notifications</span>
                                         {% endif %}
                                     {% endpartialdef notification_icon %}
                                 </div><span class="hidden lg:block">{% translate "Notifications" %}</span>
                             </a>
                         </li>
 
-                        <li class="border-b border-neutral hidden lg:block">
-                            <a href="">
-                                <i class="fa-solid fa-gears"></i>{% translate "Settings" %}
+                        <li class="border-b border-neutral {% if settings_url in request.path %}border-neutral-content{% endif %} hidden lg:block">
+                            <a href="" class="group">
+                                <span class="flex flex-row items-center gap-2">
+                                    <span class="icon icon-rounded group-hover:icon-filled {% if settings_url in request.path %}icon-filled{% endif %}">settings</span>
+                                    <span class="hidden lg:block">{% translate "Settings" %}</span>
+                                </span>
                             </a>
                         </li>
 
                         {% if request.user.is_staff %}
-                            <li class="border-b border-neutral hidden lg:block">
-                                <a href="">
-                                    <i class="fa-solid fa-user-shield"></i>{% translate "Admin" %}
+                            <li class="border-b border-neutral {% if messages_url in request.path %}border-neutral-content{% endif %} hidden lg:block">
+                                <a href="" class="group">
+                                    <span class="flex flex-row items-center gap-2">
+                                    <span class="icon icon-rounded group-hover:icon-filled {% if messages_url in request.path %}icon-filled{% endif %}">shield_person</span>
+                                    <span class="hidden lg:block">{% translate "Admin" %}</span>
+                                </span>
                                 </a>
                             </li>
                         {% endif %}
@@ -124,7 +142,7 @@
                             </div>
 
                             <div class="basis-1/4 hidden lg:flex flex-col gap-4">
-                                <div class="font-jersey text-xl font-semibold mb-2"><i class="fa-brands fa-instagram mr-2"></i>@Something</div>
+                                <div class="font-jersey text-xl font-semibold mb-2">@Something</div>
                                 <div class="flex flex-col gap-4">
                                     <div class="flex w-full flex-col gap-4">
                                         <div class="flex items-center gap-4">
@@ -205,7 +223,7 @@
 
             <footer class="hidden lg:flex footer footer-horizontal bg-neutral text-neutral-content items-center p-4 z-50">
                 <aside class="grid-flow-col items-center text-sm grow">
-                    <p class="font-jersey">MIT License <i class="fa-solid fa-copyright"></i> {% now "Y" %} Bernard Siebens</p>
+                    <p class="font-jersey items-center flex gap-2">MIT License <span class="icon icon-rounded text-sm">copyright</span> {% now "Y" %} Bernard Siebens</p>
                 </aside>
                 <nav class="grid-flow-col gap-4 md:place-self-center md:justify-self-end items-center">
                     <a href="https://github.com/bernardsiebens/clubmanager" target="_blank">
@@ -216,30 +234,30 @@
         </div>
 
         <div class="dock lg:hidden bg-neutral text-neutral-content">
-            <a href="{% url "home" %}" {% if news in request.path %}class="dock-active"{% endif %}>
-                <i class="fa-solid fa-home"></i>
-                <span class="dock-label">{% translate "Home" %}</span>
+            <a href="{% url "home" %}" class="group {% if news_url in request.path %}dock-active{% endif %}">
+                <span class="icon icon-rounded group-hover:icon-filled {% if news_url in request.path %}icon-filled{% endif %}">home</span>
+                <span class="dock-label pb-2">{% translate "Home" %}</span>
             </a>
 
-            <a href="{% url "clubmanager:calendar" %}">
-                <i class="fa-solid fa-calendar-days"></i>
-                <span class="dock-label">{% translate "Calendar" %}</span>
+            <a href="{% url "clubmanager:calendar" %}" class="group {% if calendar_url in request.path %}dock-active{% endif %}">
+                <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if calendar_url in request.path %}icon-filled{% endif %}">calendar_month</span>
+                <span class="dock-label pb-2">{% translate "Calendar" %}</span>
             </a>
 
-            <a href="">
-                <i class="fa-solid fa-comments"></i>
-                <span class="dock-label">{% translate "Chat" %}</span>
+            <a href="" class="group {% if messages_url in request.path %}dock-active{% endif %}">
+                <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if messages_url in request.path %}icon-filled{% endif %}">chat_bubble</span>
+                <span class="dock-label pb-2">{% translate "Chat" %}</span>
             </a>
 
-            <a href="">
-                <i class="fa-solid fa-gear"></i>
-                <span class="dock-label">{% translate "Settings" %}</span>
+            <a href="" class="group {% if settings_url in request.path %}dock-active{% endif %}">
+                <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if settings_url in request.path %}icon-filled{% endif %}">settings</span>
+                <span class="dock-label pb-2">{% translate "Settings" %}</span>
             </a>
 
             {% if request.user.is_staff %}
-                <a href="">
-                    <i class="fa-solid fa-user-shield"></i>
-                    <span class="dock-label">{% translate "Admin" %}</span>
+                <a href="" class="group {% if calendar_url in request.path %}dock-active{% endif %}">
+                    <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if calendar_url in request.path %}icon-filled{% endif %}">shield_person</span>
+                    <span class="dock-label pb-2">{% translate "Admin" %}</span>
                 </a>
             {% endif %}
         </div>

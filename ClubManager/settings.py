@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     "generic_notifications",
     "polymorphic",
     "recurrence",
-    "django_tailwind_cli",
+    "tailwind",
+    "theme.apps.ThemeConfig",
     "members.apps.MembersConfig",
     "notifications.apps.NotificationsConfig",
     "teams.apps.TeamsConfig",
@@ -59,7 +60,7 @@ INSTALLED_APPS = [
 ]
 
 if DEBUG:
-    INSTALLED_APPS.append("debug_toolbar")
+    INSTALLED_APPS += ["debug_toolbar", "django_browser_reload"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -74,7 +75,7 @@ MIDDLEWARE = [
 ]
 
 if DEBUG:
-    MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware", "django_browser_reload.middleware.BrowserReloadMiddleware"]
 
 ROOT_URLCONF = "ClubManager.urls"
 
@@ -190,3 +191,5 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+TAILWIND_APP_NAME = "theme"

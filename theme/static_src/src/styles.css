@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Graduate&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+@import "tailwindcss";
+@import '@savaryna/tailwindcss-material-symbols';
+@plugin "@tailwindcss/typography";
+
+@plugin "daisyui" {
+    themes: emerald --default, dim --prefersdarks;
+}
+
+/**
+  * A catch-all path to Django template files, JavaScript, and Python files
+  * that contain Tailwind CSS classes and will be scanned by Tailwind to generate the final CSS file.
+  *
+  * If your final CSS file is not being updated after code changes, you may want to broaden or narrow
+  * the scope of this path.
+  */
+@source "../../../**/*.{html,py,js}";
+
+@theme {
+    --font-jersey: Graduate, sans-serif;
+    --font-sans: Open Sans, sans-serif;
+}
+
+@custom-variant dark (&:where([data-theme="dim"], [data-theme="dim"] *));
