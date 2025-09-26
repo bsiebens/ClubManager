@@ -1,11 +1,26 @@
 {% extends "ClubManager/base.html" %}
 
 {% load i18n %}
+{% load static %}
 
-{% block title %}{% translate "News" %}{% endblock title %}
+{% block title %}{% endblock title %}
 
 {% block content %}
-    NEWS
-    
-    <button class="btn btn-primary">Hello World!</button>
+    <div>
+        {% if CM_CLUB_LOGO %}
+            <div class="h-48 aspect-[1/1] my-2 hidden lg:flex">
+                <img src="{% static CM_CLUB_LOGO %}" class="p-1 border-2 border-neutral rounded-full object-contain shadow-md" alt="{{ CM_CLUB_NAME }} logo" />
+            </div>
+        {% endif %}
+
+        <div>
+            <div>
+                {% if CM_CLUB_NAME != "ClubManager" %}
+                    {{ CM_CLUB_NAME }}
+                {% endif %}
+                ClubManager
+            </div>
+            <div>Welcome {{ request.user.first_name }}</div>
+        </div>
+    </div>
 {% endblock content %}

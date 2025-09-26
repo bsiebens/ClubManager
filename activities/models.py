@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from constance import config
 from django.db import models
-from django.db.models import Q, Prefetch
+from django.db.models import Q, Prefetch, QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
@@ -191,11 +191,31 @@ class Activity(PolymorphicModel):
         ordering = ["start_time", "end_time"]
 
     @classmethod
-    def for_user(cls, user) -> list["Activity"]:
+    def for_user(cls, user, include_registrations=True) -> QuerySet["Activity"]:
+        """
+        Retrieve a list of activities for a specific user. Activities are filtered based on teams
+        or members the user is associated with, along with optional inclusion of registration
+        details. Only future activities from now are included, and results are ordered by the
+        start time.
+
+        :param user: The user for whom activities are being retrieved.
+        :type user: User
+        :param include_registrations: Whether to include prefetching registration details for
+            activities. Defaults to True.
+        :type include_registrations: bool
+        :return: A list of Activity objects matching the user's criteria.
+        """
         members = Member.objects.filter(Q(user=user) | Q(family_members__user=user)).distinct().values_list("pk", flat=True)
         teams = Team.objects.filter(teammembership__season=Season.for_date(), teammembership__member__in=members).distinct().values_list("pk", flat=True)
         
-        activities = cls.objects.not_instance_of(Practice).filter(Q(teams__in=teams) | Q(members__in=members)).filter(start_time__gte=timezone.now()).select_related("type").prefetch_related(Prefetch("registrations", queryset=Registration.objects.filter(member__in=members).select_related("member", "member__user").order_by("member__user__last_name", "member__user__first_name"), to_attr="my_registrations")).prefetch_related(Prefetch("registrations", queryset=Registration.objects.select_related("member", "member__user").order_by("member__user__last_name", "member__user__first_name"), to_attr="all_registrations")).order_by("start_time")
+        activities = (cls.objects.not_instance_of(Practice)
+                      .filter(Q(teams__in=teams) | Q(members__in=members))
+                      .filter(start_time__gte=timezone.now()).select_related("type")
+                      .order_by("start_time"))
+        
+        if include_registrations:
+            activities = (activities.prefetch_related(Prefetch("registrations", queryset=Registration.objects.filter(member__in=members).select_related("member", "member__user").order_by("member__user__last_name", "member__user__first_name"), to_attr="my_registrations"))
+                          .prefetch_related(Prefetch("registrations", queryset=Registration.objects.select_related("member", "member__user").order_by("member__user__last_name", "member__user__first_name"), to_attr="all_registrations")))
         
         return activities
 

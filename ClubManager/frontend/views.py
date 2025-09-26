@@ -56,7 +56,7 @@ def calendar(request: HttpRequest, registration_pk: int | None = None, response:
             # Verify if we have access to the registration
             if registration.member.user == request.user or registration.member in request.user.member.family_members.all():
                 if response == "not_attending" and not is_alpine(request):
-                    return AlpineTemplateResponse(request, "ClubManager/calendar_not_attending.html", {"registration": registration})
+                    return AlpineTemplateResponse(request, "ClubManager/calendar_comment_form.html", {"registration": registration})
 
                 else:
                     registration.response = response
