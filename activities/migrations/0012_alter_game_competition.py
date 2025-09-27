@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("activities", "0011_create_activity_types"),
+        ("activities", "0010_alter_practiceoccurrence_options"),
     ]
 
     operations = [

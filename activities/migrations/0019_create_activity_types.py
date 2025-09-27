@@ -9,9 +9,9 @@ def create_default_activity_types(apps, schema_editor):
 
     # Create default activity types
     try:
-        ActivityType.objects.create(name="Event", type="event", logo="fa-solid fa-calendar-days")
-        ActivityType.objects.create(name="Game", type="game", logo="fa-solid fa-trophy")
-        ActivityType.objects.create(name="Practice", type="practice", logo="fa-solid fa-hockey-puck")
+        ActivityType.objects.create(name="Event", type="event", logo="calendar_month")
+        ActivityType.objects.create(name="Game", type="game", logo="sports_hockey")
+        ActivityType.objects.create(name="Practice", type="practice", logo="fitness_center")
     except:
         pass
 
@@ -32,7 +32,7 @@ def remove_default_activity_types(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("activities", "0010_alter_practiceoccurrence_options"),
+        ("activities", "0018_activitytype_logo"),
     ]
 
     operations = [migrations.RunPython(create_default_activity_types, remove_default_activity_types)]
