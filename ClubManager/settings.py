@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "teams.apps.TeamsConfig",
     "activities.apps.ActivitiesConfig",
     "news.apps.NewsConfig",
+    "sponsors.apps.SponsorsConfig",
 ]
 
 if DEBUG:
