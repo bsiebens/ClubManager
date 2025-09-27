@@ -1,9 +1,10 @@
 from collections import OrderedDict
 
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from generic_notifications.channels import WebsiteChannel
@@ -16,9 +17,13 @@ from ..lib import AlpineTemplateResponse, is_alpine
 
 @login_required
 def news(request: HttpRequest) -> HttpResponse:
-    news_items = NewsItem.objects.filter(status=NewsItem.StatusChoices.RELEASED, publish_on__lte=timezone.now()).filter(Q(type=NewsItem.NewsItemTypeChoices.INTERNAL) | Q(type=NewsItem.NewsItemTypeChoices.INTERNAL_EXTERNAL)).order_by("-created")[:5]
+    news_items = NewsItem.objects.filter(status=NewsItem.StatusChoices.RELEASED, publish_on__lte=timezone.now()).filter(Q(type=NewsItem.NewsItemTypeChoices.INTERNAL) | Q(type=NewsItem.NewsItemTypeChoices.INTERNAL_EXTERNAL)).order_by("-created")
+    paginator = Paginator(news_items, 10)
 
-    return render(request, "ClubManager/news.html", {"news_items": news_items})
+    page_number = request.GET.get("page", 1)
+    page = paginator.get_page(page_number)
+
+    return AlpineTemplateResponse(request, "ClubManager/news.html", {"page": page, "is_alpine": is_alpine(request)}, partial_template="news")
 
 
 @login_required

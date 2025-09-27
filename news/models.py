@@ -1,7 +1,7 @@
 from PIL import Image
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.utils import timezone
+from django.utils import timezone, text
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
 from markdownx.models import MarkdownxField
@@ -54,6 +54,11 @@ class NewsItem(RulesModel):
 
     def formatted(self) -> str:
         return markdownify(self.text)
+
+    def summary(self) -> str:
+        formatted_text = self.formatted()
+
+        return text.Truncator(formatted_text).words(40, html=True)
 
     def main_picture(self) -> "Attachment | None":
         try:

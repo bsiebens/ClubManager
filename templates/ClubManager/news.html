@@ -2,29 +2,83 @@
 
 {% load i18n %}
 {% load static %}
+{% load partials %}
 
 {% block title %}{% endblock title %}
 
 {% block content %}
-    <div>
+    <div class="flex flex-row gap-4 items-center justify-center pb-8 mb-4">
         {% if CM_CLUB_LOGO %}
-            <div class="h-48 aspect-[1/1] my-2 hidden lg:flex">
+            <div class="h-20 lg:h-48 aspect-[1/1] my-2">
                 <img src="{% static CM_CLUB_LOGO %}" class="p-1 border-2 border-neutral rounded-full object-contain shadow-md" alt="{{ CM_CLUB_NAME }} logo" />
             </div>
         {% endif %}
 
-        <div>
-            <div>
+        <div class="flex flex-col lg:gap-2 {% if CM_CLUB_LOGO %}items-start{% else %}items-center{% endif %}">
+            <div class="font-jersey text-2xl lg:text-4xl font-semibold">
                 {% if CM_CLUB_NAME != "ClubManager" %}
                     {{ CM_CLUB_NAME }}
+                {% else %}
+                    ClubManager
                 {% endif %}
-                ClubManager
             </div>
-            <div>Welcome {{ request.user.first_name }}</div>
-        </div>
 
-        {% for news_item in news_items %}
-            {{ news_item }}
-        {% endfor %}
+            {% now "H" as current_hour %}
+            <div class="opacity-75 lg:text-xl">
+                {% if current_hour|add:"0" < 12 %}
+                    {% translate "Good morning" %}
+                {% elif current_hour|add:"0" < 18 %}
+                    {% translate "Good afternoon" %}
+                {% else %}
+                    {% translate "Good evening" %}
+                {% endif %} {{ request.user.first_name }}
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+        <div class="text-2xl font-jersey font-semibold mb-2" x-data>{% translate "Latest club news" %}</div>
+
+        {% partialdef news inline %}
+            <div id="news" x-merge="append">
+                {% for news_item in page %}
+                    <div class="border border-neutral p-4 rounded-xl m-2">
+                        <div class="text-xl font-semibold mb-8">{{ news_item.title }}</div>
+                        <div>{{ news_item.formatted|safe }}</div>
+                        <div class="flex flex-row gap-2 mt-8">
+                            {% for team in news_item.teams.all %}
+                                <div class="badge badge-neutral badge-sm font-jersey"><span class="icon icon-rounded text-md icon-20">groups</span>{{ team.name }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="flex justify-center mt-4" id="pagination" x-data="{ isBusy: false }" x-init="
+                    const observer = new MutationObserver(() => {
+                        isBusy = $el.getAttribute('aria-busy') === 'true';
+                    });
+                    observer.observe($el, { attributes: true, attributeFilter: ['aria-busy'] });
+                    isBusy = $el.getAttribute('aria-busy') === 'true';
+                " x-init {% if page.has_next %}x-intersect="$ajax('?page={{ page.next_page_number }}', {target: 'news pagination'})"{% endif %}>
+                <template x-if="isBusy">
+                    <span class="loading loading-spinner loading-md"></span>
+                </template>
+
+                <div class="join {% if is_alpine %}hidden{% endif %}" x-cloak x-show="!isBusy">
+                    {% if page.has_previous %}
+                        <a aria-hidden="true" class="join-item btn" href="?page=1"><span class="icon icon-rounded">keyboard_double_arrow_left</span><span class="hidden lg:inline"> {% translate "first" %}</span></a>
+                        <a aria-hidden="true" class="join-item btn" href="?page={{ page.previous_page_number }}"><span class="hidden lg:inline">{% translate "previous" %}</span><span class="icon icon-rounded lg:hidden">keyboard_arrow_left</span></a>
+                    {% endif %}
+
+                    <button class="join-item btn btn-disabled">{% blocktranslate with page=page.number num_pages=page.paginator.num_pages %}page {{ page }} of {{ num_pages }}{% endblocktranslate %}</button>
+
+                    {% if page.has_next %}
+                        <a aria-hidden="true" class="join-item btn" href="?page={{ page.next_page_number }}"><span class="hidden lg:inline">{% translate "next" %}</span><span class="icon icon-rounded lg:hidden">keyboard_arrow_right</span></a>
+                        <a aria-hidden="true" class="join-item btn" href="?page={{ page.paginator.num_pages }}"><span class="hidden lg:inline"> {% translate "last" %}</span><span class="icon icon-rounded">keyboard_double_arrow_right</span></a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endpartialdef %}
     </div>
 {% endblock content %}
