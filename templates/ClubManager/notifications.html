@@ -35,17 +35,17 @@
                 <li class="list-row items-center">
                     <div>
                         {% if notification.notification_type == "calendar" %}
-                            <span class="icon icon-rounded text-xl bg-base-300 p-2 mask mask-circle opacity-85">calendar_month</span>
+                            <span class="icon icon-rounded text-2xl bg-base-300 p-2 mask mask-circle opacity-85">calendar_month</span>
                         {% elif notification.notification_type == "registration" %}
                             {% if notification.target.type.type == "practice" %}
-                                <span class="icon icon-rounded text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-85">fitness_center</span>
+                                <span class="icon icon-rounded text-2xl bg-base-300 p-2 m-1 mask mask-circle opacity-85">fitness_center</span>
                             {% elif notification.target.type.type == "game" %}
-                                <span class="icon icon-rounded text-xl bg-base-300 p-2 mask mask-circle opacity-85">sports_hockey</span>
+                                <span class="icon icon-rounded text-2xl bg-base-300 p-2 mask mask-circle opacity-85">sports_hockey</span>
                             {% else %}
-                                <span class="icon icon-rounded text-xl bg-base-300 p-2 mask mask-circle opacity-85">calendar_month</span>
+                                <span class="icon icon-rounded text-2xl bg-base-300 p-2 mask mask-circle opacity-85">calendar_month</span>
                             {% endif %}
                         {% else %}
-                            <span class="icon icon-rounded text-xl bg-base-300 p-2 mask mask-circle opacity-85">notifications</span>
+                            <span class="icon icon-rounded text-2xl bg-base-300 p-2 mask mask-circle opacity-85">notifications</span>
                         {% endif %}
                     </div>
 

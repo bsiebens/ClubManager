@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="hidden lg:flex items-start">
-                    <span class="icon icon-rounded text-xl bg-base-300 p-2 m-1 mask mask-circle opacity-85">{{ activity.type.logo }}</span>
+                    <span class="icon icon-rounded text-2xl bg-base-300 p-2 m-1 mask mask-circle opacity-85">{{ activity.type.logo }}</span>
                 </div>
 
                 <div class="border border-base-300 rounded-lg p-4 shadow-md gap-1 w-full flex flex-row gap-2">
@@ -57,13 +57,6 @@
                             <div class="flex items-center basis-1/2">
                                 {% if activity.location is not None %}<span class="icon icon-rounded icon-20 mr-1">location_on</span>{{ activity.location }}{% endif %}
                             </div>
-
-
-{#                            <div class="basis-2/3 lg:basis-1/4 flex items-center"><span class="icon icon-rounded icon-20 mr-1">schedule</span><span class="lg:hidden">{{ activity.start_time|date:"D d/m" }} </span>{{ activity.start_time|date:"H:i" }} - {{ activity.end_time|date:"H:i" }}</div>#}
-{#                            <div class="basis-1/3 lg:basis-1/4 flex items-center"><span class="icon icon-rounded icon-20 mr-1">arrows_input</span>{{ activity.gathering_time|date:"H:i" }}</div>#}
-{#                            <div class="hidden lg:flex basis-1/2 flex items-center">#}
-{#                                {% if activity.location is not None %}<span class="icon icon-rounded icon-20 mr-1">location_on</span>{{ activity.location }}{% endif %}#}
-{#                            </div>#}
                         </div>
 
                         <div class="mt-2 border-t border-base-300 pt-2 flex flex-col gap-2">
