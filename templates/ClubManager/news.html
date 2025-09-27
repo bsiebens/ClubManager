@@ -22,5 +22,9 @@
             </div>
             <div>Welcome {{ request.user.first_name }}</div>
         </div>
+
+        {% for news_item in news_items %}
+            {{ news_item }}
+        {% endfor %}
     </div>
 {% endblock content %}

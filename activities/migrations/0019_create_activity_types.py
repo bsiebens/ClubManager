@@ -8,12 +8,9 @@ def create_default_activity_types(apps, schema_editor):
     ActivityType = apps.get_model("activities", "ActivityType")
 
     # Create default activity types
-    try:
-        ActivityType.objects.create(name="Event", type="event", logo="calendar_month")
-        ActivityType.objects.create(name="Game", type="game", logo="sports_hockey")
-        ActivityType.objects.create(name="Practice", type="practice", logo="fitness_center")
-    except:
-        pass
+    ActivityType.objects.update_or_create(name="Event", defaults={"type": "event", "logo": "calendar_month"})
+    ActivityType.objects.update_or_create(name="Game", defaults={"type": "game", "logo": "sports_hockey"})
+    ActivityType.objects.update_or_create(name="Practice", defaults={"type": "practice", "logo": "fitness_center"})
 
 
 def remove_default_activity_types(apps, schema_editor):

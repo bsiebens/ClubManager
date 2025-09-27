@@ -1,19 +1,24 @@
 from collections import OrderedDict
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from generic_notifications.channels import WebsiteChannel
 from generic_notifications.utils import get_notifications, mark_notifications_as_read
 
 from activities.models import Activity, Registration, grouped_by_response
+from news.models import NewsItem
 from ..lib import AlpineTemplateResponse, is_alpine
 
 
 @login_required
 def news(request: HttpRequest) -> HttpResponse:
-    return render(request, "ClubManager/news.html", {})
+    news_items = NewsItem.objects.filter(status=NewsItem.StatusChoices.RELEASED, publish_on__lte=timezone.now()).filter(Q(type=NewsItem.NewsItemTypeChoices.INTERNAL) | Q(type=NewsItem.NewsItemTypeChoices.INTERNAL_EXTERNAL)).order_by("-created")[:5]
+
+    return render(request, "ClubManager/news.html", {"news_items": news_items})
 
 
 @login_required
