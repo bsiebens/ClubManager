@@ -42,7 +42,7 @@
                                         {% translate "Game" %} {{ activity.team.name }}
                                     {% endif %}
                                 {% else %}
-                                    {{ activity.title }}
+                                    {{ activity.title }} {{ activity.teams.all|join:", " }}
                                 {% endif %}
                             </div>
 
