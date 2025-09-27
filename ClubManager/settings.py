@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     "notifications.apps.NotificationsConfig",
     "teams.apps.TeamsConfig",
     "activities.apps.ActivitiesConfig",
-    "news.apps.NewsConfig"
+    "news.apps.NewsConfig",
 ]
 
 if DEBUG:
@@ -104,9 +104,7 @@ ASGI_APPLICATION = "ClubManager.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": config("DJANGO_DATABASE_URL", default="sqlite:///db.sqlite3", cast=db_url)
-}
+DATABASES = {"default": config("DJANGO_DATABASE_URL", default="sqlite:///db.sqlite3", cast=db_url)}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
