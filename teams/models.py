@@ -185,7 +185,7 @@ class Team(RulesModel):
         rules_permissions = {"add": is_superuser, "view": is_superuser, "change": is_superuser, "delete": is_superuser}
 
     def __str__(self):
-        return self.name
+        return self.short_name
 
     @property
     def initials(self) -> str:

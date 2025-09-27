@@ -326,7 +326,7 @@ class Game(Activity):
     score_team = models.IntegerField(_("score team"), default=0)
     score_opponent = models.IntegerField(_("score opponent"), default=0)
 
-    history = HistoricalRecords(excluded_fields=["created", "updated", "is_live", "score_team", "score_opponent"])
+    history = HistoricalRecords(excluded_fields=["created", "updated", "is_live", "season", "score_team", "score_opponent", "title", "teams", "type", "end_time", "require_registration", "description", "owner", "registration_deadline", "competition", "competition_id"])
 
     class Meta:
         verbose_name = _("game")

@@ -25,37 +25,41 @@
                     {% endifchanged %}
                 </div>
 
-                <div class="hidden lg:flex items-start">
-                    <span class="icon icon-rounded text-2xl bg-base-300 p-2 m-1 mask mask-circle opacity-85">{{ activity.type.logo }}</span>
-                </div>
-
-                <div class="border border-base-300 rounded-lg p-4 shadow-md gap-1 w-full flex flex-row gap-2">
+                <div class="border border-base-300 rounded-lg p-4 shadow-md gap-2 w-full flex flex-row">
                     <div class="w-1.5 h-full rounded-xl {% if activity.type.type == "practice" %}bg-primary{% elif activity.type.type == "game" %}bg-accent{% else %}bg-secondary{% endif %}">&nbsp;</div>
 
                     <div class="flex flex-col w-full">
-                        <div class="flex flex-row justify-between items-center">
-                            <div class="font-jersey font-bold text-xl">
-                                {% if activity.type.type == "game" %}
-                                    {% if activity.opponent %}
-                                        <span class="lg:hidden">{{ activity.team.short_name }}</span><span class="hidden lg:inline">{{ activity.team.name }}</span> vs. {{ activity.opponent }}
-                                    {% else %}
-                                        {% translate "Game" %} {{ activity.team.name }}
-                                    {% endif %}
-                                {% else %}
-                                    {{ activity.title }} {{ activity.teams.all|join:", " }}
-                                {% endif %}
+                        <div class="flex flex-row gap-2 items-center">
+                            <div class="hidden lg:flex items-start">
+                                <span class="icon icon-rounded text-3xl bg-base-300 p-2 m-1 mask mask-circle opacity-85">{{ activity.type.logo }}</span>
                             </div>
 
-                            <div class="badge badge-sm {% if activity.type.type == "practice" %}badge-primary{% elif activity.type.type == "game" %}badge-accent{% else %}badge-secondary{% endif %} shadow-md">{{ activity.type|lower }}</div>
-                        </div>
+                            <div class="flex flex-col w-full">
+                                <div class="flex flex-row justify-between items-center">
+                                    <div class="font-jersey font-bold text-xl">
+                                        {% if activity.type.type == "game" %}
+                                            {% if activity.opponent %}
+                                                <span class="lg:hidden">{{ activity.team.short_name }}</span><span class="hidden lg:inline">{{ activity.team.name }}</span> vs. {{ activity.opponent }}
+                                            {% else %}
+                                                {% translate "Game" %} {{ activity.team.name }}
+                                            {% endif %}
+                                        {% else %}
+                                            {{ activity.teams.all|join:", " }} - {{ activity.title }}
+                                        {% endif %}
+                                    </div>
 
-                        <div class="flex flex-col lg:flex-row gap-2 opacity-75 text-md mt-2 w-full justify-between">
-                            <div class="flex flex-row basis-1/2">
-                                <div class="flex items-center grow"><span class="icon icon-rounded icon-20 mr-1">schedule</span><span class="lg:hidden">{{ activity.start_time|date:"D d/m" }} </span>{{ activity.start_time|date:"H:i" }} - {{ activity.end_time|date:"H:i" }}</div>
-                                <div class="flex items-center grow"><span class="icon icon-rounded icon-20 mr-1">arrows_input</span>{{ activity.gathering_time|date:"H:i" }}</div>
-                            </div>
-                            <div class="flex items-center basis-1/2">
-                                {% if activity.location is not None %}<span class="icon icon-rounded icon-20 mr-1">location_on</span>{{ activity.location }}{% endif %}
+                                    <div class="badge badge-sm {% if activity.type.type == "practice" %}badge-primary{% elif activity.type.type == "game" %}badge-accent{% else %}badge-secondary{% endif %} shadow-md">{{ activity.type|lower }}</div>
+                                </div>
+
+                                <div class="flex flex-col lg:flex-row gap-2 opacity-75 text-md w-full justify-between">
+                                    <div class="flex flex-row basis-1/2">
+                                        <div class="flex items-center grow"><span class="icon icon-rounded icon-20 mr-1">schedule</span><span class="lg:hidden">{{ activity.start_time|date:"D d/m" }} </span>{{ activity.start_time|date:"H:i" }} - {{ activity.end_time|date:"H:i" }}</div>
+                                        <div class="flex items-center grow"><span class="icon icon-rounded icon-20 mr-1">arrows_input</span>{{ activity.gathering_time|date:"H:i" }}</div>
+                                    </div>
+                                    <div class="flex items-center basis-1/2">
+                                        {% if activity.location is not None %}<span class="icon icon-rounded icon-20 mr-1">location_on</span>{{ activity.location }}{% endif %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

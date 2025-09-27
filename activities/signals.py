@@ -104,7 +104,12 @@ def send_notifications(sender, instance, created, **kwargs) -> None:
             notification_text = _("A new activity for {member} has been added to the calendar.")
         
         else:
-            notification_text = _("Activity for {member} has been updated.")
+            difference = instance.history.latest().diff_against(instance.history.latest().prev_record)
+            print(difference.changed_fields)
+            if not difference.changed_fields:
+                send_notification_to_users = False
+                
+            notification_text = _("Activity for {member} has been updated: %s changed") % (", ".join(difference.changed_fields))
             
     if send_notification_to_users:
         for recipient in recipients:
