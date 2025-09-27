@@ -25,6 +25,7 @@ dependencies = [
     "python-decouple>=3.8",
     "requests>=2.32.5",
     "rules>=3.5",
+    "django-markdownx>=4.0.9",
 ]
 
 [dependency-groups]

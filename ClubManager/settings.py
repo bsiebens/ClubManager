@@ -52,11 +52,13 @@ INSTALLED_APPS = [
     "polymorphic",
     "recurrence",
     "tailwind",
+    "markdownx",
     "theme.apps.ThemeConfig",
     "members.apps.MembersConfig",
     "notifications.apps.NotificationsConfig",
     "teams.apps.TeamsConfig",
     "activities.apps.ActivitiesConfig",
+    "news.apps.NewsConfig"
 ]
 
 if DEBUG:
@@ -184,3 +186,5 @@ REST_FRAMEWORK = {
 }
 
 TAILWIND_APP_NAME = "theme"
+
+NPM_BIN_PATH = config("NPM_BIN_PATH", default="npm")
