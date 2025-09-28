@@ -5,30 +5,36 @@ FROM ubuntu:25.10
 WORKDIR /app
 
 # Build-time arguments, to be supplied by environment variables
-ARG DJANGO_DEBUG
-ARG DJANGO_SECRETY_KEY
-# ARG DJANGO_DATABASE_URL
+ENV DJANGO_DEBUG=true
+ENV DJANGO_SECRETY_KEY=insecure-key
+ENV DOMAIN_NAME="example.com"
+
 
 # Install system dependencies and uv
-RUN apt-get update && apt-get install -y build-essential curl wget python3 supervisor caddy && rm -rf /var/lib/apt/lists/*
-RUN curl -sSL https://install.python-poetry.org | python3 -
+# RUN apt-get update && apt-get install -y build-essential curl wget python3 supervisor caddy && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y build-essential curl wget python3 certbot openssl libssl-dev && rm -rf /var/lib/apt/lists/*
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:${PATH}"
 
 # Copy and install python dependencies
 COPY pyproject.toml.backup poetry.lock ./
-RUN poetry install --no-root --without dev
+RUN uv sync --no-group dev
 
 # Copy rest of the application
 COPY . .
 
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Collect static files and run migrations
-RUN poetry run python manage.py collectstatic --noinput
-RUN poetry run python manage.py migrate
+RUN uv run --no-sync ./manage.py collectstatic --noinput
+RUN uv run --no-sync ./manage.py migrate
 
 # Expose port of the application
-EXPOSE 80
+EXPOSE 80 8000
 
-COPY .config/Caddyfile /etc/caddy/Caddyfile
-COPY .config/supervisord.conf /etc/supervisord.conf
+# COPY .config/Caddyfile /etc/caddy/Caddyfile
+# COPY .config/supervisord.conf /etc/supervisord.conf
 
-CMD ["supervisord", "-c", "/etc/supervisord.conf"]
+# CMD ["supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/entrypoint.sh"]

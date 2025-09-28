@@ -17,6 +17,7 @@ Including another URLconf
 
 from debug_toolbar.toolbar import debug_toolbar_urls
 from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
@@ -33,9 +34,13 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += [
-        path("__reload__/", include("django_browser_reload.urls")),
-    ] + debug_toolbar_urls()
+    urlpatterns += (
+        [
+            path("__reload__/", include("django_browser_reload.urls")),
+        ]
+        + debug_toolbar_urls()
+        + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    )
 
 js_info_dict = {
     "packages": ("recurrence",),

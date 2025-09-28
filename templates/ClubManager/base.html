@@ -142,7 +142,7 @@
                                 {% block content %}{% endblock content %}
                             </div>
 
-                            <div class="basis-1/4 hidden lg:flex flex-col gap-4">
+                            <div class="basis-1/4 hidden {% if sponsors.count > 0 %}lg:flex{% endif %} flex-col gap-4">
                                 <div class="font-jersey text-xl font-semibold mb-2">@Something</div>
                                 <div class="flex flex-col gap-4">
                                     <div class="flex w-full flex-col gap-4">
@@ -168,55 +168,49 @@
                                     </div>
                                 </div>
 
-                                <div class="font-jersey mb-2">Sponsors</div>
-                                <div class="grid grid-cols-2 gap-4 justify-items-center content-center">
-                                    <div class="flex flex-col gap-2">
-                                        <div class="bg-slate-400 rounded-xl h-32 w-32"></div>
-                                        <div class="text-sm font-jersey mx-auto">Sponsor</div>
-                                    </div>
+                                {% if sponsors.count > 0 %}
+                                    <div class="font-jersey mb-2">Sponsors</div>
+                                    <div class="grid grid-cols-2 gap-4 justify-items-center content-center">
+                                        {% for sponsor in sponsors %}
+                                            {% if sponsor.url is not None %}
+                                                <a href="{{ sponsor.url }}">
+                                            {% endif %}
 
-                                    <div class="flex flex-col gap-2">
-                                        <div class="bg-slate-400 rounded-xl h-32 w-32"></div>
-                                        <div class="text-sm font-jersey mx-auto">Sponsor</div>
-                                    </div>
+                                                <div class="flex flex-col gap-2">
+                                                    <img class="rounded-xl max-h-32 object-scale-down transform-gpu w-full max-w-fit" src="{% get_media_prefix %}{{ sponsor.logo }}" alt="{{ sponsor.name }}" loading="lazy"/>
+                                                    <div class="text-sm font-jersey mx-auto">{{ sponsor.name }}</div>
+                                                </div>
 
-                                    <div class="flex flex-col gap-2">
-                                        <div class="bg-slate-400 rounded-xl h-32 w-32"></div>
-                                        <div class="text-sm font-jersey mx-auto">Sponsor</div>
+                                            {% if sponsor.url is not None %}
+                                                </a>
+                                            {% endif %}
+                                        {% endfor %}
                                     </div>
-
-                                    <div class="flex flex-col gap-2">
-                                        <div class="bg-slate-400 rounded-xl h-32 w-32"></div>
-                                        <div class="text-sm font-jersey mx-auto">Sponsor</div>
-                                    </div>
-                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
 
                     <div class="lg:hidden">
-                        <div class="font-jersey mb-2">Sponsors</div>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-center content-center">
-                            <div class="flex flex-col gap-2">
-                                <div class="bg-slate-400 rounded-xl h-32 w-32"></div>
-                                <div class="text-sm font-jersey mx-auto">Sponsor</div>
-                            </div>
+                        {% if sponsors.count > 0 %}
+                            <div class="font-jersey mb-2">Sponsors</div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-center content-center">
+                                {% for sponsor in sponsors %}
+                                    {% if sponsor.url is not None %}
+                                        <a href="{{ sponsor.url }}">
+                                    {% endif %}
 
-                            <div class="flex flex-col gap-2">
-                                <div class="bg-slate-400 rounded-xl h-32 w-32"></div>
-                                <div class="text-sm font-jersey mx-auto">Sponsor</div>
-                            </div>
+                                <div class="flex flex-col gap-2">
+                                    <img class="rounded-xl max-h-32 object-scale-down transform-gpu w-full max-w-fit" src="{% get_media_prefix %}{{ sponsor.logo }}" alt="{{ sponsor.name }}" loading="lazy"/>
+                                    <div class="text-sm font-jersey mx-auto">{{ sponsor.name }}</div>
+                                </div>
 
-                            <div class="flex flex-col gap-2">
-                                <div class="bg-slate-400 rounded-xl h-32 w-32"></div>
-                                <div class="text-sm font-jersey mx-auto">Sponsor</div>
+                                {% if sponsor.url is not None %}
+                                    </a>
+                                {% endif %}
+                                {% endfor %}
                             </div>
-
-                            <div class="flex flex-col gap-2">
-                                <div class="bg-slate-400 rounded-xl h-32 w-32"></div>
-                                <div class="text-sm font-jersey mx-auto">Sponsor</div>
-                            </div>
-                        </div>
+                        {% endif %}
                     </div>
 
                 </div>
