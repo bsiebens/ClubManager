@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "activities.apps.ActivitiesConfig",
     "news.apps.NewsConfig",
     "sponsors.apps.SponsorsConfig",
+    "messaging.apps.MessagingConfig",
 ]
 
 if DEBUG:
