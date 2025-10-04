@@ -6,11 +6,10 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from generic_notifications import send_notification
-from django.contrib.auth import get_user_model
-from django.db.models import Q
+
+from members.models import Member
 from notifications.notifications import RegistrationNotification, CalendarNotification
 from teams.models import TeamMembership, Season
-from members.models import Member
 from .models import Practice, Event, Game, Activity, PracticeOccurrence, Registration
 
 
@@ -79,48 +78,48 @@ def send_notifications(sender, instance, created, **kwargs) -> None:
 
         else:
             send_notification_to_users = True
-            
+
     if isinstance(instance, (Event, Game, PracticeOccurrence)):
         notification_subject = f"{instance.title} ({instance.start_time.strftime('%d/%m/%Y %H:%M')})"
         notification_type = CalendarNotification
         notification_url = reverse("clubmanager:calendar")
         send_notification_to_users = True
-        
+
         queryset = (
-                instance.members.all().select_related("member__user").prefetch_related("member__family_members__user") |
-                Member.objects.filter(team_memberships__season=Season.for_date(), team_memberships__team__in=instance.teams.all()).select_related("user").prefetch_related("family_members__user")
+            instance.members.all().select_related("member__user").prefetch_related("member__family_members__user")
+            | Member.objects.filter(team_memberships__season=Season.for_date(), team_memberships__team__in=instance.teams.all()).select_related("user").prefetch_related("family_members__user")
         ).distinct()
-        
+
         if hasattr(instance, "registrations") and instance.registrations.count() > 0:
             queryset = instance.registrations.select_related("member__user").prefetch_related("member__family_members__user")
-            
+
         for registration in queryset:
             user = registration.member.user
             family_members = [member.user for member in registration.member.family_members.all()]
             users[user].update(family_members)
             recipients.add(user)
-                
+
         if instance.history.latest().prev_record is None:
             notification_text = _("A new activity for {member} has been added to the calendar.")
-        
+
         else:
             difference = instance.history.latest().diff_against(instance.history.latest().prev_record)
             print(difference.changed_fields)
             if not difference.changed_fields:
                 send_notification_to_users = False
-                
+
             notification_text = _("Activity for {member} has been updated: %s changed") % (", ".join(difference.changed_fields))
-            
+
     if send_notification_to_users:
         for recipient in recipients:
             if isinstance(instance, (Event, Game, PracticeOccurrence)):
                 for user, family_members in users.items():
                     notification_text = notification_text.format(member=user.get_full_name())
                     send_notification(recipient=user, notification_type=notification_type, target=instance, subject=notification_subject, text=notification_text, url=notification_url)
-                
+
                     for family_member in family_members:
                         send_notification(recipient=family_member, notification_type=notification_type, target=instance, subject=notification_subject, text=notification_text, url=notification_url)
-            
+
             else:
                 send_notification(recipient=recipient, notification_type=notification_type, target=instance, subject=notification_subject, text=notification_text, url=notification_url)
 
