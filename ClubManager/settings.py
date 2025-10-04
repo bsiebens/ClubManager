@@ -80,6 +80,15 @@ MIDDLEWARE = [
 if DEBUG:
     MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware", "django_browser_reload.middleware.BrowserReloadMiddleware"]
 
+# Debug Toolbar Configuration for ASGI compatibility
+DEBUG_TOOLBAR_CONFIG = {
+    "DISABLE_PANELS": {
+        "debug_toolbar.panels.redirects.RedirectsPanel",
+        "debug_toolbar.panels.templates.TemplatesPanel",
+    },
+    "SHOW_TOOLBAR_CALLBACK": lambda request: DEBUG,
+}
+
 ROOT_URLCONF = "ClubManager.urls"
 
 TEMPLATES = [
