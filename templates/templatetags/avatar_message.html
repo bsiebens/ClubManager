@@ -1,0 +1,24 @@
+<div class="avatar-group -space-x-5">
+    {% if participants|length > 2 %}
+        {% for participant in participants|slice:":2" %}
+            <div class="avatar avatar-placeholder">
+                <div class="rounded-full w-10" style="background-color: {{ participant.background }}; color: {{ participant.foreground }};">
+                    <span class="text-lg">{{ participant.name }}</span>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="avatar avatar-placeholder">
+            <div class="rounded-full w-10 bg-neutral text-neutral-content">
+                <span class="text-lg">+{{ participants|length|add:"-2" }}</span>
+            </div>
+        </div>
+    {% else %}
+        {% for participant in participants %}
+            <div class="avatar avatar-placeholder">
+                <div class="rounded-full w-10" style="background-color: {{ participant.background }}; color: {{ participant.foreground }};">
+                    <span class="text-lg">{{ participant.name }}</span>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>

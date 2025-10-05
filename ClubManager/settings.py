@@ -35,13 +35,14 @@ CSRF_TRUSTED_ORIGINS = config("DJANGO_CSRF_TRUSTED_ORIGINS", default="", cast=Cs
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
+    # "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     "constance",
     "rules.apps.AutodiscoverRulesConfig",
     "simple_history",
@@ -82,13 +83,13 @@ if DEBUG:
     MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware", "django_browser_reload.middleware.BrowserReloadMiddleware"]
 
 # Debug Toolbar Configuration for ASGI compatibility
-DEBUG_TOOLBAR_CONFIG = {
-    "DISABLE_PANELS": {
-        "debug_toolbar.panels.redirects.RedirectsPanel",
-        "debug_toolbar.panels.templates.TemplatesPanel",
-    },
-    "SHOW_TOOLBAR_CALLBACK": lambda request: DEBUG,
-}
+# DEBUG_TOOLBAR_CONFIG = {
+#     "DISABLE_PANELS": {
+#         "debug_toolbar.panels.redirects.RedirectsPanel",
+#         "debug_toolbar.panels.templates.TemplatesPanel",
+#     },
+#     "SHOW_TOOLBAR_CALLBACK": lambda request: DEBUG,
+# }
 
 ROOT_URLCONF = "ClubManager.urls"
 
@@ -105,6 +106,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "notifications.context_processors.unread_notification_count",
                 "sponsors.context_processors.get_main_sponsors",
+                "messaging.context_processors.unread_messages_count",
             ],
         },
     },

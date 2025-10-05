@@ -67,12 +67,36 @@
                             </a>
                         </li>
 
-                        <li class="border-b border-neutral {% if messages_url in request.path %}border-neutral-content{% endif %} hidden lg:block">
+                        <li class="border-b border-neutral {% if messages_url in request.path %}border-neutral-content icon-filled{% endif %} hidden lg:block">
                             <a href="{% url "clubmanager:messages" %}" class="group">
-                                <span class="flex flex-row items-center gap-2">
-                                    <span class="icon icon-rounded group-hover:icon-filled {% if messages_url in request.path %}icon-filled{% endif %}">chat_bubble</span>
-                                    <span class="hidden lg:block">{% translate "Messages" %}</span>
-                                </span>
+                                <div x-data x-init="
+                                    const update = async () => {
+                                        try {
+                                            const res = await fetch('{% url "clubmanager:messages-check" %}', {
+                                                headers: {
+                                                    'X-Alpine-Request': 'true',
+                                                    'X-Alpine-Target': 'messages_icon'
+                                                },
+                                                'credentials': 'same-origin'
+                                            });
+                                            if (!res.ok) return;
+                                            $el.innerHTML = await res.text();
+                                        } catch (e) { console.error(e); }
+                                    };
+                                    update();
+                                    setInterval(update, 60000);
+                                    " class="flex flex-row items-center">
+                                    {% partialdef messages_icon inline %}
+                                        {% if unread_messages_count >= 1 %}
+                                            <span class="indicator" id="messages_icon" x-sync>
+                                                <span class="indicator-item status status-error"></span>
+                                                <span class="icon icon-rounded group-hover:icon-filled">chat_bubble</span>
+                                            </span>
+                                        {% else %}
+                                            <span x-sync id="messages_icon" class="icon icon-rounded group-hover:icon-filled">chat_bubble</span>
+                                        {% endif %}
+                                    {% endpartialdef messages_icon %}
+                                </div><span class="hidden lg:block">{% translate "Messages" %}</span>
                             </a>
                         </li>
 
@@ -96,13 +120,13 @@
                                     setInterval(update, 60000);
                                     " class="flex flex-row items-center">
                                     {% partialdef notification_icon inline %}
-                                        {% if unread_notification_count > 0 %}
-                                            <span class="indicator" id="notification_icon">
+                                        {% if unread_notification_count >= 1 %}
+                                            <span x-sync class="indicator" id="notification_icon">
                                                 <span class="indicator-item status status-error"></span>
                                                 <span class="icon icon-rounded group-hover:icon-filled">notifications</span>
                                             </span>
                                         {% else %}
-                                            <span id="notification_icon" class="icon icon-rounded group-hover:icon-filled">notifications</span>
+                                            <span x-sync id="notification_icon" class="icon icon-rounded group-hover:icon-filled">notifications</span>
                                         {% endif %}
                                     {% endpartialdef notification_icon %}
                                 </div><span class="hidden lg:block">{% translate "Notifications" %}</span>

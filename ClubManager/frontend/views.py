@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Prefetch, Count, Case, When, Value, BooleanField
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
@@ -11,6 +11,7 @@ from generic_notifications.channels import WebsiteChannel
 from generic_notifications.utils import get_notifications, mark_notifications_as_read
 
 from activities.models import Activity, Registration, grouped_by_response
+from messaging.models import Conversation, Message, ConversationParticipant
 from news.models import NewsItem
 from ..lib import AlpineTemplateResponse, is_alpine
 
@@ -108,7 +109,39 @@ def notifications(request: HttpRequest, notification_pk: int | None = None, mark
 
 
 @login_required
-def chat(request: HttpRequest) -> HttpResponse: ...
+def chat(request: HttpRequest, conversation_pk: int | None = None) -> HttpResponse:
+    conversations = Conversation.objects.for_user(request.user).with_unread_count(request.user).with_last_message().order_by("-last_message_time").prefetch_related("participants", "participants__user")
+    conversation_set = True
+
+    if conversation_pk is None:
+        conversation_pk = conversations.first().pk
+        conversation_set = False
+
+    selected_conversation = Conversation.objects.prefetch_related(
+        Prefetch("participants", queryset=ConversationParticipant.objects.filter(is_active=True).select_related("user")),
+        Prefetch(
+            "messages",
+            queryset=Message.objects.filter(is_deleted=False)
+            .select_related("sender")
+            .annotate(
+                total_recipients=Count("readstatus"),
+                read_count=Count("readstatus", filter=Q(readstatus__read_at__isnull=False)),
+                read_by_all=Case(When(total_recipients__gt=0, read_count=Count("readstatus"), then=Value(True)), default=Value(False), output_field=BooleanField()),
+            )
+            .order_by("sent_at"),
+        ),
+    ).get(pk=conversation_pk)
+
+    unread_messages = selected_conversation.messages.unread_for_user(request.user)
+    for message in unread_messages:
+        message.mark_as_read_by(request.user)
+
+    return AlpineTemplateResponse(
+        request,
+        "ClubManager/chat.html",
+        {"conversations": conversations, "conversation_pk": conversation_pk, "selected_conversation": selected_conversation, "conversation_set": conversation_set},
+        partial_template="messages_update",
+    )
 
 
 @login_required

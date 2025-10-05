@@ -2,6 +2,9 @@ from hashlib import md5
 from math import sqrt
 
 from django import template
+from django.contrib.auth.models import AbstractUser
+
+from messaging.models import Conversation
 
 register = template.Library()
 
@@ -55,3 +58,10 @@ def avatar(first_name: str = "", last_name: str = "", initials: str = "", width:
         "background": "#%02x%02x%02x" % (avatar_background["R"], avatar_background["G"], avatar_background["B"]),  # noqa: UP031
         "foreground": "#%02x%02x%02x" % (avatar_foreground["R"], avatar_foreground["G"], avatar_foreground["B"]),  # noqa: UP031
     }
+
+
+@register.inclusion_tag("templatetags/avatar_message.html")
+def avatar_messages(conversation: Conversation, user: AbstractUser) -> dict:
+    participants = conversation.participants.exclude(user=user)
+
+    return {"participants": [avatar(participant.user.first_name, participant.user.last_name) for participant in participants]}

@@ -7,13 +7,13 @@
 
 {% partialdef notification_update %}
     {% partial notification_list %}
-    {% include "notifications/notification.html" %}
+    {% include "ClubManager/base.html#notification_icon" %}
 {% endpartialdef %}
 
 {% block content %}
     {% if notifications|length > 0 %}
         <div class="flex flex-row gap-2 justify-center lg:justify-end lg:-mt-14">
-            <a class="btn btn-xs" x-target="notification_list notification_icon" href="{% url "clubmanager:notifications-mark-all-read" %}">{% translate "Mark all as read" %}</a>
+            <a class="btn btn-xs" x-target="notification_list" href="{% url "clubmanager:notifications-mark-all-read" %}">{% translate "Mark all as read" %}</a>
             <a class="btn btn-xs" x-target="notification_list" href="{% url "clubmanager:notifications-delete-all-read" %}">{% translate "Delete all read notifications" %}</a>
         </div>
     {% endif %}
