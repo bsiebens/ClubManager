@@ -212,7 +212,7 @@ class Activity(PolymorphicModel):
         members = Member.objects.filter(Q(user=user) | Q(family_members__user=user)).distinct().values_list("pk", flat=True)
         teams = Team.objects.filter(teammembership__season=Season.for_date(), teammembership__member__in=members).distinct().values_list("pk", flat=True)
 
-        activities = cls.objects.not_instance_of(Practice).filter(Q(teams__in=teams) | Q(members__in=members)).filter(start_time__gte=timezone.now()).select_related("type").order_by("start_time")
+        activities = cls.objects.not_instance_of(Practice).filter(Q(teams__in=teams) | Q(members__in=members)).filter(start_time__gte=timezone.now()).select_related("type").order_by("start_time").prefetch_related("teams")
 
         if include_registrations:
             activities = activities.prefetch_related(

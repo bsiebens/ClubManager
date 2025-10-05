@@ -68,7 +68,7 @@
                         </li>
 
                         <li class="border-b border-neutral {% if messages_url in request.path %}border-neutral-content{% endif %} hidden lg:block">
-                            <a href="" class="group">
+                            <a href="{% url "clubmanager:messages" %}" class="group">
                                 <span class="flex flex-row items-center gap-2">
                                     <span class="icon icon-rounded group-hover:icon-filled {% if messages_url in request.path %}icon-filled{% endif %}">chat_bubble</span>
                                     <span class="hidden lg:block">{% translate "Messages" %}</span>
@@ -142,7 +142,7 @@
                                 {% block content %}{% endblock content %}
                             </div>
 
-                            <div class="basis-1/4 hidden {% if sponsors.count > 0 %}lg:flex{% endif %} flex-col gap-4">
+                            <div class="basis-1/4 hidden {% if sponsors_count > 0 %}lg:flex{% endif %} flex-col gap-4">
                                 <div class="font-jersey text-xl font-semibold mb-2">@Something</div>
                                 <div class="flex flex-col gap-4">
                                     <div class="flex w-full flex-col gap-4">
@@ -168,7 +168,7 @@
                                     </div>
                                 </div>
 
-                                {% if sponsors.count > 0 %}
+                                {% if sponsors_count > 0 %}
                                     <div class="font-jersey mb-2">Sponsors</div>
                                     <div class="grid grid-cols-2 gap-4 justify-items-center content-center">
                                         {% for sponsor in sponsors %}
@@ -192,7 +192,7 @@
                     </div>
 
                     <div class="lg:hidden">
-                        {% if sponsors.count > 0 %}
+                        {% if sponsors_count > 0 %}
                             <div class="font-jersey mb-2">Sponsors</div>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-center content-center">
                                 {% for sponsor in sponsors %}
@@ -239,7 +239,7 @@
                 <span class="dock-label pb-2">{% translate "Calendar" %}</span>
             </a>
 
-            <a href="" class="group {% if messages_url in request.path %}dock-active{% endif %}">
+            <a href="{% url "clubmanager:messages" %}" class="group {% if messages_url in request.path %}dock-active{% endif %}">
                 <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if messages_url in request.path %}icon-filled{% endif %}">chat_bubble</span>
                 <span class="dock-label pb-2">{% translate "Chat" %}</span>
             </a>
