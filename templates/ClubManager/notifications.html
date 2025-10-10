@@ -21,10 +21,10 @@
     {% partialdef notification_list inline %}
         <ul class="list bg-base-100 my-8" id="notification_list">
             {% if notifications|length == 0 %}
-                <span class="items-center flex flex-row gap-2">
-                    <span class="icon icon-rounded">thumb_up</span>
-                    <span>{% translate "All caught up!" %}</span>
-                </span>
+                <div class="flex flex-row gap-2 items-center w-full opacity-75">
+                    <div class="icon icon-rounded icon-20">thumb_up</div>
+                    <div class="font-semibold text-sm">{% translate "All caught up!" %}</div>
+                </div>
             {% endif %}
 
             {% for notification in notifications %}

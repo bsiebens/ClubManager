@@ -21,5 +21,7 @@ urlpatterns = [
     path("chat/<int:conversation_pk>/", views.chat, name="messages-conversation"),
     path("chat/check/", messaging_views.check_messages, name="messages-check"),
     path("chat/add/", messaging_views.add_message, name="messages-add"),
+    path("chat/new/", messaging_views.create_chat, name="messages-create"),
+    path("chat/delete/", messaging_views.delete_chat, name="messages-delete"),
     path("settings/", views.settings, name="settings"),
 ]

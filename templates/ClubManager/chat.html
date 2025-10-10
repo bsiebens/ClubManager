@@ -15,7 +15,11 @@
 
 {% block content %}
     <div class="flex flex-row gap-8" x-data="{ conversationSet: {{ conversation_set|yesno:'true,false' }} }">
-        <div class="flex w-full lg:basis-2/5" :class="{ 'hidden lg:flex': conversationSet }">
+        <div class="flex flex-col w-full lg:basis-2/5" :class="{ 'hidden lg:flex': conversationSet }">
+            <a class="w-full btn btn-primary mb-2" href="{% url "clubmanager:messages-create" %}">
+                <span class="icon icon-rounded">add</span>{% translate "Send new message" %}
+            </a>
+
             {% if conversations.count > 0 %}
                 {% partialdef conversations_list inline %}
                     <ul class="list w-full" id="conversation_list">
@@ -67,8 +71,9 @@
                     </ul>
                 {% endpartialdef %}
             {% else %}
-                <div>
-                    {% translate "No messages found" %}
+                <div class="flex flex-row gap-2 items-center w-full mt-4 opacity-75 justify-center">
+                    <div class="icon icon-rounded icon-20">chat_dashed</div>
+                    <div class="font-semibold text-sm">{% translate "No messages found" %}</div>
                 </div>
             {% endif %}
         </div>
@@ -94,9 +99,13 @@
                                 {% endif %}
                             </div>
 
-                            <a href="" class="btn btn-error btn-outline btn-sm">
-                                <div class="icon icon-rounded">delete</div>
-                            </a>
+                            <form method="post" action="{% url "clubmanager:messages-delete" %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="conversation_pk" value="{{ selected_conversation.pk }}" />
+                                <button type="submit" class="btn btn-error btn-outline btn-sm">
+                                    <span class="icon icon-rounded">delete</span>
+                                </button>
+                            </form>
                         </div>
 
                         <div class="overflow-y-auto flex-1 mb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style="max-height: calc(100vh - 500px);" x-init="$el.scrollTop = $el.scrollHeight" x-effect="$el.scrollTop = $el.scrollHeight">

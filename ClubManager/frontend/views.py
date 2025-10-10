@@ -145,6 +145,5 @@ def chat(request: HttpRequest, conversation_pk: int | None = None) -> HttpRespon
         partial_template="messages_update",
     )
 
-
 @login_required
 def settings(request: HttpRequest) -> HttpResponse: ...
