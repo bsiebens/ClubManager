@@ -112,25 +112,27 @@ def notifications(request: HttpRequest, notification_pk: int | None = None, mark
 def conversations(request: HttpRequest, conversation_pk: int | None = None) -> HttpResponse:
     conversations_for_user = Conversation.objects.for_user(request.user).with_unread_count(request.user).with_last_message().order_by("-last_message_time").prefetch_related("participants", "participants__user")
     conversation_set = True
+    selected_conversation = None
 
     if conversation_pk is None:
-        conversation_pk = conversations_for_user.first().pk
+        conversation_pk = conversations_for_user.first().pk if conversations.count() > 0 else None
         conversation_set = False
 
-    selected_conversation = Conversation.objects.prefetch_related(
-        Prefetch("participants", queryset=ConversationParticipant.objects.filter(is_active=True).select_related("user")),
-        Prefetch(
-            "messages",
-            queryset=Message.objects.filter(is_deleted=False)
-            .select_related("sender")
-            .annotate(
-                total_recipients=Count("readstatus"),
-                read_count=Count("readstatus", filter=Q(readstatus__read_at__isnull=False)),
-                read_by_all=Case(When(total_recipients__gt=0, read_count=Count("readstatus"), then=Value(True)), default=Value(False), output_field=BooleanField()),
-            )
-            .order_by("sent_at"),
-        ),
-    ).get(pk=conversation_pk)
+    if conversation_pk is not None:
+        selected_conversation = Conversation.objects.prefetch_related(
+            Prefetch("participants", queryset=ConversationParticipant.objects.filter(is_active=True).select_related("user")),
+            Prefetch(
+                "messages",
+                queryset=Message.objects.filter(is_deleted=False)
+                .select_related("sender")
+                .annotate(
+                    total_recipients=Count("readstatus"),
+                    read_count=Count("readstatus", filter=Q(readstatus__read_at__isnull=False)),
+                    read_by_all=Case(When(total_recipients__gt=0, read_count=Count("readstatus"), then=Value(True)), default=Value(False), output_field=BooleanField()),
+                )
+                .order_by("sent_at"),
+            ),
+        ).get(pk=conversation_pk)
 
     # Only mark as read if:
     # 1. On desktop (non-Alpine) and a conversation was explicitly selected, OR

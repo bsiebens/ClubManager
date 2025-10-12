@@ -28,6 +28,7 @@ dependencies = [
     "django-markdownx>=4.0.9",
     "twisted[http2,tls]>=25.5.0",
     "daphne>=4.2.1",
+    "channels>=4.3.1",
 ]
 
 [dependency-groups]

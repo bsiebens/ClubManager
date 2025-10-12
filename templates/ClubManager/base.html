@@ -75,7 +75,7 @@
                                             const res = await fetch('{% url "clubmanager:conversations-check" %}', {
                                                 headers: {
                                                     'X-Alpine-Request': 'true',
-                                                    'X-Alpine-Target': 'messages_icon'
+                                                    'X-Alpine-Target': 'conversations_icon'
                                                 },
                                                 'credentials': 'same-origin'
                                             });
@@ -86,16 +86,16 @@
                                     update();
                                     setInterval(update, 60000);
                                     " class="flex flex-row items-center">
-                                    {% partialdef messages_icon inline %}
+                                    {% partialdef conversations_icon inline %}
                                         {% if unread_messages_count >= 1 %}
-                                            <span class="indicator" id="messages_icon" x-sync>
+                                            <span class="indicator" id="conversations_icon" x-sync>
                                                 <span class="indicator-item status status-error"></span>
                                                 <span class="icon icon-rounded group-hover:icon-filled">chat_bubble</span>
                                             </span>
                                         {% else %}
-                                            <span x-sync id="messages_icon" class="icon icon-rounded group-hover:icon-filled">chat_bubble</span>
+                                            <span x-sync id="conversations_icon" class="icon icon-rounded group-hover:icon-filled">chat_bubble</span>
                                         {% endif %}
-                                    {% endpartialdef messages_icon %}
+                                    {% endpartialdef conversations_icon %}
                                 </div><span class="hidden lg:block">{% translate "Conversations" %}</span>
                             </a>
                         </li>
@@ -143,10 +143,10 @@
                         </li>
 
                         {% if request.user.is_staff %}
-                            <li class="border-b border-neutral {% if messages_url in request.path %}border-neutral-content{% endif %} hidden lg:block">
+                            <li class="border-b border-neutral {% if conversations_url in request.path %}border-neutral-content{% endif %} hidden lg:block">
                                 <a href="" class="group">
                                     <span class="flex flex-row items-center gap-2">
-                                    <span class="icon icon-rounded group-hover:icon-filled {% if messages_url in request.path %}icon-filled{% endif %}">shield_person</span>
+                                    <span class="icon icon-rounded group-hover:icon-filled {% if conversations_url in request.path %}icon-filled{% endif %}">shield_person</span>
                                     <span class="hidden lg:block">{% translate "Admin" %}</span>
                                 </span>
                                 </a>
