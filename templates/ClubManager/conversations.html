@@ -10,72 +10,75 @@
 {% partialdef messages_update %}
     {% partial conversations_list %}
     {% partial messages_list %}
-    {% include "ClubManager/base.html#messages_icon" %}
+    {% include "ClubManager/base.html#conversations_icon" %}
 {% endpartialdef %}
 
 {% block content %}
-    <div class="flex flex-row gap-8" x-data="{ conversationSet: {{ conversation_set|yesno:'true,false' }} }">
-        <div class="flex w-full lg:basis-2/5" :class="{ 'hidden lg:flex': conversationSet }">
-            <a class="w-full btn btn-primary mb-2" href="{% url "clubmanager:messages-create" %}">
-                <span class="icon icon-rounded">add</span>{% translate "Send new message" %}
+    <div class="flex gap-8" x-data="{ conversationSet: {{ conversation_set|yesno:'true,false' }} }">
+        <div class="flex flex-col w-full lg:basis-2/5" :class="{ 'hidden lg:flex': conversationSet }">
+            <a class="w-full btn btn-primary mb-4" href="{% url "clubmanager:conversations-create" %}" x-target="conversation_form" x-init @ajax:before="$dispatch('dialog:open')">
+                <span class="icon icon-rounded">add</span> {% translate "Create new conversation" %}
             </a>
 
-            {% partialdef conversations_list inline %}
-                <ul class="list w-full" id="conversation_list">
-                    {% for conversation in conversations %}
-                        <a href="{% url "clubmanager:conversations-conversation" conversation.pk %}"
-                           x-target="conversation_list messages_list messages_pk"
-                           @ajax:success="conversationSet = true"
-                           @click="if (!$el.href.includes('mark_read=true')) { $el.href += '?mark_read=true'; }">
-                            <li class="list-row items-center {% if conversation.pk == conversation_pk %}lg:bg-base-200{% endif %} hover:bg-base-200">
-                                <div class="list-col-grow">
-                                    <div class="flex flex-row gap-1 items-center mb-1">
-                                        <div class="font-bold text-lg">
-                                            {% if conversation.conversation_type == "private" %}
-                                                {% for participant in conversation.participants.all %}
-                                                    {% if participant.user != request.user %}
-                                                        {{ participant.user.get_full_name }}
+            {% if conversations|length > 0 %}
+                <ul class="list w-full">
+                    {% partialdef conversations_list inline %}
+                        <ul class="list w-full" id="conversation_list" @conversation:created.window="$ajax('{% url "clubmanager:conversations" %}')">
+                            {% for conversation in conversations %}
+                                <a href="{% url "clubmanager:conversations-conversation" conversation.pk %}"
+                                   x-target="conversation_list messages_list conversation_pk"
+                                   @ajax:success="conversationSet = true"
+                                   @click="if (!$el.href.includes('mark_read=true')) { $el.href += '?mark_read=true'; }">
+                                    <li class="list-row items-center {% if conversation.pk == conversation_pk %}lg:bg-neutral/80 lg:text-neutral-content lg:hover:bg-neutral/80{% endif %} hover:bg-base-200">
+                                        <div class="list-col-grow">
+                                            <div class="flex flex-row gap-1 items-center mb-1">
+                                                <div class="font-bold text-lg">
+                                                    {% if conversation.conversation_type == "private" %}
+                                                        {% for participant in conversation.participants.all %}
+                                                            {% if participant.user != request.user %}
+                                                                {{ participant.user.get_full_name }}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        {{ conversation.name }}
                                                     {% endif %}
-                                                {% endfor %}
-                                            {% else %}
-                                                {{ conversation.name }}
-                                            {% endif %}
-                                        </div>
+                                                </div>
 
-                                            {% if conversation.unread_count >= 1 %}
-                                                <div class="status status-error"></div>
-                                            {% endif %}
+                                                {% if conversation.unread_count >= 1 %}
+                                                    <div class="status status-error"></div>
+                                                {% endif %}
+
+                                                {% if conversation.last_message_time %}
+                                                    <div class="icon icon-rounded opacity-75 icon-20 text-sm ml-4 hidden md:flex">schedule</div>
+                                                    <div class="opacity-75 text-xs hidden md:flex">{{ conversation.last_message_time|naturaltime }}</div>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="text-xs opacity-75">{{ conversation.last_message_content|truncatechars_html:"60" }}</div>
 
                                             {% if conversation.last_message_time %}
-                                                <div class="icon icon-rounded opacity-75 icon-20 text-sm ml-4 hidden md:flex">schedule</div>
-                                                <div class="opacity-75 text-xs hidden md:flex">{{ conversation.last_message_time|naturaltime }}</div>
+                                                <div class="flex flex-row gap-2 mt-2">
+                                                    <div class="icon icon-rounded opacity-75 icon-20 text-sm md:hidden">schedule</div>
+                                                    <div class="opacity-75 text-xs md:hidden">{{ conversation.last_message_time|naturaltime }}</div>
+                                                </div>
                                             {% endif %}
                                         </div>
 
-                                        <div class="text-xs opacity-75">{{ conversation.last_message_content|truncatechars_html:"60" }}</div>
+                                        <div class="hidden md:flex">
+                                            {% avatar_messages conversation request.user %}
+                                        </div>
 
-                                        {% if conversation.last_message_time %}
-                                            <div class="flex flex-row gap-2 mt-2">
-                                                <div class="icon icon-rounded opacity-75 icon-20 text-sm md:hidden">schedule</div>
-                                                <div class="opacity-75 text-xs md:hidden">{{ conversation.last_message_time|naturaltime }}</div>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-
-                                    <div class="hidden md:flex">
-                                        {% avatar_messages conversation request.user %}
-                                    </div>
-
-                                    <div class="icon icon-rounded icon-40 opacity-75 text-3xl">chevron_right</div>
-                                </li>
-                            </a>
-                        {% endfor %}
-                    </ul>
-                {% endpartialdef %}
+                                        <div class="icon icon-rounded icon-40 opacity-80 text-3xl">chevron_right</div>
+                                    </li>
+                                </a>
+                            {% endfor %}
+                        </ul>
+                    {% endpartialdef conversations_list %}
+                </ul>
             {% else %}
                 <div class="flex flex-row gap-2 items-center w-full mt-4 opacity-75 justify-center">
                     <div class="icon icon-rounded icon-20">chat_dashed</div>
-                    <div class="font-semibold text-sm">{% translate "No messages found" %}</div>
+                    <div class="font-semibold text-sm">{% translate "No conversations found" %}</div>
                 </div>
             {% endif %}
         </div>
@@ -83,29 +86,38 @@
         <div class="grow lg:basis-3/5 flex flex-col gap-y-4" :class="{ 'hidden lg:flex': !conversationSet }" x-data="{ markReadTimer: null }" x-init="if (window.innerWidth >= 1024 && {{ conversation_pk|default:'null' }}) { markReadTimer = setTimeout(() => { $refs.markReadLink.click(); }, 3000); }" @destroyed="if (markReadTimer) clearTimeout(markReadTimer)">
             {% if selected_conversation is not None %}
                 {% partialdef messages_list inline %}
-                    <a href="{% url 'clubmanager:conversations-conversation' conversation_pk %}?mark_read=true"
-                       x-ref="markReadLink"
-                       x-target="conversation_list"
-                       class="hidden"></a>
+                    <a href="{% url "clubmanager:conversations-conversation" conversation_pk %}?mark_read=true" x-ref="markReadLink" x-target="conversation_list" class="hidden"></a>
+
                     <div id="messages_list" class="flex flex-col h-full">
                         <div class="flex flex-row gap-2 items-center mb-4 pb-2">
                             <a href="{% url "clubmanager:conversations" %}" class="btn btn-ghost btn-sm lg:opacity-0" @click.prevent="conversationSet = false">
                                 <div class="icon icon-rounded">chevron_left</div>
                             </a>
 
-                            <div class="text-center font-semibold text-xl tracking-wide grow">
-                                {% if selected_conversation.conversation_type == "private" %}
-                                    {% for participant in selected_conversation.participants.all %}
-                                        {% if participant.user != request.user %}
+                            <div class="flex flex-col grow items-center gap-2">
+                                <div class="font-semibold text-xl tracking-wide grow">
+                                    {% if selected_conversation.conversation_type == "private" %}
+                                        {% for participant in selected_conversation.participants.all %}
+                                            {% if participant.user != request.user %}
+                                                {{ participant.user.get_full_name }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        {{ selected_conversation.name }}
+                                    {% endif %}
+                                </div>
+
+                                {% if selected_conversation.conversation_type != "private" %}
+                                    <div class="text-xs opacity-75">
+                                        {% for participant in selected_conversation.participants.all %}
                                             {{ participant.user.get_full_name }}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    {{ selected_conversation.name }}
+                                            {% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </div>
                                 {% endif %}
                             </div>
 
-                            <form method="post" action="{% url "clubmanager:messages-delete" %}">
+                            <form method="post" action="{% url "clubmanager:conversations-delete" %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="conversation_pk" value="{{ selected_conversation.pk }}" />
                                 <button type="submit" class="btn btn-error btn-outline btn-sm">
@@ -114,19 +126,19 @@
                             </form>
                         </div>
 
-                    <div class="overflow-y-auto flex-1 mb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-h-[calc(100vh-400px)] lg:max-h-[calc(100vh-450px)]" x-init="$el.scrollTop = $el.scrollHeight" x-effect="$el.scrollTop = $el.scrollHeight">
-                        {% for message in selected_conversation.messages.all %}
-                            <div class="chat {% if request.user == message.sender %}chat-end{% else %}chat-start{% endif %}">
-                                <div class="chat-image">
-                                    {% avatar message.sender.first_name message.sender.last_name %}
-                                </div>
+                        <div class="overflow-y-auto flex-1 mb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-h-[calc(100vh-400px)] lg:max-h-[calc(100vh-450px)]" x-init="$el.scrollTop = $el.scrollHeight" x-effect="$el.scrollTop = $el.scrollHeight">
+                            {% for message in selected_conversation.messages.all %}
+                                <div class="chat {% if request.user == message.sender %}chat-end{% else %}chat-start{% endif %}">
+                                    <div class="chat-image">
+                                        {% avatar message.sender.first_name message.sender.last_name %}
+                                    </div>
 
                                     <div class="chat-header mb-1 font-semibold">
                                         {{ message.sender.get_full_name }}
                                         <span class="opacity-60 font-normal">{{ message.sent_at|naturaltime }}</span>
                                     </div>
 
-                                    <div class="chat-bubble {% if request.user == message.sender %}chat-bubble-secondary{% endif %}">{{ message.content }}</div>
+                                    <div class="chat-bubble {% if request.user == message.sender %}chat-bubble-primary{% endif %}">{{ message.content }}</div>
 
                                     {% if request.user == message.sender %}
                                         <div class="chat-footer opacity-60 items-center">
@@ -142,12 +154,12 @@
                         </div>
                     </div>
 
-                <form method="post" action="{% url "clubmanager:conversations-add-message" %}" x-target="messages_list messages_pk conversation_list" x-data="{ loading: false }" @ajax:before="loading = true; $el.querySelector('input[name=message]').value = ''" @ajax:after="loading = false">
-                    {% csrf_token %}
-                    <input type="hidden" name="conversation_pk" value="{{ selected_conversation.pk }}" id="messages_pk" />
+                    <form method="post" action="{% url "clubmanager:conversations-add-message" %}" x-target="messages_list conversation_pk conversation_list" x-data="{ loading: false }" @ajax:before="loading = true; $el.querySelector('input[name=message]').value = ''" @ajax:after="loading = false">
+                        {% csrf_token %}
+                        <input type="hidden" name="conversation_pk" value="{{ selected_conversation.pk }}" id="conversation_pk" />
 
                         <div class="flex flex-row gap-2 items-center">
-                            <input type="text" class="input w-full" placeholder="{% translate "New message ..." %}" name="message" required />
+                            <input type="text" class="input w-full" placeholder="{% translate "New message ... " %}" name="message" required />
                             <button type="submit" class="btn btn-neutral btn-outline" :disabled="loading">
                                 <span class="icon icon-rounded" x-show="!loading">send</span>
                                 <span class="loading loading-spinner loading-sm" x-show="loading" x-cloak></span>
@@ -159,4 +171,8 @@
             {% endif %}
         </div>
     </div>
+
+    <dialog x-init @dialog:open.window="$el.showModal()" @conversation:created.window="$el.close()" class="modal modal-bottom sm:modal-middle">
+        <div id="conversation_form"></div>
+    </dialog>
 {% endblock content %}

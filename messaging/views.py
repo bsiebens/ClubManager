@@ -1,16 +1,16 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 
+from ClubManager.lib import AlpineTemplateResponse, is_alpine
 from .models import Conversation, ConversationParticipant, Message
 
 
 @login_required
 def check_messages(request: HttpRequest) -> HttpResponse:
-    return render(request, "ClubManager/base.html#messages_icon")
+    return render(request, "ClubManager/base.html#conversations_icon")
 
 
 @login_required
@@ -22,45 +22,51 @@ def add_message(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
     if is_participant:
         Message.objects.create(conversation=conversation, sender=request.user, content=request.POST.get("message"))
 
-        return redirect("clubmanager:messages-conversation", conversation_pk=conversation.pk)
+        return redirect("clubmanager:conversations-conversation", conversation_pk=conversation.pk)
 
     return redirect("conversations")
 
+
 @login_required
-def create_chat(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
+def create_conversation(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
     if request.method == "POST":
-        recipients = request.POST.get("recipients")
+        recipients = request.POST.getlist("recipients")
         name = request.POST.get("name")
-        
+
         recipients = get_user_model().objects.filter(pk__in=recipients)
         conversation = None
         if recipients.count() == 1:
             conversation = Conversation.objects.get_or_create_private_conversation(request.user, recipients[0])[0]
-        
+
         else:
             conversation = Conversation.objects.create(conversation_type=Conversation.ConversationTypes.GROUP, created_by=request.user, name=name)
             ConversationParticipant.objects.create(conversation=conversation, user=request.user)
-            
+
             for recipient in recipients:
                 ConversationParticipant.objects.create(conversation=conversation, user=recipient)
-                
-        return redirect("clubmanager:messages-conversation", conversation_pk=conversation.pk)
-    
+
+        if is_alpine(request):
+            print("running")
+            return AlpineTemplateResponse(request, "ClubManager/conversations_new_form.html", {"conversation": conversation}, partial_template="conversation_form_response")
+
+        return redirect("clubmanager:conversations-conversation", conversation_pk=conversation.pk)
+
     active_users = get_user_model().objects.filter(is_active=True).exclude(pk=request.user.pk).order_by("last_name", "first_name")
-    
-    return render(request, "ClubManager/chat_new_form.html", {"active_users": active_users})
+
+    return AlpineTemplateResponse(request, "ClubManager/conversations_new_form.html", {"active_users": active_users}, partial_template="conversation_form")
 
 
 @login_required
 @require_POST
-def delete_chat(request: HttpRequest) -> HttpResponseRedirect:
+def delete_conversation(request: HttpRequest) -> HttpResponseRedirect:
     if request.method == "POST":
         conversation = Conversation.objects.get(pk=request.POST.get("conversation_pk"))
-        
+
         if conversation.get_active_participants().filter(user=request.user).exists():
             conversation.get_active_participants().get(user=request.user).leave()
-        
-    return redirect("clubmanager:messages")
+
+    return redirect("clubmanager:conversations")
+
 
 # class ConversationViewSet(viewsets.ModelViewSet):
 #     """

@@ -1,0 +1,131 @@
+{% extends "ClubManager/base.html" %}
+
+{% load i18n %}
+{% load partials %}
+{% load humanize %}
+{% load avatar %}
+
+{% block title %}Conversations{% endblock title %}
+
+{% block content %}
+    {% partialdef conversation_form_response %}
+        <div id="conversation_form" x-target="conversation_form">
+            <div x-init="$dispatch('conversation:created')"></div>
+        </div>
+    {% endpartialdef %}
+
+    {% partialdef conversation_form inline %}
+        <div id="conversation_form" class="modal-box min-w-1/2 max-w-5xl">
+            <h3 class="text-lg font-bold mb-2">{% translate "Create new conversation" %}</h3>
+            <div class="text-sm mb-2">
+                {% blocktranslate %}
+                    Select the users that need to be a part of the conversation, you can optionally specify a name for this conversation as well (only used for group conversations).
+                {% endblocktranslate %}
+            </div>
+
+            <form method="POST" x-target="conversation_form" action="{% url "clubmanager:conversations-create" %}">
+                {% csrf_token %}
+
+                <!-- Multiselect Component -->
+                <fieldset class="fieldset w-full mb-4">
+                    <legend class="fieldset-legend text-sm">
+                        {% translate "Recipients" %}
+                    </legend>
+                    <div class="multiselect-container" data-name="recipients" data-options='[{% for user in active_users %}{"id": {{ user.pk }}, "label": "{{ user.get_full_name|escapejs }}", "value": "{{ user.pk }}"}{% if not forloop.last %},{% endif %}{% endfor %}]'>
+                        <!-- Selected items display -->
+                        <div class="selected-items flex flex-wrap gap-2 mb-2"></div>
+
+                        <!-- Search input with dropdown -->
+                        <div class="relative">
+                            <input
+                                type="text"
+                                class="multiselect-input input input-bordered w-full"
+                                placeholder="{% translate 'Search and select...' %}"
+                                autocomplete="off"
+                            />
+
+                            <!-- Dropdown menu -->
+                            <div class="multiselect-dropdown hidden absolute z-50 w-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                <ul class="menu p-2">
+                                    <!-- Options will be populated here -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="fieldset w-full mb-4">
+                    <legend class="fieldset-legend text-sm">
+                        {% translate "Conversation name" %}
+                    </legend>
+                    <input name="name" type="text" class="input input-bordered w-full" />
+                </fieldset>
+
+                <div class="modal-action">
+                    <button type="submit" class="btn btn-neutral"><span class="icon icon-rounded icon-20">add</span>{% translate "Create new conversation" %}</button>
+                    <button type="button" class="btn btn-neutral btn-outline" @click="$el.closest('dialog').close()">{% translate "Cancel" %}</button>
+                </div>
+            </form>
+
+            <style>
+                .multiselect-container {
+                    position: relative;
+                }
+
+                .selected-items {
+                    min-height: 0;
+                }
+
+                .selected-item {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    padding: 0.25rem 0.5rem;
+                    background-color: hsl(var(--p));
+                    color: hsl(var(--pc));
+                    border-radius: 0.5rem;
+                    font-size: 0.875rem;
+                }
+
+                .selected-item button {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 1rem;
+                    height: 1rem;
+                    border-radius: 50%;
+                    background-color: rgba(0, 0, 0, 0.2);
+                    border: none;
+                    cursor: pointer;
+                    color: inherit;
+                    transition: background-color 0.2s;
+                }
+
+                .selected-item button:hover {
+                    background-color: rgba(0, 0, 0, 0.3);
+                }
+
+                .multiselect-dropdown li {
+                    cursor: pointer;
+                }
+
+                .multiselect-dropdown li a {
+                    width: 100%;
+                    display: block;
+                }
+
+                .multiselect-dropdown li.selected {
+                    display: none;
+                }
+
+                .multiselect-dropdown li:hover:not(.selected) {
+                    background-color: hsl(var(--b3));
+                }
+
+                .multiselect-dropdown li.hidden {
+                    display: none;
+                }
+            </style>
+        </div>
+    {% endpartialdef conversation_form %}
+{% endblock content %}

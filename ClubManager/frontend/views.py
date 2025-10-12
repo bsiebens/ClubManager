@@ -115,7 +115,7 @@ def conversations(request: HttpRequest, conversation_pk: int | None = None) -> H
     selected_conversation = None
 
     if conversation_pk is None:
-        conversation_pk = conversations_for_user.first().pk if conversations.count() > 0 else None
+        conversation_pk = conversations_for_user.first().pk if conversations_for_user.count() > 0 else None
         conversation_set = False
 
     if conversation_pk is not None:
