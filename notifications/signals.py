@@ -8,3 +8,27 @@
 # # @receiver(post_save, sender=Notification)
 # # def alert_new_notifications(instance, **kwargs) -> None:
 # #     send_notification_to_consumer(instance.recipient)
+
+from constance import config
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils.html import strip_tags
+from generic_notifications.models import Notification
+from webpush import send_user_notification
+
+
+@receiver(post_save, sender=Notification)
+def send_web_push_notification(instance, **kwargs) -> None:
+    url = "http://127.0.0.1:8000"
+    head = f"ClubManager - {instance.subject}"
+    icon = ""
+
+    if config.CM_CLUB_NAME is not None or config.CM_CLUB_NAME != "":
+        head = f"{config.CM_CLUB_NAME} - {instance.subject}"
+
+    if config.CM_CLUB_LOGO is not None or config.CM_CLUB_LOGO != "":
+        icon = f"{url}/static/{config.CM_CLUB_LOGO}"
+
+    payload = {"head": head, "body": strip_tags(instance.text), "url": f"{url}{instance.get_absolute_url()}", "icon": icon}
+
+    send_user_notification(user=instance.recipient, payload=payload, ttl=1000)

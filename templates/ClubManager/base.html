@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load partials %}
 {% load tailwind_tags %}
+{% load webpush_notifications %}
 
 {% with CM_CLUB_NAME=config.CM_CLUB_NAME CM_CLUB_LOGO=config.CM_CLUB_LOGO %}
     <!DOCTYPE html>
@@ -25,6 +26,8 @@
 
         <!--suppress JSUnresolvedLibraryURL -->
         <script src="https://kit.fontawesome.com/8189f10079.js" crossorigin="anonymous"></script>
+
+        {% webpush_header %}
     </head>
     <body>
         {% url "clubmanager:news" as news_url %}

@@ -29,6 +29,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("admin/", admin.site.urls),
     path("markdownx/", include("markdownx.urls")),
+    path("webpush/", include("webpush.urls")),
 ]
 
 if settings.DEBUG:

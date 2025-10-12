@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "recurrence",
     "tailwind",
     "markdownx",
+    "webpush",
     "theme.apps.ThemeConfig",
     "members.apps.MembersConfig",
     "notifications.apps.NotificationsConfig",
@@ -200,3 +201,9 @@ REST_FRAMEWORK = {
 TAILWIND_APP_NAME = "theme"
 
 NPM_BIN_PATH = config("NPM_BIN_PATH", default="npm")
+
+WEBPUSH_SETTINGS = {
+    "VAPID_PUBLIC_KEY": config("VAPID_PUBLIC_KEY", default=""),
+    "VAPID_PRIVATE_KEY": config("VAPID_PRIVATE_KEY", default=""),
+    "VAPID_ADMIN_EMAIL": config("VAPID_ADMIN_EMAIL", default=""),
+}

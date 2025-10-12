@@ -13,3 +13,10 @@ class RegistrationNotification(NotificationType):
     key: str = "registration"
     name: str = "Registration Notifications"
     description: str = "Notification for new registrations."
+
+
+@register
+class MessageNotification(NotificationType):
+    key: str = "message"
+    name: str = "Message Notifications"
+    description: str = "Notification for new messages."

@@ -29,6 +29,7 @@ dependencies = [
     "twisted[http2,tls]>=25.5.0",
     "daphne>=4.2.1",
     "channels>=4.3.1",
+    "django-webpush>=0.3.6",
 ]
 
 [dependency-groups]
