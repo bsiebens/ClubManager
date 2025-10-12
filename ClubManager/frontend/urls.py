@@ -17,9 +17,9 @@ urlpatterns = [
     path("notifications/mark-all-read/", views.notifications, {"mark_read": True}, name="notifications-mark-all-read"),
     path("notifications/delete-all-read/", views.notifications, {"delete_read": True}, name="notifications-delete-all-read"),
     path("notifications/check/", notifications_views.check_notifications, name="notifications-check"),
-    path("chat/", views.chat, name="messages"),
-    path("chat/<int:conversation_pk>/", views.chat, name="messages-conversation"),
-    path("chat/check/", messaging_views.check_messages, name="messages-check"),
-    path("chat/add/", messaging_views.add_message, name="messages-add"),
+    path("conversations/", views.conversations, name="conversations"),
+    path("conversations/<int:conversation_pk>/", views.conversations, name="conversations-conversation"),
+    path("conversations/check/", messaging_views.check_messages, name="conversations-check"),
+    path("conversations/add_message/", messaging_views.add_message, name="conversations-add-message"),
     path("settings/", views.settings, name="settings"),
 ]

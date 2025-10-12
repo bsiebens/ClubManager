@@ -109,12 +109,12 @@ def notifications(request: HttpRequest, notification_pk: int | None = None, mark
 
 
 @login_required
-def chat(request: HttpRequest, conversation_pk: int | None = None) -> HttpResponse:
-    conversations = Conversation.objects.for_user(request.user).with_unread_count(request.user).with_last_message().order_by("-last_message_time").prefetch_related("participants", "participants__user")
+def conversations(request: HttpRequest, conversation_pk: int | None = None) -> HttpResponse:
+    conversations_for_user = Conversation.objects.for_user(request.user).with_unread_count(request.user).with_last_message().order_by("-last_message_time").prefetch_related("participants", "participants__user")
     conversation_set = True
 
     if conversation_pk is None:
-        conversation_pk = conversations.first().pk
+        conversation_pk = conversations_for_user.first().pk
         conversation_set = False
 
     selected_conversation = Conversation.objects.prefetch_related(
@@ -132,14 +132,26 @@ def chat(request: HttpRequest, conversation_pk: int | None = None) -> HttpRespon
         ),
     ).get(pk=conversation_pk)
 
-    unread_messages = selected_conversation.messages.unread_for_user(request.user)
-    for message in unread_messages:
-        message.mark_as_read_by(request.user)
+    # Only mark as read if:
+    # 1. On desktop (non-Alpine) and a conversation was explicitly selected, OR
+    # 2. On mobile (Alpine) and specifically requesting to mark as read (e.g., when switching to chat view)
+    should_mark_read = False
+    if not is_alpine(request):
+        # Desktop: mark as read when conversation is set (user clicked on it)
+        should_mark_read = conversation_set
+    else:
+        # Mobile: only mark as read when explicitly requested (e.g., via a parameter or when viewing chat)
+        should_mark_read = request.GET.get("mark_read", "false").lower() == "true"
+
+    if should_mark_read:
+        unread_messages = selected_conversation.messages.unread_for_user(request.user)
+        for message in unread_messages:
+            message.mark_as_read_by(request.user)
 
     return AlpineTemplateResponse(
         request,
-        "ClubManager/chat.html",
-        {"conversations": conversations, "conversation_pk": conversation_pk, "selected_conversation": selected_conversation, "conversation_set": conversation_set},
+        "ClubManager/conversations.html",
+        {"conversations": conversations_for_user, "conversation_pk": conversation_pk, "selected_conversation": selected_conversation, "conversation_set": conversation_set},
         partial_template="messages_update",
     )
 

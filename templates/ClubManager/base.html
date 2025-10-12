@@ -28,7 +28,7 @@
         {% url "clubmanager:news" as news_url %}
         {% url "clubmanager:calendar" as calendar_url %}
         {% url "clubmanager:notifications" as notifications_url %}
-        {% url "clubmanager:messages" as messages_url %}
+        {% url "clubmanager:conversations" as messages_url %}
         {% url "clubmanager:settings" as settings_url %}
 
         <div class="flex flex-col h-screen">
@@ -67,12 +67,12 @@
                             </a>
                         </li>
 
-                        <li class="border-b border-neutral {% if messages_url in request.path %}border-neutral-content icon-filled{% endif %} hidden lg:block">
-                            <a href="{% url "clubmanager:messages" %}" class="group">
+                        <li class="border-b border-neutral {% if messages_url in request.path %}border-neutral-content icon-filled{% endif %}">
+                            <a href="{% url "clubmanager:conversations" %}" class="group">
                                 <div x-data x-init="
                                     const update = async () => {
                                         try {
-                                            const res = await fetch('{% url "clubmanager:messages-check" %}', {
+                                            const res = await fetch('{% url "clubmanager:conversations-check" %}', {
                                                 headers: {
                                                     'X-Alpine-Request': 'true',
                                                     'X-Alpine-Target': 'messages_icon'
@@ -96,7 +96,7 @@
                                             <span x-sync id="messages_icon" class="icon icon-rounded group-hover:icon-filled">chat_bubble</span>
                                         {% endif %}
                                     {% endpartialdef messages_icon %}
-                                </div><span class="hidden lg:block">{% translate "Messages" %}</span>
+                                </div><span class="hidden lg:block">{% translate "Conversations" %}</span>
                             </a>
                         </li>
 
@@ -156,7 +156,7 @@
                 </div>
             </div>
 
-            <div class="m-4 lg:m-12 grow pb-20 lg:pb-0">
+            <div class="m-4 mb-2 lg:m-12 lg:mb-0 grow pb-20 lg:pb-0">
                 <div class="max-w-screen-2xl mx-auto">
                     <h1 class="text-3xl font-bold grow">{% block title %}{% endblock title %}</h1>
 
@@ -261,11 +261,6 @@
             <a href="{% url "clubmanager:calendar" %}" class="group {% if calendar_url in request.path %}dock-active{% endif %}">
                 <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if calendar_url in request.path %}icon-filled{% endif %}">calendar_month</span>
                 <span class="dock-label pb-2">{% translate "Calendar" %}</span>
-            </a>
-
-            <a href="{% url "clubmanager:messages" %}" class="group {% if messages_url in request.path %}dock-active{% endif %}">
-                <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if messages_url in request.path %}icon-filled{% endif %}">chat_bubble</span>
-                <span class="dock-label pb-2">{% translate "Chat" %}</span>
             </a>
 
             <a href="" class="group {% if settings_url in request.path %}dock-active{% endif %}">

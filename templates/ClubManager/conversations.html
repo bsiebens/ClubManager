@@ -5,7 +5,7 @@
 {% load humanize %}
 {% load avatar %}
 
-{% block title %}Messages{% endblock title %}
+{% block title %}Conversations{% endblock title %}
 
 {% partialdef messages_update %}
     {% partial conversations_list %}
@@ -19,7 +19,10 @@
             {% partialdef conversations_list inline %}
                 <ul class="list w-full" id="conversation_list">
                     {% for conversation in conversations %}
-                        <a href="{% url "clubmanager:messages-conversation" conversation.pk %}" x-target="conversation_list messages_list messages_pk" @ajax:success="conversationSet = true">
+                        <a href="{% url "clubmanager:conversations-conversation" conversation.pk %}"
+                           x-target="conversation_list messages_list messages_pk"
+                           @ajax:success="conversationSet = true"
+                           @click="if (!$el.href.includes('mark_read=true')) { $el.href += '?mark_read=true'; }">
                             <li class="list-row items-center {% if conversation.pk == conversation_pk %}lg:bg-base-200{% endif %} hover:bg-base-200">
                                 <div class="list-col-grow">
                                     <div class="flex flex-row gap-1 items-center mb-1">
@@ -67,11 +70,15 @@
             {% endpartialdef %}
         </div>
 
-        <div class="grow lg:basis-3/5 flex flex-col gap-y-4" :class="{ 'hidden lg:flex': !conversationSet }">
+        <div class="grow lg:basis-3/5 flex flex-col gap-y-4" :class="{ 'hidden lg:flex': !conversationSet }" x-data="{ markReadTimer: null }" x-init="if (window.innerWidth >= 1024 && {{ conversation_pk|default:'null' }}) { markReadTimer = setTimeout(() => { $refs.markReadLink.click(); }, 3000); }" @destroyed="if (markReadTimer) clearTimeout(markReadTimer)">
             {% partialdef messages_list inline %}
+                <a href="{% url 'clubmanager:conversations-conversation' conversation_pk %}?mark_read=true"
+                   x-ref="markReadLink"
+                   x-target="conversation_list"
+                   class="hidden"></a>
                 <div id="messages_list" class="flex flex-col h-full">
                     <div class="flex flex-row gap-2 items-center mb-4 pb-2">
-                        <a href="{% url "clubmanager:messages" %}" class="btn btn-ghost btn-sm lg:opacity-0" @click.prevent="conversationSet = false">
+                        <a href="{% url "clubmanager:conversations" %}" class="btn btn-ghost btn-sm lg:opacity-0" @click.prevent="conversationSet = false">
                             <div class="icon icon-rounded">chevron_left</div>
                         </a>
 
@@ -92,7 +99,7 @@
                         </a>
                     </div>
 
-                    <div class="overflow-y-auto flex-1 mb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"" style="max-height: calc(100vh - 500px);" x-init="$el.scrollTop = $el.scrollHeight" x-effect="$el.scrollTop = $el.scrollHeight">
+                    <div class="overflow-y-auto flex-1 mb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-h-[calc(100vh-400px)] lg:max-h-[calc(100vh-450px)]" x-init="$el.scrollTop = $el.scrollHeight" x-effect="$el.scrollTop = $el.scrollHeight">
                         {% for message in selected_conversation.messages.all %}
                             <div class="chat {% if request.user == message.sender %}chat-end{% else %}chat-start{% endif %}">
                                 <div class="chat-image">
@@ -120,7 +127,7 @@
                     </div>
                 </div>
 
-                <form method="post" action="{% url "clubmanager:messages-add" %}" x-target="messages_list messages_pk conversation_list" x-data="{ loading: false }" @ajax:before="loading = true; $el.querySelector('input[name=message]').value = ''" @ajax:after="loading = false">
+                <form method="post" action="{% url "clubmanager:conversations-add-message" %}" x-target="messages_list messages_pk conversation_list" x-data="{ loading: false }" @ajax:before="loading = true; $el.querySelector('input[name=message]').value = ''" @ajax:after="loading = false">
                     {% csrf_token %}
                     <input type="hidden" name="conversation_pk" value="{{ selected_conversation.pk }}" id="messages_pk" />
 

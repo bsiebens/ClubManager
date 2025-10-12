@@ -22,7 +22,7 @@ def add_message(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
 
         return redirect("clubmanager:messages-conversation", conversation_pk=conversation.pk)
 
-    return redirect("clubmanager:messages")
+    return redirect("conversations")
 
 
 # class ConversationViewSet(viewsets.ModelViewSet):
