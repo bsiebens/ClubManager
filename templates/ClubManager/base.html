@@ -24,9 +24,6 @@
 
         <script src="{% static "js/multi-select.js" %}"></script>
 
-        <!--suppress JSUnresolvedLibraryURL -->
-        <script src="https://kit.fontawesome.com/8189f10079.js" crossorigin="anonymous"></script>
-
         {% webpush_header %}
     </head>
     <body>
@@ -139,7 +136,7 @@
                         </li>
 
                         <li class="border-b border-neutral {% if settings_url in request.path %}border-neutral-content{% endif %} hidden lg:block">
-                            <a href="" class="group">
+                            <a href="{% url "clubmanager:settings" %}" class="group">
                                 <span class="flex flex-row items-center gap-2">
                                     <span class="icon icon-rounded group-hover:icon-filled {% if settings_url in request.path %}icon-filled{% endif %}">settings</span>
                                     <span class="hidden lg:block">{% translate "Settings" %}</span>
@@ -268,7 +265,7 @@
                 <span class="dock-label pb-2">{% translate "Calendar" %}</span>
             </a>
 
-            <a href="" class="group {% if settings_url in request.path %}dock-active{% endif %}">
+            <a href="{% url "clubmanager:settings" %}" class="group {% if settings_url in request.path %}dock-active{% endif %}">
                 <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if settings_url in request.path %}icon-filled{% endif %}">settings</span>
                 <span class="dock-label pb-2">{% translate "Settings" %}</span>
             </a>

@@ -1,0 +1,81 @@
+{% extends "ClubManager/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load webpush_notifications %}
+
+{% block title %}{% translate "Settings" %}{% endblock title %}
+
+{% block content %}
+    <div class="flex flex-col gap-2">
+        <form>
+            <div class="text-lg font-semibold border-b border-neutral pb-1 mb-1">{% translate "Personal details" %}</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 mb-6">
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">{% translate "First Name" %}</legend>
+                    <input type="text" name="first_name" class="input w-full" required value="{{ member.user.first_name }}" />
+                </fieldset>
+
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">{% translate "Last Name" %}</legend>
+                    <input type="text" name="last_name" class="input w-full" required value="{{ member.user.last_name }}" />
+                </fieldset>
+
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">{% translate "Email" %}</legend>
+                    <input type="email" name="email" class="input w-full" required value="{{ member.user.email }}" />
+                </fieldset>
+
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">{% translate "Birthday" %}</legend>
+                    <input type="date" name="birthday" class="input w-full" value="{{ member.birthday|date:"Y-m-d" }}" />
+                    <p class="label">{% translate "Optional" %}</p>
+                </fieldset>
+
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">{% translate "Phone Number" %}</legend>
+                    <input type="tel" name="phone_number" class="input w-full" value="{{ member.phone_number }}" />
+                    <p class="label">{% translate "Optional" %}</p>
+                </fieldset>
+
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">{% translate "Emergency Phone Number" %}</legend>
+                    <input type="tel" name="emergency_phone_number" class="input w-full" value="{{ member.emergency_phone_number }}" />
+                    <p class="label">{% translate "Optional" %}</p>
+                </fieldset>
+            </div>
+
+            <div class="text-lg font-semibold border-b border-neutral pb-1 mb-2.5">{% translate "Notifications" %}</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 items-center">
+                {% webpush_button with_class="btn btn-sm btn-neutral btn-outline" %}
+                <div class="text-sm text-justify">{% translate "Enable push notifications to receive instant notifications of new activities, changes and messages." %}</div>
+            </div>
+
+            <div class="text-lg font-semibold border-b border-neutral pb-1 mb-1">{% translate "Password" %}</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 mb-6">
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">{% translate "Current Password" %}</legend>
+                    <input type="password" name="password" class="input w-full" required />
+                    <p class="label">{% translate "Enter your current password so we can verify your identity" %}</p>
+                </fieldset>
+
+                <div class="hidden md:block">&nbsp;</div>
+
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">{% translate "New Password" %}</legend>
+                    <input type="password" name="new_password" class="input w-full" required />
+                </fieldset>
+
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">{% translate "New Password (repeat)" %}</legend>
+                    <input type="password" name="new_password_confirmation" class="input w-full" required />
+                </fieldset>
+            </div>
+
+            <button class="btn btn-neutral w-full">
+                <span class="icon icon-rounded icon-20">save</span>
+                {% translate "Save" %}
+            </button>
+        </form>
+    </div>
+{% endblock content %}

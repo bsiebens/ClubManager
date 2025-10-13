@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q, Prefetch, Count, Case, When, Value, BooleanField
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from generic_notifications.channels import WebsiteChannel
@@ -162,4 +162,10 @@ def conversations(request: HttpRequest, conversation_pk: int | None = None) -> H
 
 
 @login_required
-def settings(request: HttpRequest) -> HttpResponse: ...
+def settings(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        ...
+
+    member = request.user.member
+
+    return render(request, "ClubManager/settings.html", {"member": member})
