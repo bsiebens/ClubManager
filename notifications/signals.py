@@ -19,7 +19,7 @@ from webpush import send_user_notification
 
 @receiver(post_save, sender=Notification)
 def send_web_push_notification(instance, **kwargs) -> None:
-    url = "http://127.0.0.1:8000"
+    url = config.CM_CLUB_URL
     head = f"ClubManager - {instance.subject}"
     icon = ""
 

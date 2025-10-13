@@ -183,6 +183,7 @@ CONSTANCE_CONFIG = {
     "CM_DEFAULT_SEASON_DAY": (config("CM_DEFAULT_SEASON_DAY", default=1, cast=int), "Default season start day", int),
     "CM_DEFAULT_SEASON_DURATION": (config("CM_DEFAULT_SEASON_DURATION", default="1y", cast=str), "Default season duration", str),
     "CM_INSTAGRAM_HANDLE": (config("CM_INSTAGRAM_HANDLE", default="ClubManager", cast=str), "Instagram handle", str),
+    "CM_CLUB_URL": (config("CM_CLUB_URL", default="http://127.0.0.1:8000", cast=str), "URL of ClubManager instance", str),
 }
 
 PHONENUMBER_DEFAULT_FORMAT = "INTERNATIONAL"
