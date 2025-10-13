@@ -109,7 +109,7 @@ def notifications(request: HttpRequest, notification_pk: int | None = None, mark
 
 
 @login_required
-def conversations(request: HttpRequest, conversation_pk: int | None = None) -> HttpResponse:
+def conversations(request: HttpRequest, conversation_pk: int | None = None) -> HttpResponse | HttpResponseRedirect:
     conversations_for_user = Conversation.objects.for_user(request.user).with_unread_count(request.user).with_last_message().order_by("-last_message_time").prefetch_related("participants", "participants__user")
     conversation_set = True
     selected_conversation = None
@@ -119,6 +119,9 @@ def conversations(request: HttpRequest, conversation_pk: int | None = None) -> H
         conversation_set = False
 
     if conversation_pk is not None:
+        if conversation_pk not in [conversation.pk for conversation in conversations_for_user]:
+            return redirect("clubmanager:conversations")
+
         selected_conversation = Conversation.objects.prefetch_related(
             Prefetch("participants", queryset=ConversationParticipant.objects.filter(is_active=True).select_related("user")),
             Prefetch(
