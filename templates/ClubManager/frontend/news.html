@@ -2,18 +2,77 @@
 
 {% load i18n %}
 {% load partials %}
+{% load static %}
 
 {% partialdef news %}
-    <div id="title_block" hx-swap-oob="innerHTML">{% translate "News" %}</div>
+    <div id="title_block" hx-swap-oob="innerHTML"></div>
     {% partial content %}
 {% endpartialdef news %}
 
 {% block title %}
-    <div id="title_block">{% translate "News" %}</div>
+    <div id="title_block"></div>
 {% endblock title %}
 
 {% block content %}
     {% partialdef content inline %}
-        <div id="content_block">// CONTENT GOES HERE</div>
+        <div id="content_block">
+            <div class="flex flex-row gap-4 items-center justify-center pb-8 mb-4">
+                {% if CM_CLUB_LOGO %}
+                    <div class="h-20 lg:h-48 aspect-[1/1] my-2">
+                        <img src="{% static CM_CLUB_LOGO %}" class="p-1 border-2 border-neutral rounded-full object-contain shadow-md" alt="{{ CM_CLUB_NAME }} logo" />
+                    </div>
+                {% endif %}
+
+                <div class="flex flex-col lg:gap-2 {% if CM_CLUB_LOGO %}items-start{% else %}items-center{% endif %}">
+                    <div class="font-jersey text-2xl lg:text-4xl font-semibold">
+                        {% if CM_CLUB_NAME != "ClubManager" %}
+                            {{ CM_CLUB_NAME }}
+                        {% else %}
+                            ClubManager
+                        {% endif %}
+                    </div>
+
+                    {% now "H" as current_hour %}
+                    <div class="opacity-75 lg:text-xl">
+                        {% if current_hour|add:"0" < 12 %}
+                            {% translate "Good morning" %}
+                        {% elif current_hour|add:"0" < 18 %}
+                            {% translate "Good afternoon" %}
+                        {% else %}
+                            {% translate "Good evening" %}
+                        {% endif %} {{ request.user.first_name }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <div class="text-2xl font-jersey font-semibold mb-2">{% translate "Latest club news" %}</div>
+
+                {% partialdef news_items inline %}
+                    <div id="news_items">
+                        {% for news_item in page %}
+                            <div
+                                    class="border border-neutral p-4 rounded-xl m-2"
+                                    {% if page.has_next %}
+                                        hx-get="{% url "clubmanager:news" %}?page={{ page.next_page_number }}" hx-trigger="intersect" hx-swap="afterend" hx-indicator="#loading_indicator"
+                                    {% endif %}
+                            >
+                                <div class="text-xl font-semibold mb-8">{{ news_item.title }}</div>
+                                <div>{{ news_item.formatted|safe }}</div>
+                                <div class="flex flex-row gap-2 mt-8">
+                                    {% for team in news_item.teams.all %}
+                                        <div class="badge badge-neutral badge-sm font-jersey"><span class="icon icon-rounded text-md icon-20">groups</span>{{ team.name }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endpartialdef news_items %}
+
+                <div class="flex justify-center mt-4 htmx-indicator" id="loading_indicator">
+                    <span class="loading loading-spinner loading-md"></span>
+                </div>
+            </div>
+        </div>
     {% endpartialdef content %}
 {% endblock content %}

@@ -12,12 +12,16 @@ from news.models import NewsItem
 @login_required
 def news(request: HttpRequest) -> HttpResponse:
     news_items = NewsItem.objects.filter(status=NewsItem.StatusChoices.RELEASED, publish_on__lte=timezone.now()).filter(Q(type=NewsItem.NewsItemTypeChoices.INTERNAL) | Q(type=NewsItem.NewsItemTypeChoices.INTERNAL_EXTERNAL)).order_by("-created")
+    partial_template = "news"
 
     paginator = Paginator(news_items, 10)
     page_number = request.GET.get("page", 1)
     page = paginator.get_page(page_number)
 
-    return HTMXTemplateResponse(request, "ClubManager/frontend/news.html", {"page": page}, partial_template="news")
+    if int(page_number) > 1:
+        partial_template = "news_items"
+
+    return HTMXTemplateResponse(request, "ClubManager/frontend/news.html", {"page": page}, partial_template=partial_template)
 
 
 def calendar(request: HttpRequest) -> HttpResponse:
