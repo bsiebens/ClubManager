@@ -18,7 +18,7 @@ from webpush import send_user_notification
 
 
 @receiver(post_save, sender=Notification)
-def send_web_push_notification(instance, **kwargs) -> None:
+def send_web_push_notification(instance, created, **kwargs) -> None:
     url = config.CM_CLUB_URL
     head = f"ClubManager - {instance.subject}"
     icon = ""
@@ -31,4 +31,5 @@ def send_web_push_notification(instance, **kwargs) -> None:
 
     payload = {"head": head, "body": strip_tags(instance.text), "url": f"{url}{instance.get_absolute_url()}", "icon": icon}
 
-    send_user_notification(user=instance.recipient, payload=payload, ttl=1000)
+    if created and not instance.is_read:
+        send_user_notification(user=instance.recipient, payload=payload, ttl=1000)
