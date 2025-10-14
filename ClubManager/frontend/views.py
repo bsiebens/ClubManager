@@ -17,10 +17,11 @@ def news(request: HttpRequest) -> HttpResponse:
     page_number = request.GET.get("page", 1)
     page = paginator.get_page(page_number)
 
-    return HTMXTemplateResponse(request, "ClubManager/frontend/news.html", {"page": page})
+    return HTMXTemplateResponse(request, "ClubManager/frontend/news.html", {"page": page}, partial_template="news")
 
 
-def calendar(request: HttpRequest) -> HttpResponse: ...
+def calendar(request: HttpRequest) -> HttpResponse:
+    return HTMXTemplateResponse(request, "ClubManager/frontend/calendar.html", {}, partial_template="calendar")
 
 
 def conversations(request: HttpRequest) -> HttpResponse: ...

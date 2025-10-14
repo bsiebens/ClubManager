@@ -3,13 +3,14 @@
 {% load i18n %}
 {% load partials %}
 
-{% partialdef news %}
-    <div id="title_block" hx-swap-oob="innerHTML">{% translate "News" %}</div>
+{# Update identifier to the correct page!! #}
+{% partialdef identifier %}
+    <div id="title_block" hx-swap-oob="innerHTML">{% translate "// PAGE TITLE" %}</div>
     {% partial content %}
-{% endpartialdef news %}
+{% endpartialdef identifier %}
 
 {% block title %}
-    <div id="title_block">{% translate "News" %}</div>
+    <div id="title_block">{% translate "// PAGE TITLE" %}</div>
 {% endblock title %}
 
 {% block content %}
