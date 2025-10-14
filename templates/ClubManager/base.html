@@ -1,306 +1,143 @@
+{% load tailwind_tags %}
 {% load static %}
+{% load webpush_notifications %}
+{% load django_htmx %}
 {% load i18n %}
 {% load partials %}
-{% load tailwind_tags %}
-{% load webpush_notifications %}
+
+{% partialdef icons %}
+    {% partial conversations_icon %}
+    {% partial notifications_icon %}
+{% endpartialdef icons %}
+
+<!DOCTYPE html>
 
 {% with CM_CLUB_NAME=config.CM_CLUB_NAME CM_CLUB_LOGO=config.CM_CLUB_LOGO %}
-    <!DOCTYPE html>
     <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-        <title>ClubManager{% if CM_CLUB_NAME != "ClubManager" %} - {{ CM_CLUB_NAME }}{% endif %}</title>
+            <title>
+                ClubManager{% if CM_CLUB_NAME != "ClubManager" %} - {{ CM_CLUB_NAME }}{% endif %}
+            </title>
 
-        {% tailwind_css %}
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/styles/choices.min.css" />
+            <script src="https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/scripts/choices.min.js"></script>
 
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+            <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
-        <script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.12.4/dist/cdn.min.js"></script>
-        <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+            {% htmx_script %}
+            {% webpush_header %}
+            {% tailwind_css %}
+        </head>
 
-        <script src="{% static "js/multi-select.js" %}"></script>
+        <body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
+            {% url "clubmanager:news" as news_url %}
+            {% url "clubmanager:calendar" as calendar_url %}
+            {% url "clubmanager:notifications" as notifications_url %}
+            {% url "clubmanager:conversations" as messages_url %}
+            {% url "clubmanager:settings" as settings_url %}
 
-        {% webpush_header %}
-    </head>
-    <body>
-        {% url "clubmanager:news" as news_url %}
-        {% url "clubmanager:calendar" as calendar_url %}
-        {% url "clubmanager:notifications" as notifications_url %}
-        {% url "clubmanager:conversations" as messages_url %}
-        {% url "clubmanager:settings" as settings_url %}
+            <div class="flex flex-col h-screen">
+                <div class="navbar bg-neutral text-neutral-content w-full px-4 py-2 z-50 min-h-fit">
+                    <div class="flex-1 lg:mx-2 lg:px-2 gap-2 flex flex-row items-center text-2xl font-jersey tracking-wide">
+                        <a href="{% url "home" %}" class="flex flex-row items-center gap-2">
+                            {% if CM_CLUB_LOGO != "" %}
+                                <div class="h-16 aspect-[1/1] my-2 hidden lg:flex">
+                                    <img src="{% static CM_CLUB_LOGO %}" class="p-1 bg-base-100 rounded-full object-contain" alt="{{ CM_CLUB_NAME }} logo" />
+                                </div>
+                            {% endif %}
 
-        <div class="flex flex-col h-screen">
-            <div class="navbar bg-neutral text-neutral-content w-full px-4 py-2 z-50 min-h-fit">
-                <div class="flex-1 mx-2 px-2 gap-2 flex flex-row items-center text-2xl font-jersey tracking-wide">
-                    <a href="{% url "home" %}" class="flex flex-row items-center gap-2">
-                        {% if CM_CLUB_LOGO != "" %}
-                            <div class="h-16 aspect-[1/1] my-2 hidden lg:flex">
-                                <img src="{% static CM_CLUB_LOGO %}" class="p-1 bg-base-100 rounded-full object-contain" alt="{{ CM_CLUB_NAME }} logo" />
+                            <div>
+                                {% if CM_CLUB_NAME != "ClubManager" %}
+                                    <span>{{ CM_CLUB_NAME }}</span>
+                                    <span class="hidden lg:flex">ClubManager</span>
+                                {% else %}
+                                    <span>ClubManager</span>
+                                {% endif %}
                             </div>
-                        {% endif %}
-                        <div class="hidden lg:flex">
-                            {% if CM_CLUB_NAME != "ClubManager" %}
-                                {{ CM_CLUB_NAME }}
-                            {% endif %}
-                            ClubManager
-                        </div>
-                        <div class="lg:hidden">
-                            {% if CM_CLUB_NAME != "ClubManager" %}
-                                {{ CM_CLUB_NAME }}
-                            {% else %}
-                                ClubManager
-                            {% endif %}
-                        </div>
-                    </a>
-                </div>
+                        </a>
+                    </div>
 
-                <div>
-                    <ul class="menu menu-horizontal">
-                        <li class="border-b border-neutral {% if calendar_url in request.path %}border-neutral-content{% endif %} hidden lg:block">
-                            <a href="{% url "clubmanager:calendar" %}" class="group">
-                                <span class="flex flex-row items-center gap-2">
-                                    <span class="icon icon-rounded group-hover:icon-filled {% if calendar_url in request.path %}icon-filled{% endif %}">calendar_month</span>
-                                    <span class="hidden lg:block">{% translate "Calendar" %}</span>
-                                </span>
-                            </a>
-                        </li>
-
-                        <li class="border-b border-neutral {% if messages_url in request.path %}border-neutral-content icon-filled{% endif %}">
-                            <a href="{% url "clubmanager:conversations" %}" class="group">
-                                <div x-data x-init="
-                                    const update = async () => {
-                                        try {
-                                            const res = await fetch('{% url "clubmanager:conversations-check" %}', {
-                                                headers: {
-                                                    'X-Alpine-Request': 'true',
-                                                    'X-Alpine-Target': 'conversations_icon'
-                                                },
-                                                'credentials': 'same-origin'
-                                            });
-                                            if (!res.ok) return;
-                                            $el.innerHTML = await res.text();
-                                        } catch (e) { console.error(e); }
-                                    };
-                                    update();
-                                    setInterval(update, 60000);
-                                    " class="flex flex-row items-center">
-                                    {% partialdef conversations_icon inline %}
-                                        {% if unread_messages_count >= 1 %}
-                                            <span class="indicator" id="conversations_icon" x-sync>
-                                                <span class="indicator-item status status-error"></span>
-                                                <span class="icon icon-rounded group-hover:icon-filled">chat_bubble</span>
-                                            </span>
-                                        {% else %}
-                                            <span x-sync id="conversations_icon" class="icon icon-rounded group-hover:icon-filled">chat_bubble</span>
-                                        {% endif %}
-                                    {% endpartialdef conversations_icon %}
-                                </div><span class="hidden lg:block">{% translate "Conversations" %}</span>
-                            </a>
-                        </li>
-
-                        <li class="border-b border-neutral {% if notifications_url in request.path %}border-neutral-content icon-filled{% endif %}">
-                            <a href="{% url "clubmanager:notifications" %}" class="group flex flex-row items-center gap-2">
-                                <div x-data x-init="
-                                    const update = async () => {
-                                        try {
-                                            const res = await fetch('{% url "clubmanager:notifications-check" %}', {
-                                                headers: {
-                                                    'X-Alpine-Request': 'true',
-                                                    'X-Alpine-Target': 'notification_icon'
-                                                },
-                                                'credentials': 'same-origin'
-                                            });
-                                            if (!res.ok) return;
-                                            $el.innerHTML = await res.text();
-                                        } catch (e) { console.error(e); }
-                                    };
-                                    update();
-                                    setInterval(update, 60000);
-                                    " class="flex flex-row items-center">
-                                    {% partialdef notification_icon inline %}
-                                        {% if unread_notification_count >= 1 %}
-                                            <span x-sync class="indicator" id="notification_icon">
-                                                <span class="indicator-item status status-error"></span>
-                                                <span class="icon icon-rounded group-hover:icon-filled">notifications</span>
-                                            </span>
-                                        {% else %}
-                                            <span x-sync id="notification_icon" class="icon icon-rounded group-hover:icon-filled">notifications</span>
-                                        {% endif %}
-                                    {% endpartialdef notification_icon %}
-                                </div><span class="hidden lg:block">{% translate "Notifications" %}</span>
-                            </a>
-                        </li>
-
-                        <li class="border-b border-neutral {% if settings_url in request.path %}border-neutral-content{% endif %} hidden lg:block">
-                            <a href="{% url "clubmanager:settings" %}" class="group">
-                                <span class="flex flex-row items-center gap-2">
-                                    <span class="icon icon-rounded group-hover:icon-filled {% if settings_url in request.path %}icon-filled{% endif %}">settings</span>
-                                    <span class="hidden lg:block">{% translate "Settings" %}</span>
-                                </span>
-                            </a>
-                        </li>
-
-                        {% if request.user.is_staff %}
-                            <li class="border-b border-neutral {% if conversations_url in request.path %}border-neutral-content{% endif %} hidden lg:block">
-                                <a href="" class="group">
+                    <div>
+                        <ul class="menu menu-horizontal gap-2" hx-trigger="every 10s" hx-get="{% url "clubmanager:check" %}" hx-target="#conversations_icon" hx-swap="outerHTML">
+                            <li class="border rounded-md border-neutral {% if calendar_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block">
+                                <a href="{{ calendar_url }}" class="group">
                                     <span class="flex flex-row items-center gap-2">
-                                    <span class="icon icon-rounded group-hover:icon-filled {% if conversations_url in request.path %}icon-filled{% endif %}">shield_person</span>
-                                    <span class="hidden lg:block">{% translate "Admin" %}</span>
-                                </span>
+                                        <span class="icon icon-rounded group-hover:icon-filled {% if calendar_url in request.path %}icon-filled{% endif %}">calendar_month</span>
+                                        <span>{% translate "Calendar" %}</span>
+                                    </span>
                                 </a>
                             </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
 
-            <div class="m-4 mb-2 lg:m-12 lg:mb-0 grow pb-20 lg:pb-0">
-                <div class="max-w-screen-2xl mx-auto">
-                    <h1 class="text-3xl font-bold grow">{% block title %}{% endblock title %}</h1>
-
-                    <div class="my-8">
-                        <div class="flex flex-row gap-6">
-                            <div class="grow">
-                                {% block content %}{% endblock content %}
-                            </div>
-
-                            <div class="basis-1/4 hidden {% if sponsors_count > 0 %}lg:flex{% endif %} flex-col gap-4">
-                                <div class="font-jersey text-xl font-semibold mb-2">@Something</div>
-                                <div class="flex flex-col gap-4">
-                                    <div class="flex w-full flex-col gap-4">
-                                        <div class="flex items-center gap-4">
-                                            <div class="bg-slate-400 h-16 w-16 shrink-0 rounded-full"></div>
-                                            <div class="flex flex-col gap-4">
-                                                <div class="bg-slate-400 rounded-xl h-4 w-40"></div>
-                                                <div class="bg-slate-400 rounded-xl h-4 w-60"></div>
-                                            </div>
-                                        </div>
-                                        <div class="bg-slate-400 rounded-xl h-32 w-full"></div>
-                                    </div>
-
-                                    <div class="flex w-full flex-col gap-4">
-                                        <div class="flex items-center gap-4">
-                                            <div class="bg-slate-400 h-16 w-16 shrink-0 rounded-full"></div>
-                                            <div class="flex flex-col gap-4">
-                                                <div class="bg-slate-400 rounded-xl h-4 w-40"></div>
-                                                <div class="bg-slate-400 rounded-xl h-4 w-60"></div>
-                                            </div>
-                                        </div>
-                                        <div class="bg-slate-400 rounded-xl h-32 w-full"></div>
-                                    </div>
-                                </div>
-
-                                {% if sponsors_count > 0 %}
-                                    <div class="font-jersey mb-2">Sponsors</div>
-                                    <div class="grid grid-cols-2 gap-4 justify-items-center content-center">
-                                        {% for sponsor in sponsors %}
-                                            {% if sponsor.url is not None %}
-                                                <a href="{{ sponsor.url }}">
+                            <li  class="border rounded-md border-neutral {% if conversations_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block">
+                                <a href="{{ conversations_url }}" class="group">
+                                    <span class="flex flex-row items-center gap-2">
+                                        {% partialdef conversations_icon inline %}
+                                            {% if unread_messages_count >= 1 %}
+                                                <span class="indicator" id="conversations_icon">
+                                                    <span class="indicator-item status status-error"></span>
+                                                    <span class="icon icon-rounded group-hover:icon-filled {% if conversations_url in request.path %}icon-filled{% endif %}">chat_bubble</span>
+                                                </span>
+                                            {% else %}
+                                                <span id="conversations_icon" class="icon icon-rounded group-hover:icon-filled {% if conversations_url in request.path %}icon-filled{% endif %}">chat_bubble</span>
                                             {% endif %}
+                                        {% endpartialdef conversations_icon %}
 
-                                                <div class="flex flex-col gap-2">
-                                                    <img class="rounded-xl max-h-32 object-scale-down transform-gpu w-full max-w-fit" src="{% get_media_prefix %}{{ sponsor.logo }}" alt="{{ sponsor.name }}" loading="lazy"/>
-                                                    <div class="text-sm font-jersey mx-auto">{{ sponsor.name }}</div>
-                                                </div>
+                                        <span>{% translate "Conversations" %}</span>
+                                    </span>
+                                </a>
+                            </li>
 
-                                            {% if sponsor.url is not None %}
-                                                </a>
+                            <li  class="border rounded-md border-neutral {% if notifications_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block">
+                                <a href="{{ notifications_url }}" class="group">
+                                    <span class="flex flex-row items-center gap-2">
+                                        {% partialdef notifications_icon inline %}
+                                            {% if unread_notification_count >= 1 %}
+                                                <span class="indicator" id="notifications_icon" hx-swap-oob="outerHTML">
+                                                    <span class="indicator-item status status-error"></span>
+                                                    <span class="icon icon-rounded group-hover:icon-filled {% if notifications_url in request.path %}icon-filled{% endif %}">notifications</span>
+                                                </span>
+                                            {% else %}
+                                                <span hx-swap-oob="outerHTML" id="notifications_icon" class="icon icon-rounded group-hover:icon-filled {% if notifications_url in request.path %}icon-filled{% endif %}">notifications</span>
                                             {% endif %}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+                                        {% endpartialdef notifications_icon %}
 
-                    <div class="lg:hidden">
-                        {% if sponsors_count > 0 %}
-                            <div class="font-jersey mb-2">Sponsors</div>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-center content-center">
-                                {% for sponsor in sponsors %}
-                                    {% if sponsor.url is not None %}
-                                        <a href="{{ sponsor.url }}">
-                                    {% endif %}
+                                        <span>{% translate "Notifications" %}</span>
+                                    </span>
+                                </a>
+                            </li>
 
-                                <div class="flex flex-col gap-2">
-                                    <img class="rounded-xl max-h-32 object-scale-down transform-gpu w-full max-w-fit" src="{% get_media_prefix %}{{ sponsor.logo }}" alt="{{ sponsor.name }}" loading="lazy"/>
-                                    <div class="text-sm font-jersey mx-auto">{{ sponsor.name }}</div>
-                                </div>
+                            <li class="border rounded-md border-neutral {% if settings_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block">
+                                <a href="{{ settings_url }}" class="group">
+                                    <span class="flex flex-row items-center gap-2">
+                                        <span class="icon icon-rounded group-hover:icon-filled {% if settings_url in request.path %}icon-filled{% endif %}">settings</span>
+                                        <span>{% translate "Settings" %}</span>
+                                    </span>
+                                </a>
+                            </li>
 
-                                {% if sponsor.url is not None %}
+                            {% if request.user.is_staff %}
+                                <li  class="border rounded-md border-neutral {% if settings_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block">
+                                    <a href="{{ settings_url }}" class="group">
+                                    <span class="flex flex-row items-center gap-2">
+                                        <span class="icon icon-rounded group-hover:icon-filled {% if settings_url in request.path %}icon-filled{% endif %}">shield_person</span>
+                                        <span>{% translate "Admin" %}</span>
+                                    </span>
                                     </a>
-                                {% endif %}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+                                </li>
+                            {% endif %}
+                        </ul>
                     </div>
-
                 </div>
             </div>
 
-            <footer class="hidden lg:flex footer footer-horizontal bg-neutral text-neutral-content items-center p-4 z-50">
-                <aside class="grid-flow-col items-center text-sm grow">
-                    <p class="font-jersey items-center flex gap-2">MIT License <span class="icon icon-rounded text-sm">copyright</span> {% now "Y" %} Bernard Siebens</p>
-                </aside>
-                <nav class="grid-flow-col gap-4 md:place-self-center md:justify-self-end items-center">
-                    <a href="https://github.com/bernardsiebens/clubmanager" target="_blank">
-                        <i class="fa-brands fa-github"></i>
-                    </a>
-                </nav>
-            </footer>
-        </div>
 
-        <div class="dock lg:hidden bg-neutral text-neutral-content">
-            <a href="{% url "home" %}" class="group {% if news_url in request.path %}dock-active{% endif %}">
-                <span class="icon icon-rounded group-hover:icon-filled {% if news_url in request.path %}icon-filled{% endif %}">home</span>
-                <span class="dock-label pb-2">{% translate "Home" %}</span>
-            </a>
+            {% block title %}{% endblock title %}
 
-            <a href="{% url "clubmanager:calendar" %}" class="group {% if calendar_url in request.path %}dock-active{% endif %}">
-                <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if calendar_url in request.path %}icon-filled{% endif %}">calendar_month</span>
-                <span class="dock-label pb-2">{% translate "Calendar" %}</span>
-            </a>
-
-            <a href="{% url "clubmanager:settings" %}" class="group {% if settings_url in request.path %}dock-active{% endif %}">
-                <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if settings_url in request.path %}icon-filled{% endif %}">settings</span>
-                <span class="dock-label pb-2">{% translate "Settings" %}</span>
-            </a>
-
-            {% if request.user.is_staff %}
-                <a href="" class="group {% if calendar_url in request.path %}dock-active{% endif %}">
-                    <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if calendar_url in request.path %}icon-filled{% endif %}">shield_person</span>
-                    <span class="dock-label pb-2">{% translate "Admin" %}</span>
-                </a>
-            {% endif %}
-        </div>
-
-        <script type=speculationrules>
-            {
-              "prefetch": [
-                {
-                  "source": "document",
-                  "where": {
-                    "selector_matches": "a[href^='/']"
-                  },
-                  "eagerness": "immediate"
-                }
-              ],
-              "prerender": [
-                {
-                  "source": "document",
-                  "where": {
-                    "selector_matches": "a[href^='/']"
-                  },
-                  "eagerness": "moderate"
-                }
-              ]
-            }
-        </script>
-
-    </body>
+            {% block content %}{% endblock content %}
+        </body>
     </html>
 {% endwith %}

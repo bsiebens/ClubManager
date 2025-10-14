@@ -3,6 +3,24 @@ from django.template.response import TemplateResponse as BaseTemplateResponse
 from django.urls import reverse
 
 
+class HTMXTemplateResponse(BaseTemplateResponse):
+    """Can return an optional small HTML fragment instead of a full HTML page depending on the request headers."""
+
+    def get_partial_template(self, request: HttpRequest, template: str, partial_template: str | None = None) -> str:
+        # We use the target to request as the partial name; optionally, a different partial can be set
+        # using the partial_template argument.
+        if request.htmx:
+            partial = request.htmx.target if partial_template is None else partial_template
+
+            return f"{template}#{partial}"
+        return template
+
+    def __init__(self, request: HttpRequest, template: str, context: dict, partial_template: str | None = None, *args, **kwargs):
+        template_name = self.get_partial_template(request, template, partial_template)
+
+        super().__init__(request, template_name, context, *args, **kwargs)
+
+
 def is_alpine(request: HttpRequest) -> bool:
     return "X-Alpine-Request" in request.headers
 

@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "tailwind",
     "markdownx",
     "webpush",
+    "django_htmx",
     "theme.apps.ThemeConfig",
     "members.apps.MembersConfig",
     "notifications.apps.NotificationsConfig",
@@ -78,6 +79,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
 ]
 
 if DEBUG:

@@ -9,7 +9,7 @@ from .models import Conversation, ConversationParticipant, Message
 
 
 @login_required
-def check_messages(request: HttpRequest) -> HttpResponse:
+def check(request: HttpRequest) -> HttpResponse:
     return render(request, "ClubManager/base.html#conversations_icon")
 
 
