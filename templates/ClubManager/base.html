@@ -62,7 +62,7 @@
                     </div>
 
                     <div>
-                        <ul class="menu menu-horizontal gap-2" hx-trigger="every 10s" hx-get="{% url "clubmanager:check" %}" hx-target="#conversations_icon" hx-swap="outerHTML">
+                        <ul class="menu menu-horizontal gap-2" hx-trigger="every 60s" hx-get="{% url "clubmanager:check" %}" hx-target="#conversations_icon" hx-swap="outerHTML">
                             <li class="border rounded-md border-neutral {% if calendar_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block">
                                 <a href="{{ calendar_url }}" class="group">
                                     <span class="flex flex-row items-center gap-2">
