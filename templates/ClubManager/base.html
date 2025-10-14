@@ -43,7 +43,7 @@
             <div class="flex flex-col h-screen">
                 <div class="navbar bg-neutral text-neutral-content w-full px-4 py-2 z-50 min-h-fit">
                     <div class="flex-1 lg:mx-2 lg:px-2 gap-2 flex flex-row items-center text-2xl font-jersey tracking-wide">
-                        <a href="{% url "home" %}" class="flex flex-row items-center gap-2" hx-get="{{ news_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
+                        <a href="{% url "home" %}" class="nav-link flex flex-row items-center gap-2" hx-get="{{ news_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
                             {% if CM_CLUB_LOGO != "" %}
                                 <div class="h-16 aspect-[1/1] my-2 hidden lg:flex">
                                     <img src="{% static CM_CLUB_LOGO %}" class="p-1 bg-base-100 rounded-full object-contain" alt="{{ CM_CLUB_NAME }} logo" />
@@ -254,28 +254,28 @@
             </script>
 
             <script type="text/javascript">
-                document.body.addEventListener('htmx:afterOnLoad', function(event) {
-                   // Remove the 'icon-filled' from all links
-                   document.querySelectorAll("a.nav-link span.icon").forEach(icon => {
-                       icon.classList.remove("icon-filled");
-                   });
-
-                   // Remove Tailwind border class from all <li> elements
-                   document.querySelectorAll('li.border-neutral-content').forEach(li => {
-                       li.classList.remove('border-neutral-content');
-                   });
-
+                document.body.addEventListener("htmx:afterOnLoad", function(event) {
                    const clicked = event.detail.elt;
 
-                   // Look for the icon span inside the clicked element
-                   const iconSpan = clicked.querySelector("span.icon");
-                   if (iconSpan) {
-                       iconSpan.classList.add("icon-filled");
-                   }
+                   // Only proceed if the trigger is a nav link
+                   if (clicked.classList.contains("nav-link")) {
+                       // Remove the 'icon-filled' and set border color to neutral
+                       document.querySelectorAll("a.nav-link span.icon").forEach(icon => {
+                           icon.classList.remove("icon-filled");
+                       });
+                       document.querySelectorAll("li.border-neutral-content").forEach(li => {
+                           li.classList.replace("border-neutral-content", "border-neutral");
+                       });
 
-                   const parentLi = clicked.closest('li');
-                   if (parentLi) {
-                       parentLi.classList.add('border-neutral-content');
+                       const iconSpan = clicked.querySelector(".icon")
+                       if (iconSpan) {
+                           iconSpan.classList.add("icon-filled");
+                       }
+
+                       const parentLi = clicked.closest("li");
+                       if (parentLi) {
+                           parentLi.classList.replace("border-neutral", "border-neutral-content");
+                       }
                    }
                 });
             </script>
