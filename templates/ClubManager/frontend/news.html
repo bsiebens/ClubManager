@@ -52,14 +52,15 @@
                     <div id="news_items">
                         {% for news_item in page %}
                             <div
-                                    class="border border-neutral p-4 rounded-xl m-2"
+                                    class="border border-neutral shadow-md p-4 rounded-xl m-2 mb-4"
                                     {% if page.has_next %}
                                         hx-get="{% url "clubmanager:news" %}?page={{ page.next_page_number }}" hx-trigger="intersect" hx-swap="afterend" hx-indicator="#loading_indicator"
                                     {% endif %}
                             >
-                                <div class="text-xl font-semibold mb-8">{{ news_item.title }}</div>
+                                <div class="text-xl font-semibold mb-1">{{ news_item.title }}</div>
+                                <div class="mb-4 text-sm opacity-75 border-b border-neutral pb-1">{{ news_item.publish_on|date:"d M Y H:i" }} {% translate "by" %} {{ news_item.author.get_full_name }}</div>
                                 <div>{{ news_item.formatted|safe }}</div>
-                                <div class="flex flex-row gap-2 mt-8">
+                                <div class="flex flex-row gap-2 mt-4">
                                     {% for team in news_item.teams.all %}
                                         <div class="badge badge-neutral badge-sm font-jersey"><span class="icon icon-rounded text-md icon-20">groups</span>{{ team.name }}</div>
                                     {% endfor %}

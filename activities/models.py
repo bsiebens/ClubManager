@@ -3,6 +3,7 @@ import importlib
 from collections import OrderedDict
 
 from constance import config
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q, Prefetch, QuerySet
 from django.utils import timezone
@@ -291,6 +292,31 @@ class Activity(PolymorphicModel):
 
             new_registrations = [Registration(activity=self, member=member) for member in Member.objects.filter(pk__in=member_pks)]
             Registration.objects.bulk_create(new_registrations)
+
+    def update_registration_status_for_member(self, member: Member, requesting_user: AbstractUser, response: str, comment: str | None = None) -> "Registration":
+        """
+        Updates the registration for a given member, requires a requesting user to verify if the update can actually proceed.
+
+        :param member: The member for which the registration is being updated
+        :param requesting_user: The user requesting the update (required to verify if the update can proceed)
+        :param response: Response for the registration update
+        :param comment: Required in case of a response of 'not attending'
+        :return: The updated registration object
+        """
+
+        # Find the registration for the given member
+        registration = self.registrations.get(member=member)
+
+        # Verify if the requesting user actually has the necessary rights to update this registration
+        if registration.member.user == requesting_user or registration.member in requesting_user.member.family_members.all() or requesting_user.is_superuser:
+            if response == Registration.ResponseOptions.NOT_ATTENDING and (comment is None or comment == ""):
+                raise AttributeError(_("Response cannot be empty for a registration that is not attending"))
+
+            registration.response = response
+            registration.comment = comment
+            registration.save(update_fields=["response", "comment"])
+
+        return registration
 
 
 class Event(Activity):

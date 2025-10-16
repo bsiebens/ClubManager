@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load partials %}
+{% load avatar %}
 
 {% partialdef calendar %}
     <div id="title_block" hx-swap-oob="innerHTML">{% translate "Calendar" %}</div>
@@ -14,6 +15,156 @@
 
 {% block content %}
     {% partialdef content inline %}
-        <div id="content_block">// CONTENT GOES HERE</div>
+        <div id="content_block">
+            <div class="flex flex-col gap-4 lg:gap-8 w-full lg:mr-4">
+                {% for activity in activities %}
+                    <div class="flex flex-row gap-4">
+                        <div class="w-16 opacity-80 mx-auto hidden lg:flex">
+                            {% ifchanged %}
+                                <div class="border border-neutral rounded-md overflow-hidden items-center w-full shadow-md h-fit">
+                                    <div class="text-center w-full font-semibold text-xs font-jersey border-b border-neutral px-2 py-1 bg-accent text-accent-content">{{ activity.start_time|date:"D" }}</div>
+                                    <div class="text-center w-full font-semibold font-jersey text-2xl px-2">{{ activity.start_time|date:"d" }}</div>
+                                    <div class="text-center w-full font-semibold font-jersey pb-1">{{ activity.start_time|date:"M" }}</div>
+                                </div>
+                            {% endifchanged %}
+                        </div>
+
+                        <div class="border border-neutral rounded-lg p-4 shadow-md gap-2 w-full flex flex-row">
+                            <div class="w-1.5 h-full rounded-xl opacity-80 {% if activity.type.type == "practice" %}bg-primary{% elif activity.type.type == "game" %}bg-accent{% else %}bg-secondary{% endif %}"></div>
+
+                            <div class="flex flex-col w-full">
+                                <div class="flex flex-row gap-2 items-center">
+                                    <div class="hidden lg:flex items-start icon icon-rounded text-3xl bg-base-300 p-2 m-1 mask mask-circle opacity-80">
+                                        {{ activity.type.logo }}
+                                    </div>
+
+                                    <div class="flex flex-col w-full">
+                                        <div class="flex flex-row justify-between items-center">
+                                            <div class="font-jersey font-bold text-xl">
+                                                {% if activity.type.type == "game" %}
+                                                    {% if activity.opponent %}
+                                                        <span class="lg:hidden">{{ activity.team.short_name }}</span><span class="hidden lg:inline">{{ activity.team.name }}</span> vs. {{ activity.opponent }}
+                                                    {% else %}
+                                                        {% translate "Game" %} {{ activity.team.name }}
+                                                    {% endif %}
+                                                {% else %}
+                                                    {{ activity.teams.all|join:", " }} - {{ activity.title }}
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="badge badge-sm {% if activity.type.type == "practice" %}badge-primary{% elif activity.type.type == "game" %}badge-accent{% else %}badge-secondary{% endif %} shadow-md">{{ activity.type|lower }}</div>
+                                        </div>
+
+                                        <div class="flex flex-col lg:flex-row gap-2 opacity-75 text-md w-full justify-between">
+                                            <div class="flex flex-row basis-1/2">
+                                                <div class="flex items-center grow">
+                                                    <span class="icon icon-rounded icon-20 mr-1">schedule</span>
+                                                    <span class="lg:hidden">{{ activity.start_time|date:"D d/m" }}&nbsp;</span>
+                                                    {{ activity.start_time|date:"H:i" }} <span class="icon icon-rounded icon-20">arrow_right_alt</span> {{ activity.end_time|date:"H:i" }}
+                                                </div>
+
+                                                <div class="flex items-center grow"><span class="icon icon-rounded icon-20 mr-1">arrows_input</span>{{ activity.gathering_time|date:"H:i" }}</div>
+                                            </div>
+
+                                            <div class="flex items-center basis-1/2">
+                                                {% if activity.location is not None %}
+                                                    <span class="icon icon-rounded icon-20 mr-1">location_on</span>
+                                                    {{ activity.location }}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-2 ml-1 border-t border-base-300 pt-2 flex flex-col gap-2">
+                                    <div class="flex flex-row items-center gap-2">
+                                        <div class="text-sm font-bold grow">{% translate "Registrations" %}</div>
+                                        <div class="badge badge-outline badge-sm">
+                                            {% if activity.is_open %}
+                                                <div class="status status-success"></div>{% translate "registrations open" %}
+                                            {% else %}
+                                                <div class="status status-error"></div>{% translate "registrations closed" %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <ul class="list">
+                                        {% for registration in activity.my_registrations %}
+                                            {% partialdef registration_status_list inline %}
+                                                <li class="list-row items-center" id="registration_status_{{ registration.pk }}">
+                                                    <div class="list-col-grow">
+                                                        <div class="flex flex-row gap-2 items-center">
+                                                            <div class="hidden lg:flex">{% avatar first_name=registration.member.user.first_name last_name=registration.member.user.last_name width="sm" %}</div>
+                                                            <div class="text-sm">{{ registration.member }}</div>
+                                                        </div>
+                                                    </div>
+
+                                                    {% if registration.response == "selected" %}
+                                                        <div class="btn btn-success btn-sm btn-soft shadow-md border border-success pointer-events-none">
+                                                            <span class="icon icon-rounded">check_circle</span>
+                                                            {% translate "selected" %}
+                                                        </div>
+                                                    {% elif registration.response == "not_selected" %}
+                                                        <div class="btn btn-error btn-sm btn-soft shadow-md border border-error pointer-events-none">
+                                                            <span class="icon icon-rounded">cancel</span>
+                                                            {% translate "not selected" %}
+                                                        </div>
+                                                    {% else %}
+                                                        {% if activity.is_open %}
+                                                            <div class="btn btn-circle shadow-md btn-outline {% if registration.response == "attending" %}btn-soft btn-success border-success{% endif %} btn-sm"><span class="icon icon-rounded">check</span></div>
+                                                            <div class="btn btn-circle shadow-md btn-outline {% if registration.response == "no_response" %}btn-soft btn-info border-info{% endif %} btn-sm"><span class="icon icon-rounded icon-20">question_mark</span></div>
+                                                            <div class="btn btn-circle shadow-md btn-outline {% if registration.response == "not_attending" %}btn-soft btn-error border-error{% endif %} btn-sm"><span class="icon icon-rounded">close</span></div>
+                                                        {% else %}
+                                                            <div class="btn btn-circle shadow-md btn-outline {% if registration.response == "attending" %}btn-soft btn-success border-success{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded">check</span></div>
+                                                            <div class="btn btn-circle shadow-md btn-outline {% if registration.response == "no_response" %}btn-soft btn-info border-info{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded icon-20">question_mark</span></div>
+                                                            <div class="btn btn-circle shadow-md btn-outline {% if registration.response == "not_attending" %}btn-soft btn-error border-error{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded">close</span></div>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </li>
+                                            {% endpartialdef registration_status_list %}
+                                        {% endfor %}
+                                    </ul>
+
+                                    <button class="btn btn-outline shadow-md btn-sm my-1" onclick="registrations_activity_{{ activity.pk }}.showModal()">
+                                        <span class="icon icon-rounded icon-20">list</span>
+                                        {% translate "All members" %}
+                                    </button>
+
+                                    {% with all_registrations=activity.all_registrations %}
+                                        {% partialdef registration_status_modal inline %}
+                                            <dialog class="modal modal-bottom sm:modal-middle" id="registrations_activity_{{ activity.pk }}">
+                                                <div class="modal-box min-w-1/2 max-w-5xl">
+                                                    <h3 class="text-lg font-bold mb-2">{% translate "All members overview" %}</h3>
+
+                                                    {% for status, registrations in all_registrations.items %}
+                                                        {% if registrations|length > 0 %}
+                                                            <div class="pb-1 mb-2 border-b border-base-300 text-sm font-semibold">{{ status|capfirst }} ({{ registrations|length }})</div>
+                                                            <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
+                                                                {% for registration in registrations %}
+                                                                    <div class="flex flex-row gap-1 items-center">
+                                                                        <div class="hidden lg:flex">{% avatar first_name=registration.member.user.first_name last_name=registration.member.user.last_name width="sm" %}</div>
+                                                                        <div class="text-sm">{{ registration.member }}</div>
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+
+                                                    <div class="modal-action">
+                                                        <form method="dialog">
+                                                            <button class="btn btn-neutral btn-outline">{% translate "Close" %}</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </dialog>
+                                        {% endpartialdef %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     {% endpartialdef content %}
 {% endblock content %}
