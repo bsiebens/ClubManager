@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 from ClubManager.lib import HTMXTemplateResponse
 from activities.models import Registration, Activity, grouped_by_response
+from members.models import Member
 from news.models import NewsItem
 
 BUCKETS = OrderedDict(
@@ -37,9 +38,16 @@ def news(request: HttpRequest) -> HttpResponse:
 
 def calendar(request: HttpRequest) -> HttpResponse:
     context = {}
+    partial_template = "calendar"
 
     if request.method == "POST":
-        ...
+        activity = Activity.objects.get(pk=request.POST.get("activity_pk"))
+        member = Member.objects.get(pk=request.POST.get("member_pk"))
+
+        registration = Activity.update_registration_status_for_member(activity, member, request.user, request.POST.get("response"), request.POST.get("comment", ""))
+        all_registrations = grouped_by_response(activity.registrations.all(), BUCKETS, order_inside_bucket=True)
+        context.update({"activity": activity, "registration": registration, "all_registrations": all_registrations})
+        partial_template = "registration_update"
 
     else:
         number_of_items = request.GET.get("limit", None)
@@ -57,7 +65,7 @@ def calendar(request: HttpRequest) -> HttpResponse:
 
         context.update({"activities": activities})
 
-    return HTMXTemplateResponse(request, "ClubManager/frontend/calendar.html", context=context, partial_template="calendar")
+    return HTMXTemplateResponse(request, "ClubManager/frontend/calendar.html", context=context, partial_template=partial_template)
 
 
 def conversations(request: HttpRequest) -> HttpResponse: ...

@@ -9,6 +9,11 @@
     {% partial content %}
 {% endpartialdef calendar %}
 
+{% partialdef registration_update %}
+    {% partial registration_status_list %}
+    {% partial registration_status_modal %}
+{% endpartialdef %}
+
 {% block title %}
     <div id="title_block">{% translate "Calendar" %}</div>
 {% endblock title %}
@@ -111,13 +116,13 @@
                                                         </div>
                                                     {% else %}
                                                         {% if activity.is_open %}
-                                                            <div class="btn btn-circle shadow-md btn-outline {% if registration.response == "attending" %}btn-soft btn-success border-success{% endif %} btn-sm"><span class="icon icon-rounded">check</span></div>
-                                                            <div class="btn btn-circle shadow-md btn-outline {% if registration.response == "no_response" %}btn-soft btn-info border-info{% endif %} btn-sm"><span class="icon icon-rounded icon-20">question_mark</span></div>
-                                                            <div class="btn btn-circle shadow-md btn-outline {% if registration.response == "not_attending" %}btn-soft btn-error border-error{% endif %} btn-sm"><span class="icon icon-rounded">close</span></div>
+                                                            <div hx-target="#registration_status_{{ registration.pk }}" hx-swap="outerHTML" hx-post="{% url "clubmanager:calendar" %}" hx-vals='{ "activity_pk": {{ activity.pk }}, "member_pk": {{ registration.member.pk }}, "response": "attending" }' class="btn btn-square shadow-md btn-outline {% if registration.response == "attending" %}btn-soft btn-success border-success{% endif %} btn-sm"><span class="icon icon-rounded">check</span></div>
+                                                            <div hx-target="#registration_status_{{ registration.pk }}" hx-swap="outerHTML" hx-post="{% url "clubmanager:calendar" %}" hx-vals='{ "activity_pk": {{ activity.pk }}, "member_pk": {{ registration.member.pk }}, "response": "no_response" }' class="btn btn-square shadow-md btn-outline {% if registration.response == "no_response" %}btn-soft btn-info border-info{% endif %} btn-sm"><span class="icon icon-rounded icon-20">question_mark</span></div>
+                                                            <div data-requires-reason="true" hx-target="#registration_status_{{ registration.pk }}" hx-swap="outerHTML" hx-post="{% url "clubmanager:calendar" %}" hx-vals='{ "activity_pk": {{ activity.pk }}, "member_pk": {{ registration.member.pk }}, "response": "not_attending" }' class="btn btn-square shadow-md btn-outline {% if registration.response == "not_attending" %}btn-soft btn-error border-error{% endif %} btn-sm"><span class="icon icon-rounded">close</span></div>
                                                         {% else %}
-                                                            <div class="btn btn-circle shadow-md btn-outline {% if registration.response == "attending" %}btn-soft btn-success border-success{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded">check</span></div>
-                                                            <div class="btn btn-circle shadow-md btn-outline {% if registration.response == "no_response" %}btn-soft btn-info border-info{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded icon-20">question_mark</span></div>
-                                                            <div class="btn btn-circle shadow-md btn-outline {% if registration.response == "not_attending" %}btn-soft btn-error border-error{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded">close</span></div>
+                                                            <div class="btn btn-square shadow-md btn-outline {% if registration.response == "attending" %}btn-soft btn-success border-success{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded">check</span></div>
+                                                            <div class="btn btn-square shadow-md btn-outline {% if registration.response == "no_response" %}btn-soft btn-info border-info{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded icon-20">question_mark</span></div>
+                                                            <div class="btn btn-square shadow-md btn-outline {% if registration.response == "not_attending" %}btn-soft btn-error border-error{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded">close</span></div>
                                                         {% endif %}
                                                     {% endif %}
                                                 </li>
@@ -132,7 +137,7 @@
 
                                     {% with all_registrations=activity.all_registrations %}
                                         {% partialdef registration_status_modal inline %}
-                                            <dialog class="modal modal-bottom sm:modal-middle" id="registrations_activity_{{ activity.pk }}">
+                                            <dialog class="modal modal-bottom sm:modal-middle" id="registrations_activity_{{ activity.pk }}" hx-swap-oob="outerHTML">
                                                 <div class="modal-box min-w-1/2 max-w-5xl">
                                                     <h3 class="text-lg font-bold mb-2">{% translate "All members overview" %}</h3>
 
@@ -166,5 +171,75 @@
                 {% endfor %}
             </div>
         </div>
+
+        <dialog class="modal modal-bottom sm:modal-middle" id="registration_comment_modal">
+            <div class="modal-box min-w-1/2 max-w-5xl">
+                <h3 class="text-lg font-bold mb-2">{% translate "Not attending" %}</h3>
+                <div class="text-sm mb-2">{% translate "Please provide a reason why you cannot attend." %}</div>
+
+                <div>
+                    <textarea id="reason-input" name="comment" class="textarea w-full" required></textarea>
+
+                    <div class="modal-action">
+                        <button class="btn btn-neutral" onclick="submitWithReason()"><span class="icon icon-rounded icon-20">save</span>{% translate "Save" %}</button>
+                        <button class="btn btn-neutral btn-outline" onclick="cancelModal()">{% translate "Cancel" %}</button>
+                    </div>
+                </div>
+            </div>
+        </dialog>
     {% endpartialdef content %}
+
+    <script type="text/javascript">
+        document.body.addEventListener("htmx:beforeRequest", function(event) {
+           const el = event.target;
+
+           if (el.getAttribute("data-requires-reason") === "true") {
+               event.preventDefault();
+               window.htmxTriggerElement = el;
+               document.getElementById("registration_comment_modal").showModal();
+           }
+        });
+
+        function submitWithReason() {
+            const reasonInput = document.getElementById("reason-input");
+            const comment = reasonInput.value.trim();
+            const triggerEl = window.htmxTriggerElement;
+
+            if (!comment || !triggerEl) return;
+
+            const url = htmxTriggerElement.getAttribute('hx-post');
+            const target = htmxTriggerElement.getAttribute('hx-target') || 'body';
+            const swap = htmxTriggerElement.getAttribute('hx-swap') || 'innerHTML';
+
+            // Parse hx-vals if present
+            let extraVals = {};
+            const hxVals = htmxTriggerElement.getAttribute('hx-vals');
+            if (hxVals) {
+                try {
+                    extraVals = JSON.parse(hxVals);
+                } catch (e) {
+                    console.warn('Invalid hx-vals JSON:', hxVals);
+                }
+            }
+
+            // Combine reason with hx-vals
+            const values = { ...extraVals, "comment": comment };
+
+            // Close modal and clear input
+            document.getElementById("registration_comment_modal").close();
+            reasonInput.value = '';
+
+            // Send request via htmx.ajax
+            htmx.ajax('POST', url, {
+                target: target,
+                swap: swap,
+                values: values
+            });
+        }
+
+        function cancelModal() {
+            document.getElementById("registration_comment_modal").close();
+            document.getElementById("reason-input").value = "";
+        }
+    </script>
 {% endblock content %}
