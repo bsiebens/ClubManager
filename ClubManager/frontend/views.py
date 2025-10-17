@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from ClubManager.lib import HTMXTemplateResponse
 from activities.models import Registration, Activity, grouped_by_response
 from members.models import Member
+from messaging.models import Conversation
 from news.models import NewsItem
 
 BUCKETS = OrderedDict(
@@ -47,7 +48,7 @@ def calendar(request: HttpRequest) -> HttpResponse:
 
         registration = Activity.update_registration_status_for_member(activity, member, request.user, request.POST.get("response"), request.POST.get("comment", ""))
         all_registrations = grouped_by_response(activity.registrations.all(), BUCKETS, order_inside_bucket=True)
-        context.update({"activity": activity, "registration": registration, "all_registrations": all_registrations})
+        context.update({"activity": activity, "registration": registration, "all_registrations": all_registrations, "swap": True})
         partial_template = "registration_update"
 
     else:
@@ -69,7 +70,10 @@ def calendar(request: HttpRequest) -> HttpResponse:
     return HTMXTemplateResponse(request, "ClubManager/frontend/calendar.html", context=context, partial_template=partial_template)
 
 
-def conversations(request: HttpRequest) -> HttpResponse: ...
+def conversations(request: HttpRequest) -> HttpResponse:
+    conversations_for_user = Conversation.objects.for_user(request.user).with_unread_count(request.user).with_last_message().order_by("-last_message_time").prefetch_related("participants", "participants__user")
+
+    return HTMXTemplateResponse(request, "ClubManager/frontend/conversations.html", {"conversations": conversations_for_user}, partial_template="conversations")
 
 
 def notifications(request: HttpRequest) -> HttpResponse: ...

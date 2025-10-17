@@ -137,7 +137,7 @@
 
                                     {% with all_registrations=activity.all_registrations %}
                                         {% partialdef registration_status_modal inline %}
-                                            <dialog class="modal modal-bottom sm:modal-middle" id="registrations_activity_{{ activity.pk }}" hx-swap-oob="outerHTML">
+                                            <dialog class="modal modal-bottom sm:modal-middle" id="registrations_activity_{{ activity.pk }}" {% if swap %}hx-swap-oob="outerHTML"{% endif %}>
                                                 <div class="modal-box min-w-1/2 max-w-5xl">
                                                     <h3 class="text-lg font-bold mb-2">{% translate "All members overview" %}</h3>
 
