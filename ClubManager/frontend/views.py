@@ -36,6 +36,7 @@ def news(request: HttpRequest) -> HttpResponse:
     return HTMXTemplateResponse(request, "ClubManager/frontend/news.html", {"page": page}, partial_template=partial_template)
 
 
+@login_required
 def calendar(request: HttpRequest) -> HttpResponse:
     context = {}
     partial_template = "calendar"
