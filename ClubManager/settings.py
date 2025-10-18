@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "news.apps.NewsConfig",
     "sponsors.apps.SponsorsConfig",
     "messaging.apps.MessagingConfig",
+    "frontend.apps.FrontendConfig"
 ]
 
 if DEBUG:
