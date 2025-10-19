@@ -116,13 +116,43 @@
                                                         </div>
                                                     {% else %}
                                                         {% if activity.is_open %}
-                                                            <div hx-target="#registration_status_{{ registration.pk }}" hx-swap="outerHTML" hx-post="{% url "clubmanager:calendar" %}" hx-vals='{ "activity_pk": {{ activity.pk }}, "member_pk": {{ registration.member.pk }}, "response": "attending" }' class="btn btn-square shadow-md btn-outline {% if registration.response == "attending" %}btn-soft btn-success border-success{% endif %} btn-sm"><span class="icon icon-rounded">check</span></div>
-                                                            <div hx-target="#registration_status_{{ registration.pk }}" hx-swap="outerHTML" hx-post="{% url "clubmanager:calendar" %}" hx-vals='{ "activity_pk": {{ activity.pk }}, "member_pk": {{ registration.member.pk }}, "response": "no_response" }' class="btn btn-square shadow-md btn-outline {% if registration.response == "no_response" %}btn-soft btn-info border-info{% endif %} btn-sm"><span class="icon icon-rounded icon-20">question_mark</span></div>
-                                                            <div data-requires-reason="true" hx-target="#registration_status_{{ registration.pk }}" hx-swap="outerHTML" hx-post="{% url "clubmanager:calendar" %}" hx-vals='{ "activity_pk": {{ activity.pk }}, "member_pk": {{ registration.member.pk }}, "response": "not_attending" }' class="btn btn-square shadow-md btn-outline {% if registration.response == "not_attending" %}btn-soft btn-error border-error{% endif %} btn-sm"><span class="icon icon-rounded">close</span></div>
+                                                            <form hx-post="{% url "clubmanager:update_registration" %}" hx-target="#registration_status_{{ registration.pk }}" hx-swap="outerHTML" method="post" action="{% url "clubmanager:update_registration" %}">
+                                                                {% csrf_token %}
+
+                                                                <input type="hidden" name="activity_pk" value="{{ activity.pk }}" />
+                                                                <input type="hidden" name="member_pk" value="{{ registration.member.pk }}" />
+
+                                                                <div class="flex flex-row gap-4">
+                                                                    <button type="submit" name="response" value="attending" class="btn btn-square btn-outline btn-sm shadow-md {% if registration.response == "attending" %}btn-soft btn-success border-success{% endif %}">
+                                                                        <span class="icon icon-rounded">check</span>
+                                                                    </button>
+                                                                    <button type="submit" name="response" value="no_response" class="btn btn-square btn-outline btn-sm shadow-md {% if registration.response == "no_response" %}btn-soft btn-info border-info{% endif %}">
+                                                                        <span class="icon icon-rounded icon-20">question_mark</span>
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+
+                                                            <form hx-post="{% url "clubmanager:update_registration" %}" hx-target="#registration_comment_modal" hx-swap="outerHTML" method="post" action="{% url "clubmanager:update_registration" %}">
+                                                                {% csrf_token %}
+
+                                                                <input type="hidden" name="activity_pk" value="{{ activity.pk }}" />
+                                                                <input type="hidden" name="member_pk" value="{{ registration.member.pk }}" />
+                                                                <button type="submit" name="response" value="not_attending" class="btn btn-square btn-outline btn-sm shadow-md {% if registration.response == "not_attending" %}btn-soft btn-error border-error{% endif %}">
+                                                                    <span class="icon icon-rounded">close</span>
+                                                                </button>
+                                                            </form>
                                                         {% else %}
-                                                            <div class="btn btn-square shadow-md btn-outline {% if registration.response == "attending" %}btn-soft btn-success border-success{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded">check</span></div>
-                                                            <div class="btn btn-square shadow-md btn-outline {% if registration.response == "no_response" %}btn-soft btn-info border-info{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded icon-20">question_mark</span></div>
-                                                            <div class="btn btn-square shadow-md btn-outline {% if registration.response == "not_attending" %}btn-soft btn-error border-error{% endif %} btn-sm pointer-events-none"><span class="icon icon-rounded">close</span></div>
+                                                            <div class="flex flex-row gap-4">
+                                                                <div class="btn btn-square shadow-md btn-outline {% if registration.response == "attending" %}btn-soft btn-success border-success{% endif %} btn-sm pointer-events-none">
+                                                                    <span class="icon icon-rounded">check</span>
+                                                                </div>
+                                                                <div class="btn btn-square shadow-md btn-outline {% if registration.response == "no_response" %}btn-soft btn-info border-info{% endif %} btn-sm pointer-events-none">
+                                                                    <span class="icon icon-rounded icon-20">question_mark</span>
+                                                                </div>
+                                                                <div class="btn btn-square shadow-md btn-outline {% if registration.response == "not_attending" %}btn-soft btn-error border-error{% endif %} btn-sm pointer-events-none">
+                                                                    <span class="icon icon-rounded">close</span>
+                                                                </div>
+                                                            </div>
                                                         {% endif %}
                                                     {% endif %}
                                                 </li>
@@ -172,74 +202,21 @@
             </div>
         </div>
 
-        <dialog class="modal modal-bottom sm:modal-middle" id="registration_comment_modal">
-            <div class="modal-box min-w-1/2 max-w-5xl">
-                <h3 class="text-lg font-bold mb-2">{% translate "Not attending" %}</h3>
-                <div class="text-sm mb-2">{% translate "Please provide a reason why you cannot attend." %}</div>
+        <div id="registration_comment_modal"></div>
 
-                <div>
-                    <textarea id="reason-input" name="comment" class="textarea w-full" required></textarea>
-
-                    <div class="modal-action">
-                        <button class="btn btn-neutral shadow-md" onclick="submitWithReason()"><span class="icon icon-rounded icon-20">save</span>{% translate "Save" %}</button>
-                        <button class="btn btn-neutral btn-outline shadow-md" onclick="cancelModal()">{% translate "Cancel" %}</button>
-                    </div>
+        {% partialdef registration_comment_modal %}
+            <dialog class="modal modal-botton sm:modal-middle" id="registration_comment_modal" open>
+                <div class="modal-box min-w-1/2 max-w-5xl">
+                    {% include "ClubManager/frontend/calendar_comment_form.html#comment_form" %}
                 </div>
-            </div>
-        </dialog>
+            </dialog>
+        {% endpartialdef registration_comment_modal %}
     {% endpartialdef content %}
 
     <script type="text/javascript">
-        document.body.addEventListener("htmx:beforeRequest", function(event) {
-           const el = event.target;
-
-           if (el.getAttribute("data-requires-reason") === "true") {
-               event.preventDefault();
-               window.htmxTriggerElement = el;
-               document.getElementById("registration_comment_modal").showModal();
-           }
+        document.addEventListener("modalProcessedSuccesfully", function(event) {
+            const modal = document.getElementById("registration_comment_modal");
+            modal.close();
         });
-
-        function submitWithReason() {
-            const reasonInput = document.getElementById("reason-input");
-            const comment = reasonInput.value.trim();
-            const triggerEl = window.htmxTriggerElement;
-
-            if (!comment || !triggerEl) return;
-
-            const url = htmxTriggerElement.getAttribute('hx-post');
-            const target = htmxTriggerElement.getAttribute('hx-target') || 'body';
-            const swap = htmxTriggerElement.getAttribute('hx-swap') || 'innerHTML';
-
-            // Parse hx-vals if present
-            let extraVals = {};
-            const hxVals = htmxTriggerElement.getAttribute('hx-vals');
-            if (hxVals) {
-                try {
-                    extraVals = JSON.parse(hxVals);
-                } catch (e) {
-                    console.warn('Invalid hx-vals JSON:', hxVals);
-                }
-            }
-
-            // Combine reason with hx-vals
-            const values = { ...extraVals, "comment": comment };
-
-            // Close modal and clear input
-            document.getElementById("registration_comment_modal").close();
-            reasonInput.value = '';
-
-            // Send request via htmx.ajax
-            htmx.ajax('POST', url, {
-                target: target,
-                swap: swap,
-                values: values
-            });
-        }
-
-        function cancelModal() {
-            document.getElementById("registration_comment_modal").close();
-            document.getElementById("reason-input").value = "";
-        }
     </script>
 {% endblock content %}

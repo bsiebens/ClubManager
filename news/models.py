@@ -32,7 +32,7 @@ class NewsItem(RulesModel):
     type = models.IntegerField(_("type"), choices=NewsItemTypeChoices.choices, default=NewsItemTypeChoices.INTERNAL, help_text=_("Internal news is only visible to members after logging in. External news will be published on the website."))
     publish_on = models.DateTimeField(_("Publish on"), default=timezone.now, help_text="Date and time on which this item should be published. Only released items will be posted.")
 
-    teams = models.ManyToManyField(Team, related_name="news_items")
+    teams = models.ManyToManyField(Team, related_name="news_items", blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

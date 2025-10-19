@@ -7,7 +7,7 @@ from django.views.i18n import JavaScriptCatalog
 
 urlpatterns = [
     path("", RedirectView.as_view(pattern_name="clubmanager:news"), name="home"),
-    path("clubmanager/", include("ClubManager.frontend.urls")),
+    path("clubmanager/", include("frontend.urls")),
     path("accounts/", include("allauth.urls")),
     path("admin/", admin.site.urls),
     path("markdownx/", include("markdownx.urls")),

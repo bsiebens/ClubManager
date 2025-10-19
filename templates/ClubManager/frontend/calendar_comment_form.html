@@ -1,0 +1,40 @@
+{% extends "ClubManager/base.html" %}
+
+{% load i18n %}
+{% load partials %}
+
+{% block title %}
+    <div id="title_block">{% translate "Calendar" %}</div>
+{% endblock title %}
+
+{% block content %}
+    {% partialdef comment_form inline %}
+        <h3 class="text-lg font-bold mb-2">{% translate "Not attending" %}</h3>
+        <div class="text-sm mb-2">{% translate "Please provide a reason why you cannot attend." %}</div>
+
+        <form method="post" action="{% url "clubmanager:update_registration" %}" hx-post="{% url "clubmanager:update_registration" %}" hx-target="#registration_status_{{ registration.pk }}" hx-swap="outerHTML">
+            {% csrf_token %}
+
+            <input type="hidden" name="activity_pk" value="{{ activity.pk }}" />
+            <input type="hidden" name="member_pk" value="{{ member.pk }}" />
+
+            <textarea name="comment" class="textarea w-full" required></textarea>
+
+            <div class="modal-action">
+                <button type="submit" name="response" value="not_attending" class="btn btn-neutral shadow-md"><span class="icon icon-rounded icon-20">save</span>{% translate "Save" %}</button>
+
+                {% if htmx %}
+                    <button type="button" class="btn btn-neutral btn-outline shadow-md" onclick="cancelModal()">{% translate "Cancel" %}</button>
+                {% else %}
+                    <a href="{% url "clubmanager:calendar" %}" class="btn btn-neutral btn-outline shadow-md">{% translate "Cancel" %}</a>
+                {% endif %}
+            </div>
+        </form>
+
+        <script type="text/javascript">
+            function cancelModal() {
+                document.getElementById("registration_comment_modal").close();
+            }
+        </script>
+    {% endpartialdef comment_form %}
+{% endblock content %}
