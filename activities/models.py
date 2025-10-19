@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
 from recurrence.fields import RecurrenceField
-from rules import is_superuser
+from rules import is_superuser, test_rule
 from rules.contrib.models import RulesModel
 from simple_history.models import HistoricalRecords
 
@@ -308,7 +308,7 @@ class Activity(PolymorphicModel):
         registration = self.registrations.get(member=member)
 
         # Verify if the requesting user actually has the necessary rights to update this registration
-        if registration.member.user == requesting_user or registration.member in requesting_user.member.family_members.all() or requesting_user.is_superuser:
+        if test_rule("can_modify_registration_for_member", requesting_user, member):
             if response == Registration.ResponseOptions.NOT_ATTENDING and (comment is None or comment == ""):
                 raise AttributeError(_("Response cannot be empty for a registration that is not attending"))
 
