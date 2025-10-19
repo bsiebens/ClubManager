@@ -134,36 +134,20 @@
 
             <div class="m-4 mb-2 lg:m-12 lg:mb-0 grow pb-20 lg:pb-0">
                 <div class="max-w-screen-2xl mx-auto">
-                    <h1 class="text-3xl font-bold grow" id="title_block">{% block title %}{% endblock title %}</h1>
-
                     <div class="my-8">
                         <div class="flex flex-row gap-6">
                             <div class="grow">
+                                <h1 class="text-3xl font-bold grow mb-8" id="title_block">{% block title %}{% endblock title %}</h1>
+
                                 {% block content %}
                                     <div id="content_block"></div>
                                 {% endblock content %}
                             </div>
 
-                            <div class="basis-1/4 hidden {% if sponsors|length > 0 %}lg:flex{% endif %} flex-col gap-4">
-                                {% if sponsors|length > 0 %}
-                                    <div class="font-jersey mb-2">Sponsors</div>
-                                    <div class="grid grid-cols-2 gap-4 justify-items-center content-center">
-                                        {% for sponsor in sponsors %}
-                                            {% if sponsor.url is not None %}
-                                                <a href="{{ sponsor.url }}">
-                                            {% endif %}
-
-                                            <div class="flex flex-col gap-2">
-                                                <img class="rounded-xl max-h-32 object-scale-down transform-gpu w-full max-w-fit" src="{% get_media_prefix %}{{ sponsor.logo }}" alt="{{ sponsor.name }}" loading="lazy" />
-                                                <div class="text-sm font-jersey mx-auto">{{ sponsor.name }}</div>
-                                            </div>
-
-                                            {% if sponsor.url is not None %}
-                                                </a>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
+                            <div class="basis-1/4 hidden lg:flex flex-col gap-4">
+                                <div id="upcoming activities" hx-get="{% url "clubmanager:sidebar_upcoming_activities" %}" hx-trigger="revealed, registrationsUpdated from:body">
+                                    {% translate "No upcoming activities found" %}
+                                </div>
                             </div>
                         </div>
                     </div>

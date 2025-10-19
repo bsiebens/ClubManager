@@ -12,4 +12,5 @@ urlpatterns = [
     path("notifications/", views.notifications, name="notifications"),
     path("settings/", views.settings, name="settings"),
     path("check/", views.check, name="check"),
+    path("sidebar/upcoming_activities/", views.sidebar_upcoming_activities, name="sidebar_upcoming_activities"),
 ]

@@ -1,0 +1,65 @@
+{% load i18n %}
+
+<div class="font-jersey text-xl">{% translate "Upcoming activities" %}</div>
+
+{% if activities|length > 1 %}
+    <ul class="list">
+        {% for activity in activities %}
+            <li class="list-row">
+                <div class="flex flex-col items-center font-thin opacity-80 uppercase">
+                    <div class="text-xs">{{ activity.start_time|date:"D" }}</div>
+                    <div class="text-md">{{ activity.start_time|date:"d b" }}</div>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <div class="font-semibold items-center flex flex-row text-md border-b border-neutral pb-1 mb-2">
+                        {% if activity.type.type == "game" %}
+                            {% if activity.opponent %}
+                                <span class="lg:hidden">{{ activity.team.short_name }}</span><span class="hidden lg:inline">{{ activity.team.name }}</span> vs. {{ activity.opponent }}
+                            {% else %}
+                                {% translate "Game" %} {{ activity.team.name }}
+                            {% endif %}
+                        {% else %}
+                            {{ activity.teams.all|join:", " }} - {{ activity.get_title }}
+                        {% endif %}
+                        ({{ activity.start_time|date:"H:i" }} <span class="icon icon-rounded icon-20">arrow_right_alt</span> {{ activity.end_time|date:"H:i" }})
+                    </div>
+                    {% for registration in activity.my_registrations %}
+                        <div class="flex flex-row gap-2 text-sm items-center">
+                            <div class="grow">{{ registration.member }}</div>
+                            {% if registration.response == "selected" %}
+                                <div class="btn btn-success btn-xs btn-soft shadow-md border border-success pointer-events-none">
+                                    <span class="icon icon-rounded text-sm">check_circle</span>
+                                    {% translate "selected" %}
+                                </div>
+                            {% elif registration.response == "not_selected" %}
+                                <div class="btn btn-error btn-xs btn-soft shadow-md border border-error pointer-events-none">
+                                    <span class="icon icon-rounded text-sm">cancel</span>
+                                    {% translate "not selected" %}
+                                </div>
+                            {% elif registration.response == "attending" %}
+                                <div class="btn btn-success btn-xs btn-soft shadow-md border border-success pointer-events-none">
+                                    <span class="icon icon-rounded text-sm">check</span>
+                                    {% translate "attending" %}
+                                </div>
+                            {% elif registration.response == "not_attending" %}
+                                <div class="btn btn-error btn-xs btn-soft shadow-md border border-error pointer-events-none">
+                                    <span class="icon icon-rounded text-sm">close</span>
+                                    {% translate "not attending" %}
+                                </div>
+                            {% elif registration.response == "no_response" %}
+                                <div class="btn btn-info btn-xs btn-soft shadow-md border border-info pointer-events-none">
+                                    <span class="icon icon-rounded text-sm">question_mark</span>
+                                    {% translate "no response" %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a class="w-full btn btn-sm btn-neutral btn-outline" href="{% url "clubmanager:calendar" %}" class="group nav-link" hx-get="{% url "clubmanager:calendar" %}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">{% translate "Go to calendar" %}<span class="icon icon-rounded icon-20">arrow_right_alt</span></a>
+{% else %}
+    <div class="mt-2 text-sm opacity-75">{% translate "No upcoming activities found ..." %}</div>
+{% endif %}

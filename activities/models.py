@@ -269,6 +269,13 @@ class Activity(PolymorphicModel):
     def total_registrations(self) -> int:
         """Returns the total number of registrations for the activity"""
         return self.registrations.count()
+    
+    def get_title(self) -> str:
+        """Returns the title of the activity"""
+        if self.type.type == ActivityType.ActivityTypes.PRACTICE:
+            return self.type.name
+        
+        return self.title
 
     def generate_registrations(self) -> None:
         """Generates new registrations for the activity based on the current members and teams"""
@@ -521,7 +528,7 @@ class PracticeOccurrence(Activity):
         return self.title
 
     def save(self, *args, **kwargs):
-        self.title = _("Practice")
+        self.title = self.type.name
         super().save(*args, **kwargs)
 
 

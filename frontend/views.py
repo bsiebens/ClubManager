@@ -74,7 +74,7 @@ def update_registration(request: HttpRequest) -> HttpResponse:
                 return redirect("clubmanager:calendar")
             
             response = HTMXTemplateResponse(request, "ClubManager/frontend/calendar.html", {"activity": activity, "registration": registration, "all_registrations": all_registrations, "swap": True}, partial_template="registration_update")
-            return trigger_client_event(response, "modalProcessedSuccesfully")
+            return trigger_client_event(response, "registrationsUpdated")
     
     else:
         registration = Activity.update_registration_status_for_member(activity, member, request.user, request.POST.get("response"), request.POST.get("comment", ""))
@@ -83,7 +83,8 @@ def update_registration(request: HttpRequest) -> HttpResponse:
         if not request.htmx:
             return redirect("clubmanager:calendar")
 
-        return HTMXTemplateResponse(request, "ClubManager/frontend/calendar.html", {"activity": activity, "registration": registration, "all_registrations": all_registrations, "swap": True}, partial_template="registration_update")
+        response = HTMXTemplateResponse(request, "ClubManager/frontend/calendar.html", {"activity": activity, "registration": registration, "all_registrations": all_registrations, "swap": True}, partial_template="registration_update")
+        return trigger_client_event(response, "registrationsUpdated")
 
 def conversations(request: HttpRequest) -> HttpResponse: ...
 
@@ -93,3 +94,8 @@ def settings(request: HttpRequest) -> HttpResponse: ...
 
 def check(request: HttpRequest) -> HttpResponse:
     return render(request, "ClubManager/base.html#icons")
+
+def sidebar_upcoming_activities(request: HttpRequest) -> HttpResponse:
+    activities = Activity.for_user(request.user, include_registrations=True).filter(start_time__gte=timezone.now()).order_by("start_time")[:5]
+    
+    return render(request, "ClubManager/frontend/sidebar/upcoming_activities.html", {"activities": activities})

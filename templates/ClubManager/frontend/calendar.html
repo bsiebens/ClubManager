@@ -53,11 +53,11 @@
                                                         {% translate "Game" %} {{ activity.team.name }}
                                                     {% endif %}
                                                 {% else %}
-                                                    {{ activity.teams.all|join:", " }} - {{ activity.title }}
+                                                    {{ activity.teams.all|join:", " }} - {{ activity.get_title }}
                                                 {% endif %}
                                             </div>
 
-                                            <div class="badge badge-sm {% if activity.type.type == "practice" %}badge-primary{% elif activity.type.type == "game" %}badge-accent{% else %}badge-secondary{% endif %} shadow-md">{{ activity.type|lower }}</div>
+                                            <div class="badge badge-sm {% if activity.type.type == "practice" %}badge-primary{% elif activity.type.type == "game" %}badge-accent{% else %}badge-secondary{% endif %} shadow-md">{{ activity.type.get_type_display|lower }}</div>
                                         </div>
 
                                         <div class="flex flex-col lg:flex-row gap-2 opacity-75 text-md w-full justify-between">
@@ -116,7 +116,7 @@
                                                         </div>
                                                     {% else %}
                                                         {% if activity.is_open %}
-                                                            <form hx-post="{% url "clubmanager:update_registration" %}" hx-target="#registration_status_{{ registration.pk }}" hx-swap="outerHTML" method="post" action="{% url "clubmanager:update_registration" %}">
+                                                            <form id="basic_registration_response_form" hx-post="{% url "clubmanager:update_registration" %}" hx-target="#registration_status_{{ registration.pk }}" hx-swap="outerHTML" method="post" action="{% url "clubmanager:update_registration" %}">
                                                                 {% csrf_token %}
 
                                                                 <input type="hidden" name="activity_pk" value="{{ activity.pk }}" />
@@ -214,7 +214,7 @@
     {% endpartialdef content %}
 
     <script type="text/javascript">
-        document.addEventListener("modalProcessedSuccesfully", function(event) {
+        document.addEventListener("registrationsUpdated", function(event) {
             const modal = document.getElementById("registration_comment_modal");
             modal.close();
         });
