@@ -190,12 +190,12 @@
         </div>
 
         <div class="dock lg:hidden bg-neutral text-neutral-content">
-            <a href="{{ news_url }}" class="group {% if news_url in request.path %}dock-active{% endif %}">
+            <a href="{{ news_url }}" class="group {% if news_url in request.path %}dock-active{% endif %}" hx-get="{{ news_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
                 <span class="icon icon-rounded group-hover:icon-filled {% if news_url in request.path %}icon-filled{% endif %}">home</span>
                 <span class="dock-label pb-2">{% translate "Home" %}</span>
             </a>
 
-            <a href="{{ calendar_url }}" class="group {% if calendar_url in request.path %}dock-active{% endif %}">
+            <a href="{{ calendar_url }}" class="group {% if calendar_url in request.path %}dock-active{% endif %}" hx-get="{{ calendar_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
                 <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if calendar_url in request.path %}icon-filled{% endif %}">calendar_month</span>
                 <span class="dock-label pb-2">{% translate "Calendar" %}</span>
             </a>
