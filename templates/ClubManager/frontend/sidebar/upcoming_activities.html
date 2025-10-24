@@ -11,7 +11,7 @@
                     <div class="text-md">{{ activity.start_time|date:"d b" }}</div>
                 </div>
                 <div class="flex flex-col gap-1">
-                    <div class="font-semibold items-center flex flex-row text-md border-b border-neutral pb-1 mb-2">
+                    <div class="font-semibold items-center flex flex-row text-md">
                         {% if activity.type.type == "game" %}
                             {% if activity.opponent %}
                                 <span class="lg:hidden">{{ activity.team.short_name }}</span><span class="hidden lg:inline">{{ activity.team.name }}</span> vs. {{ activity.opponent }}
@@ -22,6 +22,10 @@
                             {{ activity.teams.all|join:", " }} - {{ activity.get_title }}
                         {% endif %}
                         ({{ activity.start_time|date:"H:i" }} <span class="icon icon-rounded icon-20">arrow_right_alt</span> {{ activity.end_time|date:"H:i" }})
+                    </div>
+                    <div class="opacity-80 font-thin text-xs border-b border-neutral pb-1 mb-2 items-center flex flex-row gap-2">
+                        <div class="icon icon-rounded opacity-80 text-xs">location_on</div>
+                        <div>{{ activity.location }}</div>
                     </div>
                     {% for registration in activity.my_registrations %}
                         <div class="flex flex-row gap-2 text-sm items-center">
