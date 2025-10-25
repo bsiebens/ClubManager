@@ -190,23 +190,23 @@
         </div>
 
         <div class="dock lg:hidden bg-neutral text-neutral-content">
-            <a href="{{ news_url }}" class="group {% if news_url in request.path %}dock-active{% endif %}" hx-get="{{ news_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
+            <a href="{{ news_url }}" class="group nav-bottom-link {% if news_url in request.path %}dock-active{% endif %}" hx-get="{{ news_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
                 <span class="icon icon-rounded group-hover:icon-filled {% if news_url in request.path %}icon-filled{% endif %}">home</span>
                 <span class="dock-label pb-2">{% translate "Home" %}</span>
             </a>
 
-            <a href="{{ calendar_url }}" class="group {% if calendar_url in request.path %}dock-active{% endif %}" hx-get="{{ calendar_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
+            <a href="{{ calendar_url }}" class="group nav-bottom-link {% if calendar_url in request.path %}dock-active{% endif %}" hx-get="{{ calendar_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
                 <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if calendar_url in request.path %}icon-filled{% endif %}">calendar_month</span>
                 <span class="dock-label pb-2">{% translate "Calendar" %}</span>
             </a>
 
-            <a href="{{ settings_url }}" class="group {% if settings_url in request.path %}dock-active{% endif %}">
+            <a href="{{ settings_url }}" class="group nav-bottom-link {% if settings_url in request.path %}dock-active{% endif %}">
                 <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if settings_url in request.path %}icon-filled{% endif %}">settings</span>
                 <span class="dock-label pb-2">{% translate "Settings" %}</span>
             </a>
 
             {% if request.user.is_staff %}
-                <a href="{{ settings_url }}" class="group {% if calendar_url in request.path %}dock-active{% endif %}">
+                <a href="{{ settings_url }}" class="group nav-bottom-link {% if calendar_url in request.path %}dock-active{% endif %}">
                     <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if calendar_url in request.path %}icon-filled{% endif %}">shield_person</span>
                     <span class="dock-label pb-2">{% translate "Admin" %}</span>
                 </a>
@@ -237,6 +237,8 @@
         </script>
 
         <script type="text/javascript">
+            // ToDo: Update this to use IDs on the different links to keep both the top and bottom navs in sync when switching pages.
+
             document.body.addEventListener("htmx:afterOnLoad", function(event) {
                const clicked = event.detail.elt;
 
@@ -260,6 +262,24 @@
                        parentLi.classList.replace("border-neutral", "border-neutral-content");
                    }
                }
+
+                // Only proceed if the trigger is a nav link
+                if (clicked.classList.contains("nav-bottom-link")) {
+                    // Remove the 'icon-filled' and set border color to neutral
+                    document.querySelectorAll("a.nav-bottom-link span.icon").forEach(icon => {
+                        icon.classList.remove("icon-filled");
+                    });
+                    document.querySelectorAll("a.dock-active").forEach(li => {
+                        li.classList.remove("dock-active")
+                    });
+
+                    const iconSpan = clicked.querySelector(".icon")
+                    if (iconSpan) {
+                        iconSpan.classList.add("icon-filled");
+                    }
+
+                    clicked.classList.add("dock-active");
+                }
             });
         </script>
     </body>
