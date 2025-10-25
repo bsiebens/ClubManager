@@ -312,6 +312,7 @@ dependencies = [
     { name = "django-extensions" },
     { name = "django-generic-notifications" },
     { name = "django-htmx" },
+    { name = "django-ical" },
     { name = "django-markdownx" },
     { name = "django-phonenumber-field", extra = ["phonenumbers"] },
     { name = "django-polymorphic" },
@@ -351,6 +352,7 @@ requires-dist = [
     { name = "django-extensions", specifier = ">=4.1" },
     { name = "django-generic-notifications", specifier = ">=1.3.0" },
     { name = "django-htmx", specifier = ">=1.26.0" },
+    { name = "django-ical", specifier = ">=1.9.2" },
     { name = "django-markdownx", specifier = ">=4.0.9" },
     { name = "django-phonenumber-field", extras = ["phonenumbers"], specifier = ">=8.1.0" },
     { name = "django-polymorphic", specifier = ">=4.1.0" },
@@ -661,6 +663,20 @@ wheels = [
 ]
 
 [[package]]
+name = "django-ical"
+version = "1.9.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "django-recurrence" },
+    { name = "icalendar" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e1/dc/70971de377f77c4f9f789a38b049b5fa239f1cfc6b671b0503971960f245/django-ical-1.9.2.tar.gz", hash = "sha256:44c9b6fa90d09f25e9ebaa91ed9eb007f079afbc23d6aac909cfc18188a8e90c", size = 30831, upload-time = "2023-06-12T15:22:54.015Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/05/3f/647857462fa4169cb855aaf14969a6843f3910a3781d7c17f18c460b0e08/django_ical-1.9.2-py3-none-any.whl", hash = "sha256:74a16bca05735f91a00120cad7250f3c3aa292a9f698a6cfdc544a922c11de70", size = 15494, upload-time = "2023-06-12T15:22:37.618Z" },
+]
+
+[[package]]
 name = "django-markdownx"
 version = "4.0.9"
 source = { registry = "https://pypi.org/simple" }
@@ -945,6 +961,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/3a/51/1947bd81d75af87e3bb9e34593a4cf118115a8feb451ce7a69044ef1412e/hyperlink-21.0.0.tar.gz", hash = "sha256:427af957daa58bc909471c6c40f74c5450fa123dd093fc53efd2e91d2705a56b", size = 140743, upload-time = "2021-01-08T05:51:20.972Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6e/aa/8caf6a0a3e62863cbb9dab27135660acba46903b703e224f14f447e57934/hyperlink-21.0.0-py2.py3-none-any.whl", hash = "sha256:e6b14c37ecb73e89c77d78cdb4c2cc8f3fb59a885c5b3f819ff4ed80f25af1b4", size = 74638, upload-time = "2021-01-08T05:51:22.906Z" },
+]
+
+[[package]]
+name = "icalendar"
+version = "6.3.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-dateutil" },
+    { name = "tzdata" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/08/13/e5899c916dcf1343ea65823eb7278d3e1a1d679f383f6409380594b5f322/icalendar-6.3.1.tar.gz", hash = "sha256:a697ce7b678072941e519f2745704fc29d78ef92a2dc53d9108ba6a04aeba466", size = 177169, upload-time = "2025-05-20T07:42:50.683Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6c/25/b5fc00e85d2dfaf5c806ac8b5f1de072fa11630c5b15b4ae5bbc228abd51/icalendar-6.3.1-py3-none-any.whl", hash = "sha256:7ea1d1b212df685353f74cdc6ec9646bf42fa557d1746ea645ce8779fdfbecdd", size = 242349, upload-time = "2025-05-20T07:42:48.589Z" },
 ]
 
 [[package]]
@@ -1435,6 +1464,7 @@ dependencies = [
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7c/df/f1368d22ab5dde88e117b40f5ca18f417006d43a768afc604dec3a900bd4/pywebpush-2.1.0.tar.gz", hash = "sha256:3cd55b7d217ab95beb083e68f61b812f0545f74566928312203076b069ff55c8", size = 27233, upload-time = "2025-09-29T17:05:33.117Z" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/5d/f1/41d97a4d73ddcafc6f310c287c656139c7cb7a913bfdb4e78f1a16de9a4a/pywebpush-2.1.0-1-py3-none-any.whl", hash = "sha256:587b6244e7b08590aaef9046fc8f9e077f57ebfe35b06b88faa33f84697ee540", size = 22666, upload-time = "2025-10-14T18:18:29.858Z" },
     { url = "https://files.pythonhosted.org/packages/fe/d7/7fcf09a5df44666455dedc19ed02921e7c5c3dc299b01867f9d5eba83509/pywebpush-2.1.0-py3-none-any.whl", hash = "sha256:fb5c944057d262cca9eb18dd1a4291d5f5298c25b9564c42eecd09ba548748d2", size = 22699, upload-time = "2025-09-29T17:05:31.369Z" },
 ]
 

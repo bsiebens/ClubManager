@@ -35,6 +35,7 @@ class Member(RulesModel):
 
     phone_number = PhoneNumberField(_("phone number"), blank=True, null=True)
     emergency_phone_number = PhoneNumberField(_("emergency phone number"), blank=True, null=True)
+    token = models.CharField(_("token"), max_length=64, unique=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
