@@ -3,11 +3,13 @@ import secrets
 
 from django.db import migrations
 
+
 def generate_member_tokens(apps, schema_editor):
     Member = apps.get_model("members", "Member")
     for member in Member.objects.all():
-        member.token = secrets.token_urlsafe(64)
+        member.token = secrets.token_urlsafe(32)
         member.save(update_fields=["token"])
+
 
 class Migration(migrations.Migration):
 

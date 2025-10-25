@@ -144,7 +144,7 @@
                                 {% endblock content %}
                             </div>
 
-                            <div class="basis-1/4 hidden lg:flex flex-col gap-4">
+                            <div class="basis-1/4 shrink-0 hidden lg:flex flex-col gap-4">
                                 <div id="upcoming activities" hx-get="{% url "clubmanager:sidebar_upcoming_activities" %}" hx-trigger="revealed, registrationsUpdated from:body">
                                     {% translate "No upcoming activities found" %}
                                 </div>
