@@ -26,7 +26,7 @@ class ActivityFeed(ICalFeed):
         except Member.DoesNotExist:
             raise Http404("Invalid token")
 
-        return Activity.for_user(user=member.user)
+        return Activity.for_user(user=member.user, only_future_instances=False)
 
     def item_title(self, item):
         if item.type.type == ActivityType.ActivityTypes.GAME:

@@ -196,13 +196,14 @@ class Activity(PolymorphicModel):
         ordering = ["start_time", "end_time"]
 
     @classmethod
-    def for_user(cls, user, include_registrations=True) -> QuerySet["Activity"]:
+    def for_user(cls, user, include_registrations=True, only_future_instances=True) -> QuerySet["Activity"]:
         """
         Retrieve a list of activities for a specific user. Activities are filtered based on teams
         or members the user is associated with, along with optional inclusion of registration
         details. Only future activities from now are included, and results are ordered by the
         start time.
 
+        :param only_future_instances: Limit returned instances to those that start in the future. Defaults to True.
         :param user: The user for whom activities are being retrieved.
         :type user: User
         :param include_registrations: Whether to include prefetching registration details for
@@ -213,7 +214,12 @@ class Activity(PolymorphicModel):
         members = Member.objects.filter(Q(user=user) | Q(family_members__user=user)).distinct().values_list("pk", flat=True)
         teams = Team.objects.filter(teammembership__season=Season.for_date(), teammembership__member__in=members).distinct().values_list("pk", flat=True)
 
-        activities = cls.objects.not_instance_of(Practice).filter(Q(teams__in=teams) | Q(members__in=members)).filter(start_time__gte=timezone.now()).select_related("type").order_by("start_time").prefetch_related("teams")
+        activities = cls.objects.not_instance_of(Practice).filter(Q(teams__in=teams) | Q(members__in=members))
+        
+        if only_future_instances:
+            activities = activities.filter(start_time__gte=timezone.now())
+        
+        activities = activities.select_related("type").order_by("start_time").prefetch_related("teams")
 
         if include_registrations:
             activities = activities.prefetch_related(
