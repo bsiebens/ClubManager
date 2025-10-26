@@ -11,8 +11,8 @@ db.sqlite3
 db.sqlite3-journal
 media
 
-ClubManager.iml
-misc.xml
+.idea/ClubManager.iml
+.idea/misc.xml
 
 .django_tailwind_cli
 static_root/
