@@ -2,7 +2,6 @@
 <project version="4">
   <component name="Black">
     <option name="cmdArguments" value="-l 250" />
-    <option name="enabledOnSave" value="true" />
     <option name="pathToExecutable" value="$USER_HOME$/Library/Python/3.9/bin/black" />
     <option name="sdkName" value="uv (clubmanager)" />
   </component>
