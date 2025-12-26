@@ -3,7 +3,8 @@
   <component name="Black">
     <option name="cmdArguments" value="-l 250" />
     <option name="enabledOnSave" value="true" />
-    <option name="sdkName" value="uv (ClubManager)" />
+    <option name="pathToExecutable" value="$USER_HOME$/Library/Python/3.9/bin/black" />
+    <option name="sdkName" value="uv (clubmanager)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="uv (ClubManager)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="uv (clubmanager)" project-jdk-type="Python SDK" />
 </project>
