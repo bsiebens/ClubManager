@@ -86,7 +86,7 @@ def send_notifications(sender, instance, created, **kwargs) -> None:
         send_notification_to_users = True
 
         queryset = (
-            instance.members.all().select_related("member__user").prefetch_related("member__family_members__user")
+            instance.members.all().select_related("user").prefetch_related("member__family_members__user")
             | Member.objects.filter(team_memberships__season=Season.for_date(), team_memberships__team__in=instance.teams.all()).select_related("user").prefetch_related("family_members__user")
         ).distinct()
 

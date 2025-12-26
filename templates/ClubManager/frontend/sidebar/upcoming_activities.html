@@ -2,7 +2,7 @@
 
 <div class="font-jersey text-xl">{% translate "Upcoming activities" %}</div>
 
-{% if activities|length > 1 %}
+{% if activities|length >= 1 %}
     <ul class="list">
         {% for activity in activities %}
             <li class="list-row">

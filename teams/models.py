@@ -76,7 +76,7 @@ class Season(RulesModel):
         rules_permissions = {"add": is_superuser, "view": is_superuser, "change": is_superuser, "delete": is_superuser}
         constraints = [
             models.UniqueConstraint(fields=["start_date", "end_date"], name="season_start_date_end_date_unique", violation_error_message=_("Start and end date for a given season must be unique.")),
-            models.CheckConstraint(check=models.Q(start_date__lt=models.F("end_date")), name="season_start_date_lt_end_date", violation_error_message=_("Start date must be before end date.")),
+            models.CheckConstraint(condition=models.Q(start_date__lt=models.F("end_date")), name="season_start_date_lt_end_date", violation_error_message=_("Start date must be before end date.")),
         ]
 
     def __str__(self):

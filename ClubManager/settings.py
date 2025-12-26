@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     "simple_history",
     "allauth",
     "allauth.account",
-    "template_partials",
     "generic_notifications",
     "polymorphic",
     "recurrence",
