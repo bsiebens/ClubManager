@@ -1,6 +1,8 @@
 {% extends "ClubManager/base.html" %}
 
 {% load i18n %}
+{% load humanize %}
+{% load avatar %}
 
 {% partialdef conversations %}
     <div id="title_block" hx-swap-oob="innerHTML">{% translate "Conversations" %}</div>
@@ -15,10 +17,65 @@
     {% partialdef content inline %}
         <div id="content_block">
             <div class="flex gap-8">
-                <div class="flex flex-col w-full lg:basis-2/5">
+                <div class="flex flex-col w-full lg:basis-2/5 gap-2">
                     <a class="w-full btn btn-primary shadow-md">
                         <span class="icon icon-rounded">add_comment</span>{% translate "Create new conversation" %}
                     </a>
+
+                    {% if conversations|length > 0 %}
+                        {% partialdef conversations_list inline %}
+                            <ul class="list w-full" id="conversation_list">
+                                {% for conversation in conversations %}
+                                    <li class="list-row items-center hover:bg-base-200">
+                                        <div class="list-col-grow">
+                                            <div class="flex flex-row gap-1 items-center mb-1">
+                                                <div class="font-bold text-lg">
+                                                    {% if conversation.conversation_type == "private" %}
+                                                        {% for participant in conversation.participants.all %}
+                                                            {% if participant.user != request.user %}
+                                                                {{ participant.user.get_full_name }}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        {{ conversation.name }}
+                                                    {% endif %}
+                                                </div>
+
+                                                {% if conversation.unread_count > 0 %}
+                                                    <div class="status status-error"></div>
+                                                {% endif %}
+
+                                                {% if conversation.last_message_time %}
+                                                    <div class="icon icon-rounded opacity-75 icon-20 text-sm ml-4 hidden md:flex">schedule</div>
+                                                    <div class="opacity-75 text-sm hidden md:flex">{{ conversation.last_message_time|naturaltime }}</div>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="text-xs opacity-75">{{ conversation.last_message_content|truncatechars_html:"60" }}</div>
+
+                                            {% if conversation.last_message_time %}
+                                                <div class="flex flex-row gap-2 mt-2">
+                                                    <div class="icon icon-rounded opacity-75 icon-20 text-sm md:hidden">schedule</div>
+                                                    <div class="opacity-75 text-xs md:hidden">{{ conversation.last_message_time|naturaltime }}</div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="hidden md:flex">
+                                            {% avatar_messages conversation request.user %}
+                                        </div>
+
+                                        <div class="icon icon-rounded icon-40 opacity-80 text-3xl">chevron_right</div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endpartialdef %}
+                    {% else %}
+                        <div class="flex flex-row gap-2 items-center w-full mt-4 opacity-75 justify-center">
+                            <div class="icon icon-rounded icon-20">chat_dashed</div>
+                            <div class="font-semibold text-sm">{% translate "No conversations found" %}</div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
