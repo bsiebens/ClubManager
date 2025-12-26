@@ -12,66 +12,66 @@
 <!DOCTYPE html>
 
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-        <title>
-            ClubManager{% if CM_CLUB_NAME != "ClubManager" %} - {{ CM_CLUB_NAME }}{% endif %}
-        </title>
+    <title>
+        ClubManager{% if CM_CLUB_NAME != "ClubManager" %} - {{ CM_CLUB_NAME }}{% endif %}
+    </title>
 
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/styles/choices.min.css" />
-        <script src="https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/scripts/choices.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/styles/choices.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/scripts/choices.min.js"></script>
 
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 
-        {% htmx_script %}
-        {% webpush_header %}
-        {% tailwind_css %}
-    </head>
+    {% htmx_script %}
+    {% webpush_header %}
+    {% tailwind_css %}
+</head>
 
-    <body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
-        {% url "clubmanager:news" as news_url %}
-        {% url "clubmanager:calendar" as calendar_url %}
-        {% url "clubmanager:notifications" as notifications_url %}
-        {% url "clubmanager:conversations" as conversations_url %}
-        {% url "clubmanager:settings" as settings_url %}
+<body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
+{% url "clubmanager:news" as news_url %}
+{% url "clubmanager:calendar" as calendar_url %}
+{% url "clubmanager:notifications" as notifications_url %}
+{% url "clubmanager:conversations" as conversations_url %}
+{% url "clubmanager:settings" as settings_url %}
 
-        <div class="flex flex-col h-screen">
-            <div class="navbar bg-neutral text-neutral-content w-full px-4 py-2 z-50 min-h-fit">
-                <div class="flex-1 lg:mx-2 lg:px-2 gap-2 flex flex-row items-center text-2xl font-jersey tracking-wide">
-                    <a href="{% url "home" %}" class="nav-link flex flex-row items-center gap-2" hx-get="{{ news_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
-                        {% if CM_CLUB_LOGO != "" %}
-                            <div class="h-16 aspect-[1/1] my-2 hidden lg:flex">
-                                <img src="{% static CM_CLUB_LOGO %}" class="p-1 bg-base-100 rounded-full object-contain" alt="{{ CM_CLUB_NAME }} logo" />
-                            </div>
-                        {% endif %}
-
-                        <div>
-                            {% if CM_CLUB_NAME != "ClubManager" %}
-                                <span>{{ CM_CLUB_NAME }}</span>
-                                <span class="hidden lg:flex">ClubManager</span>
-                            {% else %}
-                                <span>ClubManager</span>
-                            {% endif %}
-                        </div>
-                    </a>
-                </div>
+<div class="flex flex-col h-screen">
+    <div class="navbar bg-neutral text-neutral-content w-full px-4 py-2 z-50 min-h-fit">
+        <div class="flex-1 lg:mx-2 lg:px-2 gap-2 flex flex-row items-center text-2xl font-jersey tracking-wide">
+            <a href="{% url "home" %}" class="nav-link flex flex-row items-center gap-2" hx-get="{{ news_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML" id="home_nav_top">
+                {% if CM_CLUB_LOGO != "" %}
+                    <div class="h-16 aspect-[1/1] my-2 hidden lg:flex">
+                        <img src="{% static CM_CLUB_LOGO %}" class="p-1 bg-base-100 rounded-full object-contain" alt="{{ CM_CLUB_NAME }} logo"/>
+                    </div>
+                {% endif %}
 
                 <div>
-                    <ul class="menu menu-horizontal gap-2" hx-trigger="every 60s" hx-get="{% url "clubmanager:check" %}" hx-target="#conversations_icon" hx-swap="outerHTML">
-                        <li class="border rounded-md border-neutral {% if calendar_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block">
-                            <a href="{{ calendar_url }}" class="group nav-link" hx-get="{{ calendar_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
+                    {% if CM_CLUB_NAME != "ClubManager" %}
+                        <span>{{ CM_CLUB_NAME }}</span>
+                        <span class="hidden lg:flex">ClubManager</span>
+                    {% else %}
+                        <span>ClubManager</span>
+                    {% endif %}
+                </div>
+            </a>
+        </div>
+
+        <div>
+            <ul class="menu menu-horizontal gap-2" hx-trigger="every 60s" hx-get="{% url "clubmanager:check" %}" hx-target="#conversations_icon" hx-swap="outerHTML">
+                <li class="border rounded-md border-neutral {% if calendar_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block" id="calendar_nav_top">
+                    <a href="{{ calendar_url }}" class="group nav-link" hx-get="{{ calendar_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
                                 <span class="flex flex-row items-center gap-2">
                                     <span class="icon icon-rounded group-hover:icon-filled {% if calendar_url in request.path %}icon-filled{% endif %}">calendar_month</span>
                                     <span>{% translate "Calendar" %}</span>
                                 </span>
-                            </a>
-                        </li>
+                    </a>
+                </li>
 
-                        <li  class="border rounded-md border-neutral {% if conversations_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block">
-                            <a href="{{ conversations_url }}" class="group nav-link" hx-get="{{ conversations_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
+                <li class="border rounded-md border-neutral {% if conversations_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block" id="conversations_nav_top">
+                    <a href="{{ conversations_url }}" class="group nav-link" hx-get="{{ conversations_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
                                 <span class="flex flex-row items-center gap-2">
                                     {% partialdef conversations_icon inline %}
                                         {% if unread_messages_count >= 1 %}
@@ -86,11 +86,11 @@
 
                                     <span>{% translate "Conversations" %}</span>
                                 </span>
-                            </a>
-                        </li>
+                    </a>
+                </li>
 
-                        <li  class="border rounded-md border-neutral {% if notifications_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block">
-                            <a href="{{ notifications_url }}" class="group nav-link" hx-get="{{ notifications_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
+                <li class="border rounded-md border-neutral {% if notifications_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block" id="notifications_nav_top">
+                    <a href="{{ notifications_url }}" class="group nav-link" hx-get="{{ notifications_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
                                 <span class="flex flex-row items-center gap-2">
                                     {% partialdef notifications_icon inline %}
                                         {% if unread_notification_count >= 1 %}
@@ -105,181 +105,186 @@
 
                                     <span>{% translate "Notifications" %}</span>
                                 </span>
-                            </a>
-                        </li>
+                    </a>
+                </li>
 
-                        <li class="border rounded-md border-neutral {% if settings_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block">
-                            <a href="{{ settings_url }}" class="group nav-link" hx-get="{{ settings_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
+                <li class="border rounded-md border-neutral {% if settings_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block" id="settings_nav_top">
+                    <a href="{{ settings_url }}" class="group nav-link" hx-get="{{ settings_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
                                 <span class="flex flex-row items-center gap-2">
                                     <span class="icon icon-rounded group-hover:icon-filled {% if settings_url in request.path %}icon-filled{% endif %}">settings</span>
                                     <span>{% translate "Settings" %}</span>
                                 </span>
-                            </a>
-                        </li>
+                    </a>
+                </li>
 
-                        {% if request.user.is_staff %}
-                            <li  class="border rounded-md border-neutral {% if settings_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block">
-                                <a href="{{ settings_url }}" class="group nav-link">
+                {% if request.user.is_staff %}
+                    <li class="border rounded-md border-neutral {% if settings_url in request.path %}border-neutral-content{% endif %} hover:border-neutral-content hidden lg:block" id="admin_nav_top">
+                        <a href="{{ settings_url }}" class="group nav-link">
                                 <span class="flex flex-row items-center gap-2">
                                     <span class="icon icon-rounded group-hover:icon-filled {% if settings_url in request.path %}icon-filled{% endif %}">shield_person</span>
                                     <span>{% translate "Admin" %}</span>
                                 </span>
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
 
-            <div class="m-4 mb-2 lg:m-12 lg:mb-0 grow pb-20 lg:pb-0">
-                <div class="max-w-screen-2xl mx-auto">
-                    <div class="my-8">
-                        <div class="flex flex-row gap-6">
-                            <div class="grow">
-                                <h1 class="text-3xl font-bold grow mb-8" id="title_block">{% block title %}{% endblock title %}</h1>
+    <div class="m-4 mb-2 lg:m-12 lg:mb-0 grow pb-20 lg:pb-0">
+        <div class="max-w-screen-2xl mx-auto">
+            <div class="my-8">
+                <div class="flex flex-row gap-6">
+                    <div class="grow">
+                        <h1 class="text-3xl font-bold grow mb-8" id="title_block">{% block title %}{% endblock title %}</h1>
 
-                                {% block content %}
-                                    <div id="content_block"></div>
-                                {% endblock content %}
-                            </div>
+                        {% block content %}
+                            <div id="content_block"></div>
+                        {% endblock content %}
+                    </div>
 
-                            <div class="basis-1/4 shrink-0 hidden lg:flex flex-col gap-4">
-                                <div id="upcoming activities" hx-get="{% url "clubmanager:sidebar_upcoming_activities" %}" hx-trigger="revealed, registrationsUpdated from:body">
-                                    {% translate "No upcoming activities found" %}
-                                </div>
-                            </div>
+                    <div class="basis-1/4 shrink-0 hidden lg:flex flex-col gap-4">
+                        <div id="upcoming activities" hx-get="{% url "clubmanager:sidebar_upcoming_activities" %}" hx-trigger="revealed, registrationsUpdated from:body">
+                            {% translate "No upcoming activities found" %}
                         </div>
                     </div>
-
-
-                    <div class="lg:hidden">
-                        {% if sponsors|length > 0 %}
-                            <div class="font-jersey mb-2">Sponsors</div>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-center content-center">
-                                {% for sponsor in sponsors %}
-                                    {% if sponsor.url is not None %}
-                                        <a href="{{ sponsor.url }}">
-                                    {% endif %}
-
-                                    <div class="flex flex-col gap-2">
-                                        <img class="rounded-xl max-h-32 object-scale-down transform-gpu w-full max-w-fit" src="{% get_media_prefix %}{{ sponsor.logo }}" alt="{{ sponsor.name }}" loading="lazy"/>
-                                        <div class="text-sm font-jersey mx-auto">{{ sponsor.name }}</div>
-                                    </div>
-
-                                    {% if sponsor.url is not None %}
-                                        </a>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
                 </div>
             </div>
 
-            <footer class="hidden lg:flex footer footer-horizontal bg-neutral text-neutral-content items-center p-4 z-50">
-                <aside class="grid-flow-col items-center text-sm grow">
-                    <p class="font-jersey items-center flex gap-2">MIT License <span class="icon icon-rounded text-sm">copyright</span> {% now "Y" %} Bernard Siebens</p>
-                </aside>
-                <nav class="grid-flow-col gap-4 md:place-self-center md:justify-self-end items-center">
-                    <a href="https://github.com/bernardsiebens/clubmanager" target="_blank">
-                        <i class="fa-brands fa-github"></i>
-                    </a>
-                </nav>
-            </footer>
+
+            <div class="lg:hidden">
+                {% if sponsors|length > 0 %}
+                    <div class="font-jersey mb-2">Sponsors</div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-center content-center">
+                        {% for sponsor in sponsors %}
+                            {% if sponsor.url is not None %}
+                                <a href="{{ sponsor.url }}">
+                            {% endif %}
+
+                        <div class="flex flex-col gap-2">
+                            <img class="rounded-xl max-h-32 object-scale-down transform-gpu w-full max-w-fit" src="{% get_media_prefix %}{{ sponsor.logo }}" alt="{{ sponsor.name }}" loading="lazy"/>
+                            <div class="text-sm font-jersey mx-auto">{{ sponsor.name }}</div>
+                        </div>
+
+                        {% if sponsor.url is not None %}
+                            </a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
         </div>
+    </div>
 
-        <div class="dock lg:hidden bg-neutral text-neutral-content">
-            <a href="{{ news_url }}" class="group nav-bottom-link {% if news_url in request.path %}dock-active{% endif %}" hx-get="{{ news_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
-                <span class="icon icon-rounded group-hover:icon-filled {% if news_url in request.path %}icon-filled{% endif %}">home</span>
-                <span class="dock-label pb-2">{% translate "Home" %}</span>
+    <footer class="hidden lg:flex footer footer-horizontal bg-neutral text-neutral-content items-center p-4 z-50">
+        <aside class="grid-flow-col items-center text-sm grow">
+            <p class="font-jersey items-center flex gap-2">MIT License <span class="icon icon-rounded text-sm">copyright</span> {% now "Y" %} Bernard Siebens</p>
+        </aside>
+        <nav class="grid-flow-col gap-4 md:place-self-center md:justify-self-end items-center">
+            <a href="https://github.com/bernardsiebens/clubmanager" target="_blank">
+                <i class="fa-brands fa-github"></i>
             </a>
+        </nav>
+    </footer>
+</div>
 
-            <a href="{{ calendar_url }}" class="group nav-bottom-link {% if calendar_url in request.path %}dock-active{% endif %}" hx-get="{{ calendar_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">
-                <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if calendar_url in request.path %}icon-filled{% endif %}">calendar_month</span>
-                <span class="dock-label pb-2">{% translate "Calendar" %}</span>
-            </a>
+<div class="dock lg:hidden bg-neutral text-neutral-content">
+    <a href="{{ news_url }}" class="group nav-bottom-link {% if news_url in request.path %}dock-active{% endif %}" hx-get="{{ news_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML" id="home_nav_bottom">
+        <span class="icon icon-rounded group-hover:icon-filled {% if news_url in request.path %}icon-filled{% endif %}">home</span>
+        <span class="dock-label pb-2">{% translate "Home" %}</span>
+    </a>
 
-            <a href="{{ settings_url }}" class="group nav-bottom-link {% if settings_url in request.path %}dock-active{% endif %}">
-                <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if settings_url in request.path %}icon-filled{% endif %}">settings</span>
-                <span class="dock-label pb-2">{% translate "Settings" %}</span>
-            </a>
+    <a href="{{ calendar_url }}" class="group nav-bottom-link {% if calendar_url in request.path %}dock-active{% endif %}" hx-get="{{ calendar_url }}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML" id="calendar_nav_bottom">
+        <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if calendar_url in request.path %}icon-filled{% endif %}">calendar_month</span>
+        <span class="dock-label pb-2">{% translate "Calendar" %}</span>
+    </a>
 
-            {% if request.user.is_staff %}
-                <a href="{{ settings_url }}" class="group nav-bottom-link {% if calendar_url in request.path %}dock-active{% endif %}">
-                    <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if calendar_url in request.path %}icon-filled{% endif %}">shield_person</span>
-                    <span class="dock-label pb-2">{% translate "Admin" %}</span>
-                </a>
-            {% endif %}
-        </div>
+    <a href="{{ settings_url }}" class="group nav-bottom-link {% if settings_url in request.path %}dock-active{% endif %}" id="settings_nav_bottom">
+        <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if settings_url in request.path %}icon-filled{% endif %}">settings</span>
+        <span class="dock-label pb-2">{% translate "Settings" %}</span>
+    </a>
 
-        <script type="speculationrules">
-            {
-              "prefetch": [
-                {
-                  "source": "document",
-                  "where": {
-                    "selector_matches": "a[href^='/']"
-                  },
-                  "eagerness": "immediate"
-                }
-              ],
-              "prerender": [
-                {
-                  "source": "document",
-                  "where": {
-                    "selector_matches": "a[href^='/']"
-                  },
-                  "eagerness": "moderate"
-                }
-              ]
+    {% if request.user.is_staff %}
+        <a href="{{ settings_url }}" class="group nav-bottom-link {% if calendar_url in request.path %}dock-active{% endif %}" id="admin_nav_bottom">
+            <span class="icon icon-rounded group-hover:icon-filled transition-all duration-100 {% if calendar_url in request.path %}icon-filled{% endif %}">shield_person</span>
+            <span class="dock-label pb-2">{% translate "Admin" %}</span>
+        </a>
+    {% endif %}
+</div>
+
+<script type="speculationrules">
+    {
+      "prefetch": [
+        {
+          "source": "document",
+          "where": {
+            "selector_matches": "a[href^='/']"
+          },
+          "eagerness": "immediate"
+        }
+      ],
+      "prerender": [
+        {
+          "source": "document",
+          "where": {
+            "selector_matches": "a[href^='/']"
+          },
+          "eagerness": "moderate"
+        }
+      ]
+    }
+</script>
+
+<script type="text/javascript">
+    document.body.addEventListener("htmx:afterOnLoad", function (event) {
+        const clicked = event.detail.elt;
+        const clickedElementId = clicked.id === "" || clicked.id == null ? clicked.parentElement.id : clicked.id;
+
+        let elementBase = clickedElementId.split("_")[0];
+
+        if (clickedElementId === "upcoming_activities") {
+            elementBase = "calendar";
+        }
+
+        // Remove the current highlighted icons
+        document.querySelectorAll("a.nav-link span.icon").forEach(icon => {
+            icon.classList.remove("icon-filled");
+        });
+        document.querySelectorAll("li.border-neutral-content").forEach(li => {
+            li.classList.replace("border-neutral-content", "border-neutral");
+        });
+
+        document.querySelectorAll("a.nav-bottom-link span.icon").forEach(icon => {
+            icon.classList.remove("icon-filled");
+        });
+        document.querySelectorAll("a.dock-active").forEach(li => {
+            li.classList.remove("dock-active")
+        });
+
+        // Update the top navigation icon
+        const topNavigationIcon = document.querySelector("#" + elementBase + "_nav_top");
+        const bottomNavigationIcon = document.querySelector("#" + elementBase + "_nav_bottom");
+
+        if (topNavigationIcon) {
+            const icon = topNavigationIcon.querySelector(".icon");
+
+            if (icon) {
+                icon.classList.add("icon-filled");
             }
-        </script>
 
-        <script type="text/javascript">
-            // ToDo: Update this to use IDs on the different links to keep both the top and bottom navs in sync when switching pages.
+            topNavigationIcon.classList.replace("border-neutral", "border-neutral-content");
+        }
 
-            document.body.addEventListener("htmx:afterOnLoad", function(event) {
-               const clicked = event.detail.elt;
+        if (bottomNavigationIcon) {
+            const icon = bottomNavigationIcon.querySelector(".icon");
 
-               // Only proceed if the trigger is a nav link
-               if (clicked.classList.contains("nav-link")) {
-                   // Remove the 'icon-filled' and set border color to neutral
-                   document.querySelectorAll("a.nav-link span.icon").forEach(icon => {
-                       icon.classList.remove("icon-filled");
-                   });
-                   document.querySelectorAll("li.border-neutral-content").forEach(li => {
-                       li.classList.replace("border-neutral-content", "border-neutral");
-                   });
+            if (icon) {
+                icon.classList.add("icon-filled");
+            }
 
-                   const iconSpan = clicked.querySelector(".icon")
-                   if (iconSpan) {
-                       iconSpan.classList.add("icon-filled");
-                   }
-
-                   const parentLi = clicked.closest("li");
-                   if (parentLi) {
-                       parentLi.classList.replace("border-neutral", "border-neutral-content");
-                   }
-               }
-
-                // Only proceed if the trigger is a nav link
-                if (clicked.classList.contains("nav-bottom-link")) {
-                    // Remove the 'icon-filled' and set border color to neutral
-                    document.querySelectorAll("a.nav-bottom-link span.icon").forEach(icon => {
-                        icon.classList.remove("icon-filled");
-                    });
-                    document.querySelectorAll("a.dock-active").forEach(li => {
-                        li.classList.remove("dock-active")
-                    });
-
-                    const iconSpan = clicked.querySelector(".icon")
-                    if (iconSpan) {
-                        iconSpan.classList.add("icon-filled");
-                    }
-
-                    clicked.classList.add("dock-active");
-                }
-            });
-        </script>
-    </body>
+            bottomNavigationIcon.classList.add("dock-active");
+        }
+    });
+</script>
+</body>
 </html>

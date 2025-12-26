@@ -65,7 +65,8 @@
         {% endfor %}
     </ul>
 
-    <a class="w-full btn btn-sm btn-neutral btn-outline" href="{% url "clubmanager:calendar" %}" class="group nav-link" hx-get="{% url "clubmanager:calendar" %}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML">{% translate "Go to calendar" %}<span class="icon icon-rounded icon-20">arrow_right_alt</span></a>
+    <a class="w-full btn btn-sm btn-neutral btn-outline" href="{% url "clubmanager:calendar" %}" class="group nav-link" hx-get="{% url "clubmanager:calendar" %}" hx-push-url="true" hx-target="#content_block" hx-swap="outerHTML"
+       id="upcoming_activities">{% translate "Go to calendar" %}<span class="icon icon-rounded icon-20">arrow_right_alt</span></a>
 {% else %}
     <div class="mt-2 text-sm opacity-75">{% translate "No upcoming activities found ..." %}</div>
 {% endif %}
